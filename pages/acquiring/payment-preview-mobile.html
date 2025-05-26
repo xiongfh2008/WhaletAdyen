@@ -1,0 +1,786 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Mobile Payment - Whalet</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="../../styles/custom.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary-color: #7D33FF;
+            --primary-light: #f0e7ff;
+            --primary-dark: #6929D9;
+        }
+
+        body {
+            background: #f0f0f0;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            padding: 20px;
+        }
+
+        .phone-frame {
+            width: 375px;
+            height: 812px;
+            background: white;
+            border-radius: 40px;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            border: 12px solid #f8f8f8;
+        }
+        
+        .notch {
+            position: absolute;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 200px;
+            height: 30px;
+            background: #f8f8f8;
+            border-bottom-left-radius: 20px;
+            border-bottom-right-radius: 20px;
+            z-index: 100;
+        }
+
+        .content-container {
+            width: 100%;
+            height: 100%;
+            background: white;
+            overflow-y: auto;
+            position: relative;
+            padding-top: 44px;
+        }
+
+        .header {
+            padding: 15px;
+            background: var(--primary-color);
+            color: white;
+        }
+
+        .header-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .mobile-money-icon {
+            width: 24px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+        }
+
+        .mobile-money-icon img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+
+        .mobile-money-text {
+            color: white;
+            font-weight: 500;
+        }
+
+        .language-select {
+            color: white;
+            font-size: 14px;
+            border: none;
+            background: transparent;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .whalet-logo {
+            color: white;
+            font-weight: bold;
+            font-size: 18px;
+        }
+
+        .email {
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 14px;
+        }
+
+        .amount {
+            color: white;
+            font-size: 18px;
+            font-weight: 600;
+        }
+
+        .transaction-details {
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .transaction-details i {
+            font-size: 16px;
+        }
+
+        .payment-hint {
+            text-align: center;
+            color: #666;
+            font-size: 14px;
+            margin: 20px;
+        }
+
+        .form-section {
+            padding: 0 20px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            color: #666;
+            font-size: 14px;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+        }
+
+        .form-group input,
+        .form-group select {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #eee;
+            border-radius: 8px;
+            font-size: 16px;
+            background: #f9f9f9;
+        }
+
+        .form-group input[readonly] {
+            background: #f5f5f5;
+        }
+
+        .pay-button {
+            width: 100%;
+            padding: 16px;
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 500;
+            margin: 20px 0;
+            transition: background-color 0.3s ease;
+        }
+
+        .pay-button:hover {
+            background: var(--primary-dark);
+        }
+
+        .change-method {
+            width: 100%;
+            padding: 15px;
+            background: white;
+            border: 1px solid var(--primary-color);
+            border-radius: 8px;
+            text-align: center;
+            color: var(--primary-color);
+            font-size: 14px;
+            cursor: pointer;
+        }
+
+        .bottom-sheet {
+            position: fixed;
+            bottom: -100%;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 351px;
+            background: white;
+            border-radius: 20px 20px 0 0;
+            transition: bottom 0.3s ease-out;
+            z-index: 1000;
+            display: none;
+        }
+
+        .bottom-sheet.show {
+            bottom: 0;
+            display: block;
+        }
+
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+            z-index: 999;
+        }
+
+        .overlay.show {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .payment-method {
+            display: none;
+        }
+
+        .payment-method i {
+            display: none;
+        }
+
+        /* 添加状态栏样式 */
+        .status-bar {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 44px;
+            padding: 0 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            color: #000;
+            font-size: 14px;
+            font-weight: 500;
+            z-index: 1000;
+            background: white;
+        }
+
+        .status-bar-left {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .status-bar-time {
+            min-width: 54px;
+            text-align: center;
+            font-weight: 600;
+        }
+
+        .status-bar-right {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .signal-icon {
+            display: flex;
+            align-items: center;
+            gap: 2px;
+        }
+
+        .signal-bar {
+            width: 3px;
+            background: #000;
+            border-radius: 1px;
+        }
+
+        .signal-bar-1 { height: 5px; }
+        .signal-bar-2 { height: 7px; }
+        .signal-bar-3 { height: 9px; }
+        .signal-bar-4 { height: 11px; }
+
+        .wifi-icon {
+            font-size: 14px;
+            color: #000;
+        }
+
+        .battery-icon {
+            width: 25px;
+            height: 12px;
+            border: 1px solid #000;
+            border-radius: 3px;
+            padding: 1px;
+            position: relative;
+        }
+
+        .battery-icon::after {
+            content: '';
+            position: absolute;
+            right: -4px;
+            top: 3px;
+            width: 3px;
+            height: 4px;
+            background: #000;
+            border-radius: 0 2px 2px 0;
+        }
+
+        .battery-level {
+            height: 100%;
+            width: 80%;
+            background: #000;
+            border-radius: 1px;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus {
+            border-color: var(--primary-color);
+            outline: none;
+            box-shadow: 0 0 0 2px var(--primary-light);
+        }
+
+        /* 添加卡支付相关样式 */
+        .card-form {
+            padding: 0 20px;
+        }
+
+        .required-notice {
+            color: #666;
+            font-size: 14px;
+            margin: 20px 0;
+            text-align: center;
+        }
+
+        .card-logos {
+            display: flex;
+            gap: 8px;
+            margin-left: auto;
+            align-items: center;
+        }
+
+        .card-logos img {
+            height: 20px;
+            width: auto;
+            object-fit: contain;
+        }
+
+        .card-field {
+            margin-bottom: 20px;
+        }
+
+        .card-field label {
+            display: block;
+            color: #666;
+            font-size: 14px;
+            margin-bottom: 8px;
+        }
+
+        .card-field input {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 16px;
+            background: #fff;
+        }
+
+        .card-field input:focus {
+            border-color: var(--primary-color);
+            outline: none;
+            box-shadow: 0 0 0 2px var(--primary-light);
+        }
+
+        .card-row {
+            display: flex;
+            gap: 20px;
+        }
+
+        .card-field .hint {
+            color: #666;
+            font-size: 12px;
+            margin-top: 4px;
+        }
+
+        .card-input-icon {
+            position: relative;
+        }
+
+        .card-input-icon input {
+            padding-right: 40px;
+        }
+
+        .card-input-icon i {
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #666;
+        }
+
+        .payment-option {
+            display: flex;
+            align-items: center;
+            padding: 16px;
+            border-bottom: 1px solid #eee;
+            cursor: pointer;
+            transition: background-color 0.2s;
+            position: relative;
+        }
+
+        .payment-option:active {
+            background: #f5f5f5;
+        }
+
+        .option-icon {
+            width: 24px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 12px;
+        }
+
+        .option-icon img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+
+        .option-icon i {
+            font-size: 20px;
+            color: #666;
+        }
+
+        .payment-option span {
+            font-size: 16px;
+            color: #333;
+        }
+
+        .payment-option.selected {
+            background: var(--primary-light);
+        }
+
+        .payment-option.selected .option-icon i {
+            color: var(--primary-color);
+        }
+
+        .payment-option.selected span {
+            color: var(--primary-color);
+            font-weight: 500;
+        }
+
+        .payment-option .card-logos {
+            position: absolute;
+            right: 16px;
+            display: flex;
+            gap: 8px;
+        }
+
+        .payment-option .card-logos img {
+            height: 16px;
+            width: auto;
+            object-fit: contain;
+        }
+
+        .preview-buttons {
+            position: fixed;
+            left: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            z-index: 9999;
+        }
+
+        .preview-button {
+            padding: 12px 20px;
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            text-decoration: none;
+            text-align: center;
+            font-size: 14px;
+            transition: background-color 0.3s;
+            white-space: nowrap;
+        }
+
+        .preview-button:hover {
+            background: var(--primary-dark);
+        }
+
+        .preview-button.active {
+            background: var(--primary-dark);
+        }
+    </style>
+</head>
+<body>
+    <div class="preview-buttons">
+        <a href="payment-preview.html" class="preview-button">PC端效果</a>
+        <a href="payment-preview-mobile.html" class="preview-button active">移动端效果</a>
+    </div>
+    <div class="phone-frame">
+        <div class="status-bar">
+            <div class="status-bar-left">
+                <span class="status-bar-time">9:41</span>
+                                    </div>
+            <div class="status-bar-right">
+                <div class="signal-icon">
+                    <div class="signal-bar signal-bar-1"></div>
+                    <div class="signal-bar signal-bar-2"></div>
+                    <div class="signal-bar signal-bar-3"></div>
+                    <div class="signal-bar signal-bar-4"></div>
+                                </div>
+                <i class="fas fa-wifi wifi-icon"></i>
+                <div class="battery-icon">
+                    <div class="battery-level"></div>
+                            </div>
+                                    </div>
+                                </div>
+        <div class="notch"></div>
+        <div class="content-container">
+            <div class="header">
+                <div class="header-top">
+                    <div class="header-left">
+                        <div class="mobile-money-icon">
+                            <img src="../../assets/images/whaletlogolittile.png" alt="Mobile Money">
+                            </div>
+                        <span class="mobile-money-text">Cards</span>
+                                    </div>
+                    <div class="language-select">
+                        English
+                        <i class="fas fa-chevron-down"></i>
+                                </div>
+                            </div>
+                <div class="header-content">
+                    <div class="left-content">
+                        <div class="whalet-logo">whalet.</div>
+                        <div class="email">mdiandian@gmail.com</div>
+                                    </div>
+                    <div class="right-content">
+                        <div class="amount">NGN 372,132.65</div>
+                        <div class="transaction-details">
+                            Transaction details
+                            <i class="fas fa-info-circle"></i>
+                                </div>
+                            </div>
+                                </div>
+                            </div>
+
+            <div class="payment-hint">
+                All fields are required unless marked otherwise.
+                            </div>
+
+            <div class="card-form">
+                <div class="card-field">
+                    <label>Card number</label>
+                    <div class="card-input-icon">
+                        <input type="text" placeholder="0000 0000 0000 0000" maxlength="19">
+                        <i class="fas fa-credit-card"></i>
+                                    </div>
+                    <div class="card-logos">
+                        <img src="../../assets/images/Visa.svg" alt="Visa">
+                        <img src="../../assets/images/Mastercard.svg" alt="Mastercard">
+                        <img src="../../assets/images/American Express.svg" alt="American Express">
+                        <img src="../../assets/images/UnionPay.svg" alt="UnionPay">
+                        <img src="../../assets/images/jcb.svg" alt="JCB">
+                        <img src="../../assets/images/Diners.svg" alt="Diners">
+                                </div>
+                            </div>
+
+                <div class="card-row">
+                    <div class="card-field">
+                        <label>Expiry date</label>
+                        <div class="card-input-icon">
+                            <input type="text" placeholder="MM/YY" maxlength="5">
+                            <i class="fas fa-calendar"></i>
+                                    </div>
+                        <div class="hint">Front of card in MM/YY format</div>
+                            </div>
+
+                    <div class="card-field">
+                        <label>Security code</label>
+                        <div class="card-input-icon">
+                            <input type="text" placeholder="123" maxlength="4">
+                            <i class="fas fa-lock"></i>
+                                    </div>
+                        <div class="hint">3 digits on back of card</div>
+                                </div>
+                            </div>
+
+                <button class="pay-button">
+                    Pay NGN 372,132.65
+                </button>
+
+                <button class="change-method" id="changeMethodBtn">
+                    Change payment method
+                </button>
+                                </div>
+                            </div>
+                        </div>
+                        
+    <div class="overlay" id="overlay"></div>
+    <div class="bottom-sheet" id="paymentSheet">
+        <div style="padding: 20px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                <h3 style="font-size: 18px; font-weight: 600;">Select payment method</h3>
+                <button id="closeSheet" style="background: none; border: none;">
+                    <i class="fas fa-times"></i>
+                            </button>
+                        </div>
+            <div id="paymentOptions">
+                <!-- 支付选项将通过 JavaScript 动态添加 -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const changeMethodBtn = document.getElementById('changeMethodBtn');
+            const paymentSheet = document.getElementById('paymentSheet');
+            const overlay = document.getElementById('overlay');
+            const closeSheet = document.getElementById('closeSheet');
+            const paymentOptions = document.getElementById('paymentOptions');
+            const cardForm = document.querySelector('.card-form');
+
+            // 支付方式数据
+            const paymentMethods = [
+                { 
+                    id: 'cards', 
+                    name: 'Cards', 
+                    icon: 'fas fa-credit-card',
+                    logos: [
+                        '../../assets/images/Visa.svg',
+                        '../../assets/images/Mastercard.svg',
+                        '../../assets/images/American Express.svg'
+                    ]
+                },
+                { id: 'mobile-money', name: 'Mobile Money', icon: 'fas fa-wallet' },
+                { id: 'ussd', name: 'USSD', icon: 'fas fa-mobile-alt' },
+                { id: 'bank', name: 'Bank', icon: 'fas fa-university' },
+                { id: 'bank-transfer', name: 'Bank Transfer', icon: 'fas fa-exchange-alt' },
+                { id: 'apple-pay', name: 'Apple Pay', image: '../../assets/images/Apple Pay.svg' },
+                { id: 'google-pay', name: 'Google Pay', image: '../../assets/images/Google Pay.svg' },
+                { id: 'pix', name: 'Pix', image: '../../assets/images/Pix.svg' }
+            ];
+
+            // 更新页面标题和图标
+            function updatePaymentMethodUI(method) {
+                const headerText = document.querySelector('.mobile-money-text');
+                
+                // 只更新标题文本
+                headerText.textContent = method.name;
+
+                // 更新支付按钮文本
+                const payButton = document.querySelector('.pay-button');
+                payButton.textContent = `Pay with ${method.name}`;
+            }
+
+            // 生成支付方式选项
+            paymentMethods.forEach(method => {
+                const option = document.createElement('div');
+                option.className = 'payment-option';
+                if (method.id === 'cards') {
+                    option.classList.add('selected');
+                }
+                
+                let optionContent = `
+                    <div class="option-icon">
+                        ${method.image 
+                            ? `<img src="${method.image}" alt="${method.name}">`
+                            : `<i class="${method.icon}"></i>`
+                        }
+                    </div>
+                    <span>${method.name}</span>
+                `;
+
+                if (method.logos) {
+                    optionContent += `
+                        <div class="card-logos">
+                            ${method.logos.map(logo => `<img src="${logo}" alt="card">`).join('')}
+                        </div>
+                    `;
+                }
+
+                option.innerHTML = optionContent;
+
+                option.addEventListener('click', () => {
+                    // 更新选中状态
+                    document.querySelectorAll('.payment-option').forEach(opt => {
+                        opt.classList.remove('selected');
+                    });
+                    option.classList.add('selected');
+                    
+                    // 更新页面UI
+                    updatePaymentMethodUI(method);
+                    
+                    // 关闭底部弹出框
+                    closeBottomSheet();
+                });
+
+                paymentOptions.appendChild(option);
+            });
+
+            function openBottomSheet() {
+                paymentSheet.style.display = 'block';
+                setTimeout(() => {
+                    paymentSheet.classList.add('show');
+                    overlay.classList.add('show');
+                }, 10);
+            }
+
+            function closeBottomSheet() {
+                paymentSheet.classList.remove('show');
+                overlay.classList.remove('show');
+                setTimeout(() => {
+                    paymentSheet.style.display = 'none';
+                }, 300);
+            }
+
+            changeMethodBtn.addEventListener('click', openBottomSheet);
+            closeSheet.addEventListener('click', closeBottomSheet);
+            overlay.addEventListener('click', closeBottomSheet);
+
+            // 添加触摸滑动关闭功能
+            let startY = 0;
+            let currentY = 0;
+
+            paymentSheet.addEventListener('touchstart', (e) => {
+                startY = e.touches[0].clientY;
+            });
+
+            paymentSheet.addEventListener('touchmove', (e) => {
+                currentY = e.touches[0].clientY;
+                const diff = currentY - startY;
+                
+                if (diff > 0) {
+                    paymentSheet.style.transform = `translateY(${diff}px)`;
+                    e.preventDefault();
+                }
+            });
+
+            paymentSheet.addEventListener('touchend', () => {
+                const diff = currentY - startY;
+                if (diff > 100) {
+                    closeBottomSheet();
+                } else {
+                    paymentSheet.style.transform = '';
+                }
+                startY = 0;
+                currentY = 0;
+            });
+        });
+    </script>
+</body>
+</html> 

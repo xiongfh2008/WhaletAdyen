@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>添加银行卡 - Whalet</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body {
+            background-color: #f9fafb;
+        }
+        .form-input {
+            width: 100%;
+            padding: 0.5rem;
+            border: 1px solid #E5E7EB;
+            border-radius: 0.375rem;
+            font-size: 0.875rem;
+            height: 2.5rem;
+        }
+        .form-input:focus {
+            outline: none;
+            border-color: #7C3AED;
+            box-shadow: 0 0 0 1px #7C3AED;
+        }
+        .form-select {
+            width: 100%;
+            padding: 0.5rem;
+            border: 1px solid #E5E7EB;
+            border-radius: 0.375rem;
+            font-size: 0.875rem;
+            height: 2.5rem;
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
+            background-position: right 0.5rem center;
+            background-repeat: no-repeat;
+            background-size: 1.5em 1.5em;
+            padding-right: 2.5rem;
+        }
+        .form-select:focus {
+            outline: none;
+            border-color: #7C3AED;
+            box-shadow: 0 0 0 1px #7C3AED;
+        }
+        .file-upload-area {
+            border: 2px dashed #E5E7EB;
+            border-radius: 0.5rem;
+            padding: 1.25rem;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        .file-upload-area:hover {
+            border-color: #7C3AED;
+            background-color: #F5F3FF;
+        }
+        .location-selects {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 0.5rem;
+        }
+        .form-section {
+            background-color: #fff;
+            border-radius: 0.5rem;
+            overflow: hidden;
+        }
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1.5rem;
+        }
+        .form-grid-full {
+            grid-column: span 2;
+        }
+        @media (max-width: 640px) {
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+            .form-grid-full {
+                grid-column: span 1;
+            }
+        }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <div class="container mx-auto px-4 py-6">
+        <div class="max-w-6xl mx-auto bg-white rounded-lg shadow-sm">
+            <!-- 头部 -->
+            <div class="px-6 py-4 border-b border-gray-200">
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center">
+                        <a href="javascript:void(0)" onclick="window.history.back()" class="text-purple-600 hover:text-purple-700 mr-2">
+                            <i class="fas fa-arrow-left"></i>
+                        </a>
+                        <a href="javascript:void(0)" onclick="window.history.back()" class="text-purple-600 hover:text-purple-700 mr-4">返回</a>
+                        <h1 class="text-lg font-medium text-gray-800">信息确认</h1>
+                    </div>
+                    <a href="withdrawal.html?return_tab=bank-cards" class="text-gray-500 hover:text-gray-700">
+                        <i class="fas fa-times"></i>
+                    </a>
+                </div>
+            </div>
+
+            <!-- 表单内容 -->
+            <div class="p-6">
+                <form class="space-y-5">
+                    <div class="form-grid">
+                        <!-- 账户类型 -->
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1.5">
+                                账户类型
+                                <span class="text-xs text-gray-500 ml-1">Account Type</span>
+                            </label>
+                            <div class="form-input bg-gray-50">企业账户</div>
+                        </div>
+
+                        <!-- 账户币种 -->
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1.5">
+                                账户币种
+                                <span class="text-xs text-gray-500 ml-1">Currency</span>
+                            </label>
+                            <div class="form-input bg-gray-50">美元 USD</div>
+                        </div>
+
+                        <!-- 国家地区 -->
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1.5">
+                                国家地区
+                                <span class="text-xs text-gray-500 ml-1">Country/Region</span>
+                            </label>
+                            <div class="form-input bg-gray-50">美国</div>
+                        </div>
+
+                        <!-- 收款人名称 -->
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1.5">
+                                收款人名称
+                                <span class="text-xs text-gray-500 ml-1">Beneficiary's Name</span>
+                            </label>
+                            <div class="form-input bg-gray-50">Wahaha Group (Cecond branch company</div>
+                        </div>
+
+                        <!-- 银行名称 -->
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1.5">
+                                银行名称
+                                <span class="text-xs text-gray-500 ml-1">Beneficiary's Bank</span>
+                            </label>
+                            <div class="form-input bg-gray-50">Community Federal Savings Bank</div>
+                        </div>
+
+                        <!-- 银行账号 -->
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1.5">
+                                银行账号
+                                <span class="text-xs text-gray-500 ml-1">Beneficiary's A/C No.</span>
+                            </label>
+                            <div class="form-input bg-gray-50">12345678555555</div>
+                        </div>
+
+                        <!-- 银行SwiftCode -->
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1.5">
+                                银行SwiftCode
+                                <span class="text-xs text-gray-500 ml-1">Beneficiary's Swift Code</span>
+                            </label>
+                            <div class="form-input bg-gray-50">CITIHKHXXXX</div>
+                        </div>
+
+                        <!-- routingNumber -->
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1.5">
+                                routingNumber
+                                <span class="text-xs text-gray-500 ml-1">Beneficiary's Routing Number</span>
+                            </label>
+                            <div class="form-input bg-gray-50">123456789</div>
+                        </div>
+
+                        <!-- 银行地址 -->
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1.5">
+                                银行地址
+                                <span class="text-xs text-gray-500 ml-1">Beneficiary's Bank Address</span>
+                            </label>
+                            <div class="form-input bg-gray-50">89-16 Jamaica Ave Woodhaven, NY</div>
+                        </div>
+
+                        <!-- 收款人地址 -->
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1.5">
+                                收款人地址
+                                <span class="text-xs text-gray-500 ml-1">Beneficiary's Address</span>
+                            </label>
+                            <div class="form-input bg-gray-50">ASDFASDF asd Alabama US</div>
+                        </div>
+
+                        <!-- 收款人邮政编码 -->
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1.5">
+                                收款人邮政编码
+                                <span class="text-xs text-gray-500 ml-1">Beneficiary's PostalCode</span>
+                            </label>
+                            <div class="form-input bg-gray-50">--</div>
+                        </div>
+
+                        <!-- 联系电话 -->
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1.5">
+                                联系电话
+                                <span class="text-xs text-gray-500 ml-1">Beneficiary's Mobile</span>
+                            </label>
+                            <div class="form-input bg-gray-50">--</div>
+                        </div>
+
+                        <!-- 邮箱 -->
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1.5">
+                                邮箱
+                                <span class="text-xs text-gray-500 ml-1">Beneficiary's Email</span>
+                            </label>
+                            <div class="form-input bg-gray-50">--</div>
+                        </div>
+                    </div>
+
+                    <!-- 提示信息 -->
+                    <div class="bg-yellow-50 p-4 rounded-md mt-6 border border-yellow-200">
+                        <div class="flex">
+                            <div class="flex-shrink-0">
+                                <i class="fas fa-exclamation-triangle text-yellow-400"></i>
+                            </div>
+                            <div class="ml-3">
+                                <p class="text-sm text-yellow-700">请仔细核对收款账户信息，银行账户信息错误将导致付款不成功，资金会被收款行退回，提现手续费将不予退回！</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 交易密码 -->
+                    <div class="pt-4">
+                        <div class="flex items-center space-x-4">
+                            <div class="flex-grow">
+                                <label class="block text-sm font-medium text-gray-700 mb-1.5">
+                                    <span class="text-red-500">*</span> 交易密码
+                                </label>
+                                <input type="password" placeholder="请输入交易密码" class="form-input" required>
+                            </div>
+                            <a href="#" class="text-purple-600 hover:text-purple-700 text-sm whitespace-nowrap">忘记交易密码？</a>
+                        </div>
+                    </div>
+
+                    <!-- 提交按钮 -->
+                    <div class="flex justify-center space-x-4 pt-4">
+                        <button type="button" onclick="window.history.back()" class="px-8 py-2.5 border border-gray-300 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors">
+                            上一步
+                        </button>
+                        <button type="submit" class="px-8 py-2.5 bg-purple-600 text-white rounded-md text-sm font-medium hover:bg-purple-700 transition-colors">
+                            确认
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // 表单提交处理
+            document.querySelector('form').addEventListener('submit', function(e) {
+                e.preventDefault();
+                // 这里添加表单验证和提交逻辑
+                // ...
+                
+                // 提交成功后返回到提现页面的银行卡tab
+                window.location.href = 'withdrawal.html?return_tab=bank-cards';
+            });
+
+            // 文件上传区域点击处理
+            const fileUploadArea = document.querySelector('.file-upload-area');
+            const fileInput = fileUploadArea.querySelector('input[type="file"]');
+            
+            fileUploadArea.addEventListener('click', () => {
+                fileInput.click();
+            });
+
+            fileInput.addEventListener('change', (e) => {
+                if (e.target.files.length > 0) {
+                    const fileName = e.target.files[0].name;
+                    const fileSize = (e.target.files[0].size / 1024 / 1024).toFixed(2);
+                    if (fileSize > 15) {
+                        alert('文件大小不能超过15M');
+                        return;
+                    }
+                    fileUploadArea.querySelector('span').textContent = fileName;
+                }
+            });
+        });
+    </script>
+</body>
+</html> 

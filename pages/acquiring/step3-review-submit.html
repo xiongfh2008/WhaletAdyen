@@ -1,0 +1,632 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>检查并提交申请 - 激活收单产品</title>
+    <link rel="stylesheet" href="../../styles/main.css">
+    <link rel="stylesheet" href="../../styles/header.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #7D33FF;
+            --primary-hover: #6929D4;
+            --primary-light: rgba(125, 51, 255, 0.1);
+            --bg-color: #FFFFFF;
+            --text-primary: #1F1F1F;
+            --text-secondary: #666666;
+            --border-color: #E5E5E5;
+            --success-color: #34C759;
+            --error-color: #FF3B30;
+            --card-shadow: 0 2px 8px rgba(125, 51, 255, 0.08);
+            --transition: all 0.2s ease-in-out;
+            --header-height: 56px;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            margin: 0;
+            padding: 0;
+            padding-top: var(--header-height);
+            background-color: #F8F7FF;
+            color: var(--text-primary);
+            line-height: 1.5;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 24px auto;
+            padding: 0 24px;
+            display: flex;
+            gap: 32px;
+        }
+
+        /* 左侧进度条样式 */
+        .progress-steps {
+            width: 240px;
+            min-width: 240px;
+            background-color: #fff;
+            border-radius: 12px;
+            padding: 24px;
+            box-shadow: var(--card-shadow);
+            position: sticky;
+            top: calc(var(--header-height) + 24px);
+            align-self: flex-start;
+            height: fit-content;
+        }
+
+        .step {
+            display: flex;
+            margin-bottom: 24px;
+            position: relative;
+            padding-left: 40px;
+        }
+
+        .step:last-child {
+            margin-bottom: 0;
+        }
+
+        .step::before {
+            content: "";
+            position: absolute;
+            left: 14px;
+            top: 24px;
+            bottom: -24px;
+            width: 2px;
+            background-color: var(--border-color);
+            transition: var(--transition);
+        }
+
+        .step:last-child::before {
+            display: none;
+        }
+
+        .step.active::before {
+            background-color: var(--primary-color);
+        }
+
+        .step.completed::before {
+            background-color: var(--primary-color);
+        }
+
+        .step-number {
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            background-color: var(--bg-color);
+            border: 2px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-secondary);
+            z-index: 1;
+            transition: var(--transition);
+        }
+
+        .step.active .step-number {
+            background-color: var(--primary-color);
+            border-color: var(--primary-color);
+            color: white;
+        }
+
+        .step.completed .step-number {
+            background-color: var(--primary-color);
+            border-color: var(--primary-color);
+            color: white;
+        }
+
+        .step-content {
+            flex: 1;
+        }
+
+        .step-title {
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--text-secondary);
+            margin-bottom: 4px;
+            transition: var(--transition);
+        }
+
+        .step.active .step-title {
+            color: var(--primary-color);
+            font-weight: 600;
+        }
+
+        .step.completed .step-title {
+            color: var(--primary-color);
+            font-weight: 600;
+        }
+
+        .step-desc {
+            font-size: 12px;
+            color: var(--text-secondary);
+            opacity: 0.8;
+            transition: var(--transition);
+        }
+
+        /* 右侧内容区域样式 */
+        .content-card {
+            flex: 1;
+            max-width: 680px;
+            background: var(--bg-color);
+            border-radius: 12px;
+            padding: 32px;
+            box-shadow: var(--card-shadow);
+        }
+
+        .section-title {
+            font-size: 20px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 32px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .review-section {
+            margin-bottom: 40px;
+        }
+
+        .review-section:last-child {
+            margin-bottom: 0;
+        }
+
+        .review-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .review-title i {
+            color: var(--primary-color);
+            font-size: 18px;
+        }
+
+        .review-content {
+            background-color: #F8F9FA;
+            border-radius: 8px;
+            padding: 20px;
+        }
+
+        .review-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            padding: 12px 0;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .review-item:first-child {
+            padding-top: 0;
+        }
+
+        .review-item:last-child {
+            padding-bottom: 0;
+            border-bottom: none;
+        }
+
+        .review-label {
+            font-size: 14px;
+            color: var(--text-secondary);
+            flex: 0 0 120px;
+        }
+
+        .review-value {
+            font-size: 14px;
+            color: var(--text-primary);
+            font-weight: 500;
+            flex: 1;
+            text-align: right;
+        }
+
+        .terms-section {
+            margin: 32px 0;
+            padding: 20px;
+            background-color: #F8F9FA;
+            border-radius: 8px;
+        }
+
+        .terms-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 12px;
+        }
+
+        .terms-content {
+            font-size: 14px;
+            color: var(--text-secondary);
+            line-height: 1.6;
+        }
+
+        .terms-checkbox {
+            margin-top: 16px;
+            display: flex;
+            align-items: flex-start;
+            gap: 8px;
+        }
+
+        .terms-checkbox input[type="checkbox"] {
+            margin-top: 4px;
+            accent-color: var(--primary-color);
+        }
+
+        .terms-checkbox label {
+            font-size: 14px;
+            color: var(--text-primary);
+            line-height: 1.5;
+        }
+
+        .terms-checkbox a {
+            color: var(--primary-color);
+            text-decoration: none;
+        }
+
+        .terms-checkbox a:hover {
+            text-decoration: underline;
+        }
+
+        .button-container {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 32px;
+            padding-top: 24px;
+            border-top: 1px solid var(--border-color);
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: var(--transition);
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-secondary {
+            background-color: white;
+            border: 1px solid var(--border-color);
+            color: var(--text-primary);
+        }
+
+        .btn-secondary:hover {
+            background-color: #F8F9FA;
+        }
+
+        .btn-primary {
+            background-color: var(--primary-color);
+            border: none;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background-color: var(--primary-hover);
+        }
+
+        .btn-primary:disabled {
+            background-color: #B3B3B3;
+            cursor: not-allowed;
+        }
+
+        .btn i {
+            font-size: 16px;
+        }
+
+        .error-message {
+            color: var(--error-color);
+            font-size: 14px;
+            margin-top: 8px;
+            display: none;
+        }
+
+        @media (max-width: 1024px) {
+            .container {
+                padding: 0 16px;
+                gap: 24px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                flex-direction: column;
+                padding: 16px;
+            }
+
+            .progress-steps {
+                width: 100%;
+                min-width: auto;
+                position: static;
+            }
+
+            .review-item {
+                flex-direction: column;
+                gap: 4px;
+            }
+
+            .review-label {
+                flex: none;
+            }
+
+            .review-value {
+                text-align: left;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="header-logo">
+            <img src="../../assets/images/whaletlogo2.png" alt="Whalet Logo">
+        </div>
+        <div class="header-divider"></div>
+        <span class="header-title">激活收单产品</span>
+        <i class="fas fa-times header-close" onclick="closeHeader()"></i>
+    </div>
+
+    <div class="container">
+        <!-- 左侧进度条 -->
+        <div class="progress-steps">
+            <div class="step completed">
+                <div class="step-number">1</div>
+                <div class="step-content">
+                    <div class="step-title">选择支付方式</div>
+                    <div class="step-desc">选择您需要的支付方式</div>
+                </div>
+            </div>
+            <div class="step completed">
+                <div class="step-number">2</div>
+                <div class="step-content">
+                    <div class="step-title">提供业务信息</div>
+                    <div class="step-desc">填写业务相关信息</div>
+                </div>
+            </div>
+            <div class="step active">
+                <div class="step-number">3</div>
+                <div class="step-content">
+                    <div class="step-title">检查并提交申请</div>
+                    <div class="step-desc">确认信息并提交</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 右侧内容 -->
+        <div class="content-card">
+            <h1 class="section-title">检查并提交申请</h1>
+
+            <!-- 支付方式信息 -->
+            <div class="review-section">
+                <h2 class="review-title">
+                    <i class="fas fa-credit-card"></i>
+                    支付方式
+                </h2>
+                <div class="review-content">
+                    <div class="review-item">
+                        <div class="review-value" id="selectedPayments">-</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 基本信息 -->
+            <div class="review-section">
+                <h2 class="review-title">
+                    <i class="fas fa-info-circle"></i>
+                    基本信息
+                </h2>
+                <div class="review-content">
+                    <div class="review-item">
+                        <div class="review-label">交易名称</div>
+                        <div class="review-value" id="tradeName">-</div>
+                    </div>
+                    <div class="review-item">
+                        <div class="review-label">行业</div>
+                        <div class="review-value" id="industry">-</div>
+                    </div>
+                    <div class="review-item">
+                        <div class="review-label">网址</div>
+                        <div class="review-value" id="websites">-</div>
+                    </div>
+                    <div class="review-item">
+                        <div class="review-label">业务描述</div>
+                        <div class="review-value" id="description">-</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 交易信息 -->
+            <div class="review-section">
+                <h2 class="review-title">
+                    <i class="fas fa-exchange-alt"></i>
+                    交易信息
+                </h2>
+                <div class="review-content">
+                    <div class="review-item">
+                        <div class="review-label">单笔平均交易金额</div>
+                        <div class="review-value" id="singleAmount">-</div>
+                    </div>
+                    <div class="review-item">
+                        <div class="review-label">单笔最大交易金额</div>
+                        <div class="review-value" id="maxAmount">-</div>
+                    </div>
+                    <div class="review-item">
+                        <div class="review-label">平均月交易额</div>
+                        <div class="review-value" id="monthlyAmount">-</div>
+                    </div>
+                    <div class="review-item">
+                        <div class="review-label">国际客户交易比例</div>
+                        <div class="review-value" id="internationalRatio">-</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 其他收单服务商 -->
+            <div class="review-section">
+                <h2 class="review-title">
+                    <i class="fas fa-building"></i>
+                    其他收单服务商
+                </h2>
+                <div class="review-content">
+                    <div class="review-item">
+                        <div class="review-label">是否使用其他收单服务商</div>
+                        <div class="review-value" id="otherProvider">-</div>
+                    </div>
+                    <div class="review-item" id="providersListItem" style="display: none;">
+                        <div class="review-label">使用的服务商</div>
+                        <div class="review-value" id="providersList">-</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 条款和协议 -->
+            <div class="terms-section">
+                <div class="terms-title">条款和协议</div>
+                <div class="terms-content">
+                    在提交申请之前，请仔细阅读并同意以下条款：
+                    <br><br>
+                    1. 您确认所提供的所有信息真实、准确、完整。
+                    <br>
+                    2. 您同意我们对您提供的信息进行核实和审查。
+                    <br>
+                    3. 您了解并接受我们的服务条款和隐私政策。
+                </div>
+                <div class="terms-checkbox">
+                    <input type="checkbox" id="termsCheckbox">
+                    <label for="termsCheckbox">
+                        我已阅读并同意<a href="#" target="_blank">服务条款</a>和<a href="#" target="_blank">隐私政策</a>
+                    </label>
+                </div>
+                <div class="error-message" id="errorMessage">请阅读并同意服务条款和隐私政策</div>
+            </div>
+
+            <!-- 按钮组 -->
+            <div class="button-container">
+                <button type="button" class="btn btn-secondary" onclick="goToPreviousStep()">
+                    <i class="fas fa-arrow-left"></i>
+                    上一步
+                </button>
+                <button type="button" class="btn btn-primary" id="submitButton" onclick="submitApplication()" disabled>
+                    <i class="fas fa-check"></i>
+                    提交申请
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function closeHeader() {
+            window.location.href = '../../index.html';
+        }
+
+        function goToPreviousStep() {
+            window.location.href = './step2-business-info.html';
+        }
+
+        function submitApplication() {
+            const checkbox = document.getElementById('termsCheckbox');
+            const errorMessage = document.getElementById('errorMessage');
+            const submitButton = document.getElementById('submitButton');
+
+            if (!checkbox.checked) {
+                errorMessage.style.display = 'block';
+                return;
+            }
+
+            // 禁用提交按钮防止重复提交
+            submitButton.disabled = true;
+            submitButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> 提交中...';
+
+            // 模拟提交过程
+            setTimeout(() => {
+                // 存储申请状态
+                localStorage.setItem('applicationSubmitted', 'true');
+                // 跳转到成功页面
+                window.location.href = './step4-success.html';
+            }, 1500);
+        }
+
+        // 初始化页面
+        document.addEventListener('DOMContentLoaded', function() {
+            // 获取之前保存的数据
+            const businessInfo = JSON.parse(localStorage.getItem('businessInfo') || '{}');
+            const paymentMethods = JSON.parse(localStorage.getItem('selectedPaymentMethods') || '[]');
+
+            // 填充基本信息
+            document.getElementById('tradeName').textContent = businessInfo.tradeName || '-';
+            document.getElementById('industry').textContent = businessInfo.industry || '-';
+            document.getElementById('description').textContent = businessInfo.description || '-';
+            
+            // 处理网址显示
+            const websiteUrls = businessInfo.websites || [];
+            document.getElementById('websites').innerHTML = websiteUrls.length > 0 
+                ? websiteUrls.map(url => `<div>${url}</div>`).join('')
+                : '-';
+
+            // 填充交易信息
+            document.getElementById('singleAmount').textContent = businessInfo.singleAmount ? `$${businessInfo.singleAmount} USD` : '-';
+            document.getElementById('maxAmount').textContent = businessInfo.maxAmount ? `$${businessInfo.maxAmount} USD` : '-';
+            document.getElementById('monthlyAmount').textContent = businessInfo.monthlyAmount ? `$${businessInfo.monthlyAmount} USD` : '-';
+            document.getElementById('internationalRatio').textContent = businessInfo.internationalRatio || '-';
+
+            // 填充支付方式信息
+            const paymentLogos = {
+                'Visa': '../../assets/images/Visa.svg',
+                'Mastercard': '../../assets/images/Mastercard.svg',
+                'American Express': '../../assets/images/American Express.svg',
+                'Google Pay': '../../assets/images/Google Pay.svg',
+                'Apple Pay': '../../assets/images/Apple Pay.svg',
+                'PayPal': '../../assets/images/paypal.svg',
+                'OXXO': '../../assets/images/OXXO.svg',
+                'OXXOPay': '../../assets/images/OXXOPay.svg',
+                'Mercado Pago': '../../assets/images/Mercado Pago.svg'
+            };
+
+            const paymentElements = paymentMethods.map(payment => {
+                const logoPath = paymentLogos[payment.name] || '../../assets/images/card-illustration.svg';
+                return `<div class="payment-item" style="display: flex; align-items: center; margin: 8px 0; font-size: 14px;">
+                    <div style="width: 32px; height: 20px; display: flex; align-items: center; justify-content: center; margin-right: 12px; background: #F8F9FA; border-radius: 4px; padding: 4px;">
+                        <img src="${logoPath}" alt="${payment.name}" style="max-width: 100%; max-height: 100%; object-fit: contain;">
+                    </div>
+                    <span style="color: #1F1F1F;">${payment.name}</span>
+                </div>`;
+            });
+            
+            document.getElementById('selectedPayments').innerHTML = paymentElements.length > 0
+                ? `<div style="display: flex; flex-direction: column; gap: 8px;">${paymentElements.join('')}</div>`
+                : '-';
+
+            // 填充其他收单服务商信息
+            const otherProviderText = businessInfo.otherProvider === 'yes' ? '是' : '否';
+            document.getElementById('otherProvider').textContent = otherProviderText;
+
+            if (businessInfo.otherProvider === 'yes' && businessInfo.selectedProviders) {
+                document.getElementById('providersListItem').style.display = 'flex';
+                document.getElementById('providersList').textContent = businessInfo.selectedProviders.join('、');
+            }
+
+            // 处理条款复选框
+            const checkbox = document.getElementById('termsCheckbox');
+            const submitButton = document.getElementById('submitButton');
+            const errorMessage = document.getElementById('errorMessage');
+
+            checkbox.addEventListener('change', function() {
+                submitButton.disabled = !this.checked;
+                errorMessage.style.display = 'none';
+            });
+        });
+    </script>
+</body>
+</html> 

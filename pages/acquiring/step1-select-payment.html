@@ -1,0 +1,1105 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>激活收单产品</title>
+    <link rel="stylesheet" href="../../styles/main.css">
+    <link rel="stylesheet" href="../../styles/header.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #7D33FF;
+            --primary-hover: #6929D4;
+            --primary-light: rgba(125, 51, 255, 0.1);
+            --bg-color: #FFFFFF;
+            --text-primary: #1F1F1F;
+            --text-secondary: #666666;
+            --border-color: #E5E5E5;
+            --success-color: #34C759;
+            --card-shadow: 0 2px 8px rgba(125, 51, 255, 0.08);
+            --transition: all 0.2s ease-in-out;
+            --spacing-xs: 4px;
+            --spacing-sm: 8px;
+            --spacing-md: 12px;
+            --spacing-lg: 16px;
+            --spacing-xl: 24px;
+            --radius-sm: 4px;
+            --radius-md: 6px;
+            --radius-lg: 8px;
+            --header-height: 56px;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            color: var(--text-primary);
+            line-height: 1.5;
+            background-color: #F8F7FF;
+            margin: 0;
+            padding: 0;
+            padding-top: var(--header-height);
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 24px auto;
+            padding: 0 24px;
+            display: flex;
+            gap: 32px;
+        }
+
+        /* 左侧进度条样式 */
+        .progress-steps {
+            width: 240px;
+            min-width: 240px;
+            background-color: #fff;
+            border-radius: 12px;
+            padding: 24px;
+            box-shadow: var(--card-shadow);
+            position: sticky;
+            top: calc(var(--header-height) + 24px);
+            align-self: flex-start;
+            height: fit-content;
+        }
+
+        .step {
+            display: flex;
+            margin-bottom: 24px;
+            position: relative;
+            padding-left: 40px;
+        }
+
+        .step:last-child {
+            margin-bottom: 0;
+        }
+
+        .step::before {
+            content: "";
+            position: absolute;
+            left: 14px;
+            top: 24px;
+            bottom: -24px;
+            width: 2px;
+            background-color: var(--border-color);
+            transition: var(--transition);
+        }
+
+        .step:last-child::before {
+            display: none;
+        }
+
+        .step.active::before {
+            background-color: var(--primary-color);
+        }
+
+        .step.completed::before {
+            background-color: var(--primary-color);
+        }
+
+        .step-number {
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            background-color: var(--bg-color);
+            border: 2px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-secondary);
+            z-index: 1;
+            transition: var(--transition);
+        }
+
+        .step.active .step-number {
+            background-color: var(--primary-color);
+            border-color: var(--primary-color);
+            color: white;
+        }
+
+        .step.completed .step-number {
+            background-color: var(--primary-color);
+            border-color: var(--primary-color);
+            color: white;
+        }
+
+        .step-content {
+            flex: 1;
+        }
+
+        .step-title {
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--text-secondary);
+            margin-bottom: 4px;
+            transition: var(--transition);
+        }
+
+        .step.active .step-title {
+            color: var(--primary-color);
+            font-weight: 600;
+        }
+
+        .step.completed .step-title {
+            color: var(--primary-color);
+            font-weight: 600;
+        }
+
+        .step-desc {
+            font-size: 12px;
+            color: var(--text-secondary);
+            opacity: 0.8;
+            transition: var(--transition);
+        }
+
+        /* 右侧内容区域样式 */
+        .content-card {
+            flex: 1;
+            max-width: 680px;
+            background: var(--bg-color);
+            border-radius: var(--radius-lg);
+            padding: var(--spacing-lg);
+            box-shadow: var(--card-shadow);
+        }
+
+        .section-title {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 16px;
+            color: var(--text-primary);
+        }
+
+        .payment-notice {
+            background-color: #F8F9FA;
+            border-radius: 8px;
+            padding: 12px 16px;
+            margin-bottom: 24px;
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+        }
+
+        .notice-icon {
+            color: var(--primary-color);
+            font-size: 16px;
+            margin-top: 3px;
+        }
+
+        .payment-notice p {
+            margin: 0;
+            color: var(--text-secondary);
+            font-size: 14px;
+            line-height: 1.5;
+            flex: 1;
+        }
+
+        .payment-notice a {
+            color: var(--primary-color);
+            text-decoration: none;
+        }
+
+        .payment-filters {
+            display: flex;
+            gap: 16px;
+            margin-bottom: 24px;
+            flex-wrap: wrap;
+        }
+
+        .search-input {
+            flex: 1;
+            min-width: 200px;
+            padding: 8px 16px;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            font-size: 14px;
+        }
+
+        .filter-button {
+            padding: 8px 16px;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            background: white;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 14px;
+            color: var(--text-primary);
+            min-width: 120px;
+        }
+
+        .payment-list {
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+        }
+
+        .payment-item {
+            display: flex;
+            align-items: center;
+            padding: 16px;
+            border-bottom: 1px solid var(--border-color);
+            background: white;
+            transition: background-color 0.2s;
+        }
+
+        .payment-item:hover {
+            background-color: var(--primary-light);
+        }
+
+        .payment-item:last-child {
+            border-bottom: none;
+        }
+
+        .payment-checkbox {
+            margin-right: 16px;
+            width: 18px;
+            height: 18px;
+            accent-color: var(--primary-color);
+        }
+
+        .payment-logo {
+            width: 40px;
+            height: 28px;
+            margin-right: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: transparent;
+            border-radius: 4px;
+            padding: 2px;
+        }
+
+        .payment-logo img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            display: block;
+        }
+
+        .payment-info {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+        }
+
+        .payment-name-container {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            min-width: 160px;
+        }
+
+        .payment-name {
+            font-size: 14px;
+            color: var(--text-primary);
+            font-weight: 500;
+        }
+
+        .payment-tag {
+            font-size: 12px;
+            color: #00A870;
+            background-color: #E6F6F0;
+            padding: 2px 8px;
+            border-radius: 4px;
+        }
+
+        .payment-type {
+            font-size: 14px;
+            color: var(--text-secondary);
+            min-width: 80px;
+            text-align: center;
+        }
+
+        .payment-status {
+            font-size: 14px;
+            color: var(--text-secondary);
+            min-width: 80px;
+            text-align: center;
+        }
+
+        .payment-time {
+            font-size: 14px;
+            color: var(--text-secondary);
+            min-width: 100px;
+            text-align: right;
+        }
+
+        .button-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 32px;
+            padding: 24px 0;
+            border-top: 1px solid var(--border-color);
+            background: white;
+        }
+
+        .btn {
+            padding: 14px 24px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            min-width: 120px;
+            justify-content: center;
+        }
+
+        .btn-secondary {
+            background-color: #F8F9FA;
+            border: 1px solid var(--border-color);
+            color: var(--text-primary);
+        }
+
+        .btn-secondary:hover {
+            background-color: #F1F3F5;
+        }
+
+        .btn-primary {
+            background-color: var(--primary-color);
+            border: none;
+            color: white;
+            font-weight: 600;
+        }
+
+        .btn-primary:hover {
+            background-color: var(--primary-hover);
+        }
+
+        .btn i {
+            font-size: 16px;
+        }
+
+        .button-right-wrapper {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+        }
+
+        .error-message {
+            color: #FF3B30;
+            font-size: 14px;
+            display: none;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 12px;
+        }
+
+        .error-message i {
+            font-size: 16px;
+        }
+
+        .error-message.show {
+            display: flex;
+        }
+
+        @media (max-width: 1024px) {
+            .container {
+                padding: 0 16px;
+                gap: 24px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                flex-direction: column;
+            }
+
+            .progress-steps {
+            width: 100%;
+                min-width: auto;
+                position: static;
+            }
+        }
+
+        /* 分页样式 */
+        .pagination {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-top: 24px;
+            padding: 16px;
+            background: #fff;
+            border-top: 1px solid var(--border-color);
+        }
+
+        .pagination-controls {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .pagination-btn {
+            width: 32px;
+            height: 32px;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            background: white;
+            color: var(--text-secondary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .pagination-btn:hover:not(:disabled) {
+            border-color: var(--primary-color);
+            color: var(--primary-color);
+        }
+
+        .pagination-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            background-color: #f5f5f5;
+        }
+
+        .pagination-number {
+            width: 32px;
+            height: 32px;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            background: white;
+            color: var(--text-primary);
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .pagination-number.active {
+            background: white;
+            color: var(--primary-color);
+            border-color: var(--primary-color);
+        }
+
+        .pagination-info {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .pagination-text {
+            color: var(--text-secondary);
+            font-size: 14px;
+        }
+
+        .pagination-select {
+            position: relative;
+            width: 80px;
+        }
+
+        .pagination-select select {
+            width: 100%;
+            height: 32px;
+            padding: 0 24px 0 12px;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            background: white;
+            color: var(--text-primary);
+            font-size: 14px;
+            appearance: none;
+            cursor: pointer;
+        }
+
+        .pagination-select i {
+            position: absolute;
+            right: 8px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-secondary);
+            pointer-events: none;
+        }
+
+        .pagination-total {
+            color: var(--text-secondary);
+            font-size: 14px;
+        }
+
+        .filter-dropdown {
+            position: relative;
+        }
+
+        .dropdown-menu {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            margin-top: 4px;
+            background: white;
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            min-width: 200px;
+            display: none;
+            z-index: 1000;
+        }
+
+        .dropdown-menu.show {
+            display: block;
+        }
+
+        .dropdown-item {
+            padding: 8px 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        .dropdown-item:hover {
+            background-color: var(--primary-light);
+        }
+
+        .dropdown-item input[type="checkbox"] {
+            width: 16px;
+            height: 16px;
+            accent-color: var(--primary-color);
+        }
+
+        .dropdown-item label {
+            font-size: 14px;
+            color: var(--text-primary);
+            cursor: pointer;
+        }
+
+        .dropdown-divider {
+            height: 1px;
+            background-color: var(--border-color);
+            margin: 4px 0;
+        }
+
+        .dropdown-item input[type="radio"] {
+            width: 16px;
+            height: 16px;
+            accent-color: var(--primary-color);
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="header-logo">
+            <img src="../../assets/images/whaletlogo2.png" alt="Whalet Logo">
+        </div>
+        <div class="header-divider"></div>
+        <span class="header-title">激活收单产品</span>
+        <i class="fas fa-times header-close" onclick="closeHeader()"></i>
+    </div>
+
+    <div class="container">
+            <!-- 左侧进度条 -->
+            <div class="progress-steps">
+                <div class="step active">
+                    <div class="step-number">1</div>
+                    <div class="step-content">
+                    <div class="step-title">选择支付方式</div>
+                    <div class="step-desc">选择您需要的支付方式</div>
+                    </div>
+                </div>
+                <div class="step">
+                    <div class="step-number">2</div>
+                    <div class="step-content">
+                    <div class="step-title">提供业务信息</div>
+                    <div class="step-desc">填写业务相关信息</div>
+                    </div>
+                </div>
+            <div class="step">
+                <div class="step-number">3</div>
+                <div class="step-content">
+                    <div class="step-title">检查并提交申请</div>
+                    <div class="step-desc">确认信息并提交</div>
+                            </div>
+                        </div>
+                    </div>
+
+        <!-- 右侧内容 -->
+        <div class="content-card">
+            <div class="section-title">选择支付方式</div>
+            
+            <!-- 支付说明 -->
+            <div class="payment-notice">
+                <i class="fas fa-exclamation-circle notice-icon"></i>
+                <p>您选择的某些支付方式有特定的网站和行业要求。如果您的网站和从事行业不符合这些标准，支付方式可能会被拒绝。您可以随时更新您的网站并重新申请。</p>
+            </div>
+
+            <!-- 筛选和搜索 -->
+            <div class="payment-filters">
+                <input type="text" class="search-input" placeholder="搜索支付方式名称">
+                <div class="filter-dropdown">
+                    <button class="filter-button" id="paymentTypeBtn">
+                        支付方式类型
+                        <i class="fas fa-chevron-down"></i>
+                    </button>
+                    <div class="dropdown-menu" id="paymentTypeMenu">
+                        <div class="dropdown-item">
+                            <input type="radio" name="paymentType" id="typeAll" checked>
+                            <label for="typeAll">ALL</label>
+                        </div>
+                        <div class="dropdown-divider"></div>
+                        <div class="dropdown-item">
+                            <input type="checkbox" id="typeCards">
+                            <label for="typeCards">Cards</label>
+                        </div>
+                        <div class="dropdown-item">
+                            <input type="checkbox" id="typeCash">
+                            <label for="typeCash">Cash</label>
+                        </div>
+                        <div class="dropdown-item">
+                            <input type="checkbox" id="typeWallets">
+                            <label for="typeWallets">Digital wallets</label>
+                        </div>
+                        <div class="dropdown-item">
+                            <input type="checkbox" id="typeMobile">
+                            <label for="typeMobile">Mobile Money</label>
+                        </div>
+                        <div class="dropdown-item">
+                            <input type="checkbox" id="typeBank">
+                            <label for="typeBank">Bank Transfer</label>
+                        </div>
+                        <div class="dropdown-item">
+                            <input type="checkbox" id="typeOthers">
+                            <label for="typeOthers">Others</label>
+                        </div>
+                    </div>
+                </div>
+                <div class="filter-dropdown">
+                    <button class="filter-button" id="regionBtn">
+                        消费者地区
+                        <i class="fas fa-chevron-down"></i>
+                    </button>
+                    <div class="dropdown-menu" id="regionMenu">
+                        <div class="dropdown-item">
+                            <input type="radio" name="region" id="regionAll" checked>
+                            <label for="regionAll">全球</label>
+                        </div>
+                        <div class="dropdown-divider"></div>
+                        <div class="dropdown-item">
+                            <input type="radio" name="region" id="regionChina">
+                            <label for="regionChina">中国</label>
+                        </div>
+                        <div class="dropdown-item">
+                            <input type="radio" name="region" id="regionUS">
+                            <label for="regionUS">美国</label>
+                        </div>
+                        <div class="dropdown-item">
+                            <input type="radio" name="region" id="regionEU">
+                            <label for="regionEU">欧盟</label>
+                        </div>
+                        <div class="dropdown-item">
+                            <input type="radio" name="region" id="regionUK">
+                            <label for="regionUK">英国</label>
+                        </div>
+                        <div class="dropdown-item">
+                            <input type="radio" name="region" id="regionJapan">
+                            <label for="regionJapan">日本</label>
+                        </div>
+                        <div class="dropdown-item">
+                            <input type="radio" name="region" id="regionKorea">
+                            <label for="regionKorea">韩国</label>
+                        </div>
+                        <div class="dropdown-item">
+                            <input type="radio" name="region" id="regionSEA">
+                            <label for="regionSEA">东南亚</label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 支付方式列表 -->
+            <div class="payment-list">
+                <div class="payment-item">
+                    <input type="checkbox" class="payment-checkbox">
+                    <div class="payment-logo">
+                        <img src="../../assets/images/Visa.svg" alt="Visa">
+                    </div>
+                    <div class="payment-info">
+                        <div class="payment-name-container">
+                            <span class="payment-name">Visa</span>
+                        </div>
+                        <span class="payment-type">Cards</span>
+                        <span class="payment-status">全球</span>
+                    </div>
+                </div>
+
+                <div class="payment-item">
+                    <input type="checkbox" class="payment-checkbox">
+                    <div class="payment-logo">
+                        <img src="../../assets/images/Mastercard.svg" alt="Mastercard">
+                    </div>
+                    <div class="payment-info">
+                        <div class="payment-name-container">
+                            <span class="payment-name">Mastercard</span>
+                        </div>
+                        <span class="payment-type">Cards</span>
+                        <span class="payment-status">全球</span>
+                    </div>
+                </div>
+
+                <div class="payment-item">
+                    <input type="checkbox" class="payment-checkbox">
+                    <div class="payment-logo">
+                        <img src="../../assets/images/American Express.svg" alt="American Express">
+                    </div>
+                    <div class="payment-info">
+                        <div class="payment-name-container">
+                            <span class="payment-name">American Express</span>
+                        </div>
+                        <span class="payment-type">Cards</span>
+                        <span class="payment-status">全球</span>
+                    </div>
+                </div>
+
+                <div class="payment-item">
+                    <input type="checkbox" class="payment-checkbox">
+                    <div class="payment-logo">
+                        <img src="../../assets/images/Apple Pay.svg" alt="Apple Pay">
+                    </div>
+                    <div class="payment-info">
+                        <div class="payment-name-container">
+                            <span class="payment-name">Apple Pay</span>
+                        </div>
+                        <span class="payment-type">Digital Wallets</span>
+                        <span class="payment-status">全球</span>
+                    </div>
+                </div>
+
+                <div class="payment-item">
+                    <input type="checkbox" class="payment-checkbox">
+                    <div class="payment-logo">
+                        <img src="../../assets/images/Google Pay.svg" alt="Google Pay">
+                    </div>
+                    <div class="payment-info">
+                        <div class="payment-name-container">
+                            <span class="payment-name">Google Pay</span>
+                        </div>
+                        <span class="payment-type">Digital Wallets</span>
+                        <span class="payment-status">全球</span>
+                    </div>
+                </div>
+
+            </div>
+            
+            <!-- 分页组件 -->
+            <div class="pagination">
+                <div class="pagination-controls">
+                    <button class="pagination-btn" title="首页">
+                        <i class="fas fa-angle-double-left"></i>
+                    </button>
+                    <button class="pagination-btn" title="上一页">
+                        <i class="fas fa-angle-left"></i>
+                    </button>
+                    <span class="pagination-number active">1</span>
+                    <button class="pagination-btn" title="下一页">
+                        <i class="fas fa-angle-right"></i>
+                    </button>
+                    <button class="pagination-btn" title="末页">
+                        <i class="fas fa-angle-double-right"></i>
+                    </button>
+                </div>
+                <div class="pagination-info">
+                    <span class="pagination-text">每页展示数量</span>
+                    <div class="pagination-select">
+                        <select>
+                            <option value="5">5</option>
+                            <option value="10">10</option>
+                            <option value="20">20</option>
+                            <option value="50">50</option>
+                        </select>
+                        <i class="fas fa-chevron-down"></i>
+                    </div>
+                    <span class="pagination-total">第 1 到 2 条（共 2 条）</span>
+                </div>
+            </div>
+
+            <!-- 按钮组 -->
+            <div class="button-container">
+                <button type="button" class="btn btn-secondary" onclick="history.back()">
+                    <i class="fas fa-arrow-left"></i>
+                    返回
+                </button>
+                <div class="button-right-wrapper">
+                    <div class="error-message">
+                        <i class="fas fa-exclamation-circle"></i>
+                        <span>请至少选择一种支付方式</span>
+                    </div>
+                    <button type="button" class="btn btn-primary" onclick="goToNextStep()">
+                        <i class="fas fa-arrow-right"></i>
+                        下一步
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function closeHeader() {
+            window.location.href = '../../index.html';
+        }
+
+        function showError(show) {
+            const errorMessage = document.querySelector('.error-message');
+            if (show) {
+                errorMessage.classList.add('show');
+            } else {
+                errorMessage.classList.remove('show');
+            }
+        }
+
+        function goToNextStep() {
+            // 检查是否选择了至少一个支付方式
+            const selectedPayments = document.querySelectorAll('.payment-checkbox:checked');
+            if (selectedPayments.length === 0) {
+                showError(true);
+                return;
+            }
+
+            showError(false);
+            // 存储选中的支付方式
+            const selectedPaymentMethods = Array.from(selectedPayments).map(checkbox => {
+                const paymentItem = checkbox.closest('.payment-item');
+                return {
+                    name: paymentItem.querySelector('.payment-name').textContent,
+                    type: paymentItem.querySelector('.payment-type').textContent
+                };
+            });
+            localStorage.setItem('selectedPaymentMethods', JSON.stringify(selectedPaymentMethods));
+
+            // 跳转到下一步
+            window.location.href = './step2-business-info.html';
+        }
+
+        // 分页功能
+        document.addEventListener('DOMContentLoaded', function() {
+            const paymentItems = document.querySelectorAll('.payment-item');
+            let itemsPerPage = 5; // 默认每页显示5条
+            let currentPage = 1;
+            let totalItems = paymentItems.length;
+
+            function updatePagination() {
+                const totalPages = Math.ceil(totalItems / itemsPerPage);
+                const start = (currentPage - 1) * itemsPerPage + 1;
+                const end = Math.min(currentPage * itemsPerPage, totalItems);
+
+                // 更新页码显示
+                document.querySelector('.pagination-number').textContent = currentPage;
+                
+                // 更新总数显示
+                document.querySelector('.pagination-total').textContent = 
+                    `第 ${start} 到 ${end} 条（共 ${totalItems} 条）`;
+
+                // 更新按钮状态
+                document.querySelector('button[title="首页"]').disabled = currentPage === 1;
+                document.querySelector('button[title="上一页"]').disabled = currentPage === 1;
+                document.querySelector('button[title="下一页"]').disabled = currentPage === totalPages;
+                document.querySelector('button[title="末页"]').disabled = currentPage === totalPages;
+
+                // 显示当前页的数据
+                paymentItems.forEach((item, index) => {
+                    item.style.display = (index >= start - 1 && index < end) ? 'flex' : 'none';
+                });
+            }
+
+            // 绑定分页按钮事件
+            document.querySelector('button[title="首页"]').addEventListener('click', () => {
+                if (currentPage !== 1) {
+                    currentPage = 1;
+                    updatePagination();
+                }
+            });
+
+            document.querySelector('button[title="上一页"]').addEventListener('click', () => {
+                if (currentPage > 1) {
+                    currentPage--;
+                    updatePagination();
+                }
+            });
+
+            document.querySelector('button[title="下一页"]').addEventListener('click', () => {
+                const totalPages = Math.ceil(totalItems / itemsPerPage);
+                if (currentPage < totalPages) {
+                    currentPage++;
+                    updatePagination();
+                }
+            });
+
+            document.querySelector('button[title="末页"]').addEventListener('click', () => {
+                const totalPages = Math.ceil(totalItems / itemsPerPage);
+                if (currentPage !== totalPages) {
+                    currentPage = totalPages;
+                    updatePagination();
+                }
+            });
+
+            // 绑定每页显示数量选择事件
+            document.querySelector('.pagination-select select').addEventListener('change', (e) => {
+                itemsPerPage = parseInt(e.target.value);
+                currentPage = 1; // 切换每页显示数量时重置到第一页
+                updatePagination();
+            });
+
+            // 初始化分页
+            updatePagination();
+        });
+
+        // 下拉菜单功能
+        document.addEventListener('DOMContentLoaded', function() {
+            const paymentTypeBtn = document.getElementById('paymentTypeBtn');
+            const paymentTypeMenu = document.getElementById('paymentTypeMenu');
+
+            // 点击按钮显示/隐藏下拉菜单
+            paymentTypeBtn.addEventListener('click', function(e) {
+                e.stopPropagation();
+                paymentTypeMenu.classList.toggle('show');
+            });
+
+            // 点击下拉菜单项不关闭菜单
+            paymentTypeMenu.addEventListener('click', function(e) {
+                e.stopPropagation();
+            });
+
+            // 点击页面其他地方关闭下拉菜单
+            document.addEventListener('click', function() {
+                paymentTypeMenu.classList.remove('show');
+            });
+
+            // 选择支付方式类型
+            const typeAll = document.getElementById('typeAll');
+            const typeCheckboxes = paymentTypeMenu.querySelectorAll('input[type="checkbox"]');
+
+            typeAll.addEventListener('change', function() {
+                if (this.checked) {
+                    typeCheckboxes.forEach(cb => {
+                        cb.checked = false;
+                    });
+                    filterPaymentMethods();
+                }
+            });
+
+            typeCheckboxes.forEach(checkbox => {
+                checkbox.addEventListener('change', function() {
+                    if (this.checked) {
+                        typeAll.checked = false;
+                    } else if (Array.from(typeCheckboxes).every(cb => !cb.checked)) {
+                        typeAll.checked = true;
+                    }
+                    filterPaymentMethods();
+                });
+            });
+
+            function filterPaymentMethods() {
+                if (typeAll.checked) {
+                    document.querySelectorAll('.payment-item').forEach(item => {
+                        item.style.display = 'flex';
+                    });
+                } else {
+                    const selectedTypes = Array.from(typeCheckboxes)
+                        .filter(cb => cb.checked)
+                        .map(cb => cb.id.replace('type', '').toLowerCase());
+
+                    const paymentItems = document.querySelectorAll('.payment-item');
+                    paymentItems.forEach(item => {
+                        const type = item.querySelector('.payment-type').textContent.toLowerCase();
+                        if (selectedTypes.length === 0 || selectedTypes.some(t => type.includes(t))) {
+                            item.style.display = 'flex';
+                        } else {
+                            item.style.display = 'none';
+                        }
+                    });
+                }
+
+                // 更新分页
+                updatePagination();
+            }
+
+            // 消费者地区筛选功能
+            const regionBtn = document.getElementById('regionBtn');
+            const regionMenu = document.getElementById('regionMenu');
+            const regionRadios = regionMenu.querySelectorAll('input[type="radio"]');
+
+            // 点击按钮显示/隐藏下拉菜单
+            regionBtn.addEventListener('click', function(e) {
+                e.stopPropagation();
+                regionMenu.classList.toggle('show');
+            });
+
+            // 点击下拉菜单项不关闭菜单
+            regionMenu.addEventListener('click', function(e) {
+                e.stopPropagation();
+            });
+
+            // 点击页面其他地方关闭下拉菜单
+            document.addEventListener('click', function() {
+                regionMenu.classList.remove('show');
+            });
+
+            // 选择地区
+            regionRadios.forEach(radio => {
+                radio.addEventListener('change', function() {
+                    filterByRegion();
+                });
+            });
+
+            function filterByRegion() {
+                const selectedRegion = document.querySelector('input[name="region"]:checked').id.replace('region', '').toLowerCase();
+                const paymentItems = document.querySelectorAll('.payment-item');
+                
+                paymentItems.forEach(item => {
+                    const region = item.querySelector('.payment-status').textContent.toLowerCase();
+                    if (selectedRegion === 'all' || region.includes(selectedRegion)) {
+                        // 如果当前项已经被支付方式类型筛选隐藏，则保持隐藏
+                        if (item.style.display !== 'none' || !typeCheckboxes.some(cb => cb.checked)) {
+                            item.style.display = 'flex';
+                        }
+                    } else {
+                        item.style.display = 'none';
+                    }
+                });
+
+                // 更新分页
+                updatePagination();
+            }
+
+            // 合并支付方式类型和地区的筛选
+            function filterPaymentMethods() {
+                if (typeAll.checked) {
+                    filterByRegion();
+                } else {
+                    const selectedTypes = Array.from(typeCheckboxes)
+                        .filter(cb => cb.checked)
+                        .map(cb => cb.id.replace('type', '').toLowerCase());
+
+                    const selectedRegion = document.querySelector('input[name="region"]:checked').id.replace('region', '').toLowerCase();
+                    const paymentItems = document.querySelectorAll('.payment-item');
+
+                    paymentItems.forEach(item => {
+                        const type = item.querySelector('.payment-type').textContent.toLowerCase();
+                        const region = item.querySelector('.payment-status').textContent.toLowerCase();
+                        
+                        if ((selectedTypes.length === 0 || selectedTypes.some(t => type.includes(t))) &&
+                            (selectedRegion === 'all' || region.includes(selectedRegion))) {
+                            item.style.display = 'flex';
+                        } else {
+                            item.style.display = 'none';
+                        }
+                    });
+                }
+
+                // 更新分页
+                updatePagination();
+            }
+        });
+    </script>
+</body>
+</html> 

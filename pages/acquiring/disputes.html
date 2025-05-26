@@ -1,0 +1,786 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>争议 - Whalet</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="../../styles/custom.css">
+    <style>
+        body {
+            background-color: #f9fafb;
+            font-family: 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+        }
+        .container {
+            max-width: 1280px;
+            margin: 0 auto;
+            padding: 1.5rem 1rem;
+        }
+        .tab-btn {
+            border-bottom: 2px solid transparent;
+            color: #6b7280;
+            transition: all 0.2s ease-in-out;
+        }
+        .tab-btn:hover {
+            color: #374151;
+            border-bottom-color: #d1d5db;
+        }
+        .tab-btn.active {
+            border-bottom: 2px solid #7D33FF;
+            color: #7D33FF;
+        }
+        .more-actions-dropdown {
+            position: absolute;
+            right: 0;
+            margin-top: 0.5rem;
+            z-index: 50;
+            min-width: 10rem;
+            padding: 0.5rem 0;
+            background-color: white;
+            border-radius: 0.375rem;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <div class="container mx-auto">
+        <!-- 将顶部导航和tab选项卡放在同一行 -->
+        <div class="bg-white rounded-lg shadow-sm mb-4">
+            <div class="border-b border-gray-200">
+                <div class="flex justify-between items-center">
+                    <nav class="flex justify-start -mb-px pl-6">
+                        <button class="tab-btn active whitespace-nowrap py-4 px-8 border-b-2 text-center text-sm font-medium" data-tab="disputes">
+                            争议管理
+                        </button>
+                    </nav>
+                    <div class="flex items-center space-x-6 pr-6">
+                        <!-- 公告图标 -->
+                        <div class="relative">
+                            <a href="#" class="text-gray-600 hover:text-blue-600">
+                                <span class="relative">
+                                    <i class="fas fa-bell text-lg"></i>
+                                    <span class="absolute -top-1 -right-1 w-2 h-2 bg-red-500 rounded-full"></span>
+                                </span>
+                            </a>
+                        </div>
+                        
+                        <!-- 帮助 -->
+                        <a href="#" class="text-gray-600 hover:text-blue-600 text-sm">帮助</a>
+                        
+                        <!-- 用户中心 -->
+                        <div class="relative">
+                            <button id="userCenterBtn" class="text-gray-600 hover:text-blue-600">
+                                <i class="fas fa-user-circle text-lg"></i>
+                            </button>
+                            <div id="userCenterDropdown" class="absolute right-0 top-full mt-1 w-64 bg-white rounded-lg shadow-lg py-3 hidden z-10">
+                                <!-- 用户信息部分 -->
+                                <div class="px-4 pb-3 border-b border-gray-100">
+                                    <div class="flex items-center justify-between mb-2">
+                                        <h3 class="font-medium text-gray-900">张珊珊</h3>
+                                        <a href="#" class="text-xs text-blue-600 hover:text-blue-700">升级为企业</a>
+                                    </div>
+                                    <div class="flex items-center justify-between mb-2">
+                                        <div class="flex items-center">
+                                            <span class="text-sm text-gray-600">ZHANG SHANSHAN</span>
+                                            <button class="ml-2 text-gray-400 hover:text-gray-600">
+                                                <i class="fas fa-edit text-xs"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                    <div class="flex items-center justify-between">
+                                        <span class="text-sm text-gray-600">ID</span>
+                                        <button class="text-gray-400 hover:text-gray-600">
+                                            <i class="fas fa-copy text-xs"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                                <!-- 菜单选项 -->
+                                <div class="py-1">
+                                    <a href="../security.html" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                        <i class="fas fa-shield-alt w-5 text-gray-400"></i>
+                                        安全设置
+                                    </a>
+                                    <a href="../authentication-info.html" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                        <i class="fas fa-id-card w-5 text-gray-400"></i>
+                                        认证信息
+                                    </a>
+                                    <a href="../fees.html" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                        <i class="fas fa-percentage w-5 text-gray-400"></i>
+                                        费率查询
+                                    </a>
+                                    <a href="../coupons.html" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                        <i class="fas fa-gift w-5 text-gray-400"></i>
+                                        我的优惠
+                                    </a>
+                                    <a href="../my-invitation.html" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                        <i class="fas fa-user-plus w-5 text-gray-400"></i>
+                                        我的邀请
+                                    </a>
+                                    <div class="border-t border-gray-100 my-1"></div>
+                                    <a href="../logout.html" class="block px-4 py-2 text-sm text-red-600 hover:bg-gray-100">
+                                        <i class="fas fa-sign-out-alt w-5"></i>
+                                        退出
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 争议统计 -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+            <div class="bg-white rounded-lg shadow p-6">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-sm text-gray-600">待处理争议</p>
+                        <h3 class="text-2xl font-bold text-red-600">3</h3>
+                    </div>
+                    <div class="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center">
+                        <i class="fas fa-exclamation-circle text-red-600 text-xl"></i>
+                    </div>
+                </div>
+            </div>
+            <div class="bg-white rounded-lg shadow p-6">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-sm text-gray-600">处理中争议</p>
+                        <h3 class="text-2xl font-bold text-yellow-600">5</h3>
+                    </div>
+                    <div class="w-12 h-12 bg-yellow-100 rounded-full flex items-center justify-center">
+                        <i class="fas fa-clock text-yellow-600 text-xl"></i>
+                    </div>
+                </div>
+            </div>
+            <div class="bg-white rounded-lg shadow p-6">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-sm text-gray-600">已解决争议</p>
+                        <h3 class="text-2xl font-bold text-green-600">12</h3>
+                    </div>
+                    <div class="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center">
+                        <i class="fas fa-check-circle text-green-600 text-xl"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 争议列表 -->
+        <div class="bg-white rounded-lg shadow overflow-hidden">
+            <div class="p-6 border-b border-gray-200">
+                <div class="flex justify-between items-center">
+                    <h2 class="text-xl font-semibold">争议列表</h2>
+                    <div class="flex space-x-2">
+                        <button id="filterBtn" class="px-4 py-2 bg-purple-600 text-white rounded hover:bg-purple-700">
+                            <i class="fas fa-filter mr-2"></i>筛选
+                        </button>
+                        <button class="px-4 py-2 bg-gray-100 text-gray-700 rounded hover:bg-gray-200">
+                            <i class="fas fa-download mr-2"></i>导出
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 查询条件 -->
+            <div id="filterPanel" class="p-6 border-b border-gray-200 hidden">
+                <div class="flex flex-wrap gap-4">
+                    <div class="flex items-center">
+                        <span class="mr-2 text-sm font-medium text-gray-700">状态:</span>
+                        <select class="p-2 text-sm border border-gray-300 rounded-md">
+                            <option value="">全部状态</option>
+                            <option value="pending">待处理</option>
+                            <option value="processing">处理中</option>
+                            <option value="resolved">已解决</option>
+                        </select>
+                    </div>
+                    <div class="flex items-center">
+                        <span class="mr-2 text-sm font-medium text-gray-700">拒付时间:</span>
+                        <input type="date" class="p-2 text-sm border border-gray-300 rounded-md" placeholder="开始日期" />
+                        <span class="mx-2">至</span>
+                        <input type="date" class="p-2 text-sm border border-gray-300 rounded-md" placeholder="结束日期" />
+                    </div>
+                    <div class="flex items-center">
+                        <span class="mr-2 text-sm font-medium text-gray-700">流水号:</span>
+                        <input type="text" class="p-2 text-sm border border-gray-300 rounded-md w-48" placeholder="请输入流水号" />
+                    </div>
+                    <div class="flex items-center">
+                        <span class="mr-2 text-sm font-medium text-gray-700">商户订单号:</span>
+                        <input type="text" class="p-2 text-sm border border-gray-300 rounded-md w-48" placeholder="请输入商户订单号" />
+                    </div>
+                </div>
+            </div>
+            
+            <div class="overflow-x-auto">
+                <table class="min-w-full divide-y divide-gray-200">
+                    <thead>
+                        <tr>
+                            <th class="px-3 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-[160px]">
+                                <div>交易流水号</div>
+                            </th>
+                            <th class="px-3 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-[160px]">
+                                <div>商户订单号</div>
+                            </th>
+                            <th class="px-3 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-[120px]">
+                                <div>交易网站</div>
+                            </th>
+                            <th class="px-3 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-[100px]">
+                                <div>交易时间</div>
+                            </th>
+                            <th class="px-3 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-[100px]">
+                                <div>拒付时间</div>
+                            </th>
+                            <th class="px-3 py-3 bg-gray-50 text-right text-xs font-medium text-gray-500 uppercase tracking-wider w-[100px]">
+                                <div>交易金额</div>
+                            </th>
+                            <th class="px-3 py-3 bg-gray-50 text-right text-xs font-medium text-gray-500 uppercase tracking-wider w-[100px]">
+                                <div>拒付金额</div>
+                            </th>
+                            <th class="px-3 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-[120px]">
+                                <div>拒付原因</div>
+                            </th>
+                            <th class="px-3 py-3 bg-gray-50 text-center text-xs font-medium text-gray-500 uppercase tracking-wider w-[100px]">
+                                <div>剩余申诉</div>
+                                <div class="text-[10px] font-normal normal-case text-gray-400 mt-1">天数</div>
+                            </th>
+                            <th class="px-3 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-[80px]">
+                                <div>状态</div>
+                            </th>
+                            <th class="px-3 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-[80px]">
+                                <div>操作</div>
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody class="bg-white divide-y divide-gray-200">
+                        <tr>
+                            <td class="px-3 py-4 whitespace-nowrap text-sm text-gray-900">TXN202403150001</td>
+                            <td class="px-3 py-4 whitespace-nowrap text-sm text-gray-900">ORD202403150001</td>
+                            <td class="px-3 py-4 whitespace-nowrap text-sm text-gray-900">example.com</td>
+                            <td class="px-3 py-4 whitespace-normal text-sm text-gray-500">
+                                <div>2024-03-15</div>
+                                <div>10:30:00</div>
+                            </td>
+                            <td class="px-3 py-4 whitespace-normal text-sm text-gray-500">
+                                <div>2024-03-15</div>
+                                <div>14:30:00</div>
+                            </td>
+                            <td class="px-3 py-4 whitespace-nowrap text-sm text-gray-900 text-right">$1,299.00</td>
+                            <td class="px-3 py-4 whitespace-nowrap text-sm text-gray-900 text-right">$1,299.00</td>
+                            <td class="px-3 py-4 whitespace-nowrap text-sm text-gray-900">商品未收到</td>
+                            <td class="px-3 py-4 whitespace-nowrap text-sm text-red-600 text-center">5天</td>
+                            <td class="px-3 py-4 whitespace-nowrap">
+                                <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800">待处理</span>
+                            </td>
+                            <td class="px-3 py-4 whitespace-nowrap text-sm font-medium">
+                                <a href="#" class="text-purple-600 hover:text-purple-900">处理</a>
+                                <a href="disputes-detail.html" class="text-purple-600 hover:text-purple-900 ml-2">详情</a>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="px-3 py-4 whitespace-nowrap text-sm text-gray-900">TXN202403150002</td>
+                            <td class="px-3 py-4 whitespace-nowrap text-sm text-gray-900">ORD202403150002</td>
+                            <td class="px-3 py-4 whitespace-nowrap text-sm text-gray-900">shop.example.com</td>
+                            <td class="px-3 py-4 whitespace-normal text-sm text-gray-500">
+                                <div>2024-03-15</div>
+                                <div>11:20:00</div>
+                            </td>
+                            <td class="px-3 py-4 whitespace-normal text-sm text-gray-500">
+                                <div>2024-03-15</div>
+                                <div>15:45:00</div>
+                            </td>
+                            <td class="px-3 py-4 whitespace-nowrap text-sm text-gray-900 text-right">$899.00</td>
+                            <td class="px-3 py-4 whitespace-nowrap text-sm text-gray-900 text-right">$899.00</td>
+                            <td class="px-3 py-4 whitespace-nowrap text-sm text-gray-900">商品描述不符</td>
+                            <td class="px-3 py-4 whitespace-nowrap text-sm text-yellow-600 text-center">8天</td>
+                            <td class="px-3 py-4 whitespace-nowrap">
+                                <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-100 text-yellow-800">处理中</span>
+                            </td>
+                            <td class="px-3 py-4 whitespace-nowrap text-sm font-medium">
+                                <a href="disputes-detail.html" class="text-purple-600 hover:text-purple-900">详情</a>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="px-3 py-4 whitespace-nowrap text-sm text-gray-900">TXN202403150003</td>
+                            <td class="px-3 py-4 whitespace-nowrap text-sm text-gray-900">ORD202403150003</td>
+                            <td class="px-3 py-4 whitespace-nowrap text-sm text-gray-900">store.example.com</td>
+                            <td class="px-3 py-4 whitespace-normal text-sm text-gray-500">
+                                <div>2024-03-15</div>
+                                <div>09:15:00</div>
+                            </td>
+                            <td class="px-3 py-4 whitespace-normal text-sm text-gray-500">
+                                <div>2024-03-15</div>
+                                <div>13:20:00</div>
+                            </td>
+                            <td class="px-3 py-4 whitespace-nowrap text-sm text-gray-900 text-right">$599.00</td>
+                            <td class="px-3 py-4 whitespace-nowrap text-sm text-gray-900 text-right">$599.00</td>
+                            <td class="px-3 py-4 whitespace-nowrap text-sm text-gray-900">重复扣款</td>
+                            <td class="px-3 py-4 whitespace-nowrap text-sm text-gray-500 text-center">-</td>
+                            <td class="px-3 py-4 whitespace-nowrap">
+                                <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">已解决</span>
+                            </td>
+                            <td class="px-3 py-4 whitespace-nowrap text-sm font-medium">
+                                <a href="disputes-detail.html" class="text-purple-600 hover:text-purple-900">详情</a>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- 分页 -->
+            <div class="px-6 py-4 border-t border-gray-200">
+                <div class="flex items-center justify-between">
+                    <div class="text-sm text-gray-500">
+                        共16页/80条数据
+                    </div>
+                    <div class="flex items-center space-x-1">
+                        <button class="px-3 py-1 border border-gray-300 rounded text-sm text-gray-700 hover:bg-gray-50 disabled:opacity-50" disabled>
+                            上一页
+                        </button>
+                        <button class="px-3 py-1 border border-blue-600 bg-blue-600 text-white rounded text-sm">1</button>
+                        <button class="px-3 py-1 border border-gray-300 rounded text-sm text-gray-700 hover:bg-gray-50">2</button>
+                        <button class="px-3 py-1 border border-gray-300 rounded text-sm text-gray-700 hover:bg-gray-50">3</button>
+                        <button class="px-3 py-1 border border-gray-300 rounded text-sm text-gray-700 hover:bg-gray-50">4</button>
+                        <button class="px-3 py-1 border border-gray-300 rounded text-sm text-gray-700 hover:bg-gray-50">5</button>
+                        <span class="px-2 py-1 text-sm text-gray-500">...</span>
+                        <button class="px-3 py-1 border border-gray-300 rounded text-sm text-gray-700 hover:bg-gray-50">16</button>
+                        <button class="px-3 py-1 border border-gray-300 rounded text-sm text-gray-700 hover:bg-gray-50">
+                            下一页
+                        </button>
+                        <div class="flex items-center ml-4">
+                            <span class="text-sm text-gray-700">跳至</span>
+                            <input type="text" class="w-12 h-7 mx-1 text-center text-sm border border-gray-300 rounded">
+                            <span class="text-sm text-gray-700">页</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 处理拒付弹框 -->
+    <div id="disputeModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 hidden items-center justify-center">
+        <div class="bg-white rounded-lg shadow-xl w-[600px]">
+            <!-- 弹框头部 -->
+            <div class="px-6 py-4 border-b border-gray-200 flex justify-between items-center">
+                <h3 class="text-lg font-medium text-gray-900">处理拒付</h3>
+                <button onclick="closeDisputeModal()" class="text-gray-400 hover:text-gray-500">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+
+            <!-- 弹框内容 -->
+            <div class="px-6 py-4">
+                <div class="mb-6">
+                    <div class="flex space-x-4">
+                        <button onclick="selectDisputeAction('appeal')" id="appealBtn" class="flex-1 py-2 px-4 rounded border text-center transition-colors">
+                            申诉拒付
+                        </button>
+                        <button onclick="selectDisputeAction('accept')" id="acceptBtn" class="flex-1 py-2 px-4 rounded border text-center transition-colors">
+                            接收拒付
+                        </button>
+                    </div>
+                </div>
+
+                <!-- 申诉拒付上传区域 -->
+                <div id="appealSection" class="hidden">
+                    <div class="mb-4">
+                        <h4 class="text-base font-medium text-gray-900 mb-2">提交以下文件以申诉拒付：</h4>
+                        <p class="text-sm text-gray-600 mb-2">在同一文件中提交您的申诉文件。请确保格式符合以下要求：</p>
+                        
+                        <div class="bg-gray-50 p-4 rounded-lg mb-4">
+                            <h5 class="font-medium mb-2">上传文件要求：</h5>
+                            <ul class="text-sm text-gray-600 list-disc list-inside space-y-1">
+                                <li>文件必须为英文</li>
+                                <li>可接受的格式和文件大小为JPG、TIFF（最大10MB）或PDF（最大2MB）</li>
+                                <li>为获得最佳效果，原始文件应为A4（21 x 29.7cm）或US Letter（8.5 x 11"）</li>
+                            </ul>
+                        </div>
+
+                        <div class="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center" id="dropZone">
+                            <div class="mb-3">
+                                <i class="fas fa-file-upload text-gray-400 text-3xl"></i>
+                            </div>
+                            <p class="text-gray-600 mb-2">点击上传或拖拽文件至此处</p>
+                            <p class="text-sm text-gray-500">支持 JPG、TIFF、PDF 格式</p>
+                            <input type="file" id="fileInput" class="hidden" accept=".jpg,.jpeg,.tiff,.pdf" onchange="handleFileSelect(event)">
+                        </div>
+                        <div id="fileList" class="mt-4 space-y-2"></div>
+                    </div>
+                </div>
+
+                <!-- 接收拒付提示 -->
+                <div id="acceptSection" class="hidden">
+                    <p class="text-gray-600 mb-4">您确定要接收此笔拒付吗？接收后将无法再次申诉。</p>
+                </div>
+
+                <!-- 警告提示 -->
+                <div class="bg-yellow-50 p-4 rounded-lg mb-4">
+                    <div class="flex">
+                        <div class="flex-shrink-0">
+                            <i class="fas fa-exclamation-triangle text-yellow-400"></i>
+                        </div>
+                        <div class="ml-3">
+                            <p class="text-sm text-yellow-700">
+                                提交后将无法更改您的申诉。
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 弹框底部 -->
+            <div class="px-6 py-4 border-t border-gray-200 flex justify-end">
+                <button onclick="closeDisputeModal()" class="mr-3 px-4 py-2 border border-gray-300 rounded-md text-sm text-gray-700 hover:bg-gray-50">
+                    取消
+                </button>
+                <button onclick="submitDispute()" id="submitBtn" class="px-4 py-2 bg-purple-600 text-white rounded-md text-sm hover:bg-purple-700" disabled>
+                    提交
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 查看申诉详情弹框 -->
+    <div id="viewDisputeModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 hidden items-center justify-center">
+        <div class="bg-white rounded-lg shadow-xl w-[600px]">
+            <!-- 弹框头部 -->
+            <div class="px-6 py-4 border-b border-gray-200 flex justify-between items-center">
+                <h3 class="text-lg font-medium text-gray-900">申诉详情</h3>
+                <button onclick="closeViewDisputeModal()" class="text-gray-400 hover:text-gray-500">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+
+            <!-- 弹框内容 -->
+            <div class="px-6 py-4">
+                <!-- 基本信息 -->
+                <div class="mb-6">
+                    <div class="flex items-center justify-between mb-4">
+                        <div class="text-sm text-gray-500">申诉提交时间</div>
+                        <div class="text-sm text-gray-900">2024-03-15 16:30:00</div>
+                    </div>
+                    <div class="flex items-center justify-between mb-4">
+                        <div class="text-sm text-gray-500">处理状态</div>
+                        <div class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-100 text-yellow-800">
+                            处理中
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 申诉材料 -->
+                <div class="mb-6">
+                    <h4 class="text-base font-medium text-gray-900 mb-4">申诉材料</h4>
+                    <div class="space-y-3">
+                        <div class="flex items-center justify-between bg-gray-50 p-3 rounded">
+                            <div class="flex items-center">
+                                <i class="fas fa-file-pdf text-red-400 mr-3"></i>
+                                <div>
+                                    <div class="text-sm text-gray-900">Transaction_Receipt.pdf</div>
+                                    <div class="text-xs text-gray-500">1.5 MB</div>
+                                </div>
+                            </div>
+                            <a href="#" class="text-purple-600 hover:text-purple-700 text-sm" onclick="downloadFile(event, 'Transaction_Receipt.pdf')">
+                                <i class="fas fa-download"></i>
+                            </a>
+                        </div>
+                        <div class="flex items-center justify-between bg-gray-50 p-3 rounded">
+                            <div class="flex items-center">
+                                <i class="fas fa-file-image text-blue-400 mr-3"></i>
+                                <div>
+                                    <div class="text-sm text-gray-900">Shipping_Document.jpg</div>
+                                    <div class="text-xs text-gray-500">2.3 MB</div>
+                                </div>
+                            </div>
+                            <a href="#" class="text-purple-600 hover:text-purple-700 text-sm" onclick="downloadFile(event, 'Shipping_Document.jpg')">
+                                <i class="fas fa-download"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 弹框底部 -->
+            <div class="px-6 py-4 border-t border-gray-200 flex justify-end">
+                <button onclick="closeViewDisputeModal()" class="px-4 py-2 border border-gray-300 rounded-md text-sm text-gray-700 hover:bg-gray-50">
+                    关闭
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // User center dropdown
+            const userCenterBtn = document.getElementById('userCenterBtn');
+            const userCenterDropdown = document.getElementById('userCenterDropdown');
+            
+            userCenterBtn.addEventListener('click', function() {
+                userCenterDropdown.classList.toggle('hidden');
+            });
+            
+            // Close dropdown when clicking outside
+            document.addEventListener('click', function(event) {
+                if (!userCenterBtn.contains(event.target) && !userCenterDropdown.contains(event.target)) {
+                    userCenterDropdown.classList.add('hidden');
+                }
+            });
+
+            // 筛选功能
+            const filterBtn = document.getElementById('filterBtn');
+            const filterPanel = document.getElementById('filterPanel');
+            
+            filterBtn.addEventListener('click', function() {
+                filterPanel.classList.toggle('hidden');
+                // 更新按钮样式
+                if (!filterPanel.classList.contains('hidden')) {
+                    filterBtn.classList.remove('bg-purple-600', 'hover:bg-purple-700');
+                    filterBtn.classList.add('bg-purple-700');
+                } else {
+                    filterBtn.classList.remove('bg-purple-700');
+                    filterBtn.classList.add('bg-purple-600', 'hover:bg-purple-700');
+                }
+            });
+
+            // 添加查询条件的重置和确认按钮
+            const filterForm = document.createElement('div');
+            filterForm.className = 'flex justify-end mt-4 space-x-2';
+            filterForm.innerHTML = `
+                <button type="button" class="px-4 py-2 border border-gray-300 rounded-md text-sm text-gray-700 hover:bg-gray-50" onclick="resetFilter()">
+                    重置
+                </button>
+                <button type="button" class="px-4 py-2 bg-purple-600 text-white rounded-md text-sm hover:bg-purple-700" onclick="applyFilter()">
+                    查询
+                </button>
+            `;
+            filterPanel.appendChild(filterForm);
+        });
+
+        // 重置筛选条件
+        function resetFilter() {
+            const filterPanel = document.getElementById('filterPanel');
+            const inputs = filterPanel.querySelectorAll('input');
+            const selects = filterPanel.querySelectorAll('select');
+            
+            inputs.forEach(input => {
+                input.value = '';
+            });
+            
+            selects.forEach(select => {
+                select.selectedIndex = 0;
+            });
+        }
+
+        // 应用筛选条件
+        function applyFilter() {
+            // 获取所有筛选条件的值
+            const status = document.querySelector('select').value;
+            const dateInputs = document.querySelectorAll('input[type="date"]');
+            const startDate = dateInputs[0].value;
+            const endDate = dateInputs[1].value;
+            const txnId = document.querySelector('input[placeholder="请输入流水号"]').value;
+            const orderId = document.querySelector('input[placeholder="请输入商户订单号"]').value;
+
+            // 这里可以添加实际的筛选逻辑
+            console.log('筛选条件：', {
+                status,
+                startDate,
+                endDate,
+                txnId,
+                orderId
+            });
+
+            // 隐藏筛选面板
+            document.getElementById('filterPanel').classList.add('hidden');
+            // 恢复按钮样式
+            const filterBtn = document.getElementById('filterBtn');
+            filterBtn.classList.remove('bg-purple-700');
+            filterBtn.classList.add('bg-purple-600', 'hover:bg-purple-700');
+        }
+
+        // 处理拒付相关的JavaScript
+        let currentDisputeAction = null;
+        let uploadedFiles = [];
+
+        function openDisputeModal() {
+            document.getElementById('disputeModal').classList.remove('hidden');
+            document.getElementById('disputeModal').classList.add('flex');
+            resetModal();
+        }
+
+        function closeDisputeModal() {
+            document.getElementById('disputeModal').classList.add('hidden');
+            document.getElementById('disputeModal').classList.remove('flex');
+            resetModal();
+        }
+
+        function resetModal() {
+            currentDisputeAction = null;
+            uploadedFiles = [];
+            document.getElementById('appealBtn').classList.remove('bg-purple-600', 'text-white');
+            document.getElementById('acceptBtn').classList.remove('bg-purple-600', 'text-white');
+            document.getElementById('appealSection').classList.add('hidden');
+            document.getElementById('acceptSection').classList.add('hidden');
+            document.getElementById('fileList').innerHTML = '';
+            document.getElementById('submitBtn').disabled = true;
+            document.getElementById('fileInput').value = '';
+        }
+
+        function selectDisputeAction(action) {
+            currentDisputeAction = action;
+            
+            // 更新按钮样式
+            document.getElementById('appealBtn').classList.remove('bg-purple-600', 'text-white');
+            document.getElementById('acceptBtn').classList.remove('bg-purple-600', 'text-white');
+            
+            if (action === 'appeal') {
+                document.getElementById('appealBtn').classList.add('bg-purple-600', 'text-white');
+                document.getElementById('appealSection').classList.remove('hidden');
+                document.getElementById('acceptSection').classList.add('hidden');
+                document.getElementById('submitBtn').disabled = uploadedFiles.length === 0;
+            } else {
+                document.getElementById('acceptBtn').classList.add('bg-purple-600', 'text-white');
+                document.getElementById('appealSection').classList.add('hidden');
+                document.getElementById('acceptSection').classList.remove('hidden');
+                document.getElementById('submitBtn').disabled = false;
+            }
+        }
+
+        // 文件上传相关
+        const dropZone = document.getElementById('dropZone');
+        const fileInput = document.getElementById('fileInput');
+
+        dropZone.addEventListener('click', () => {
+            fileInput.click();
+        });
+
+        dropZone.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            dropZone.classList.add('border-purple-500');
+        });
+
+        dropZone.addEventListener('dragleave', () => {
+            dropZone.classList.remove('border-purple-500');
+        });
+
+        dropZone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            dropZone.classList.remove('border-purple-500');
+            const files = e.dataTransfer.files;
+            handleFiles(files);
+        });
+
+        function handleFileSelect(event) {
+            const files = event.target.files;
+            handleFiles(files);
+        }
+
+        function handleFiles(files) {
+            for (const file of files) {
+                if (validateFile(file)) {
+                    uploadedFiles.push(file);
+                    displayFile(file);
+                }
+            }
+            document.getElementById('submitBtn').disabled = false;
+        }
+
+        function validateFile(file) {
+            const allowedTypes = ['image/jpeg', 'image/tiff', 'application/pdf'];
+            const maxSize = file.type === 'application/pdf' ? 2 * 1024 * 1024 : 10 * 1024 * 1024;
+            
+            if (!allowedTypes.includes(file.type)) {
+                alert('不支持的文件格式。请上传 JPG、TIFF 或 PDF 文件。');
+                return false;
+            }
+            
+            if (file.size > maxSize) {
+                alert('文件大小超出限制。PDF最大2MB，图片最大10MB。');
+                return false;
+            }
+            
+            return true;
+        }
+
+        function displayFile(file) {
+            const fileList = document.getElementById('fileList');
+            const fileItem = document.createElement('div');
+            fileItem.className = 'flex items-center justify-between bg-gray-50 p-3 rounded';
+            
+            const fileInfo = document.createElement('div');
+            fileInfo.className = 'flex items-center';
+            fileInfo.innerHTML = `
+                <i class="fas fa-file-alt text-gray-400 mr-3"></i>
+                <span class="text-sm text-gray-700">${file.name}</span>
+                <span class="text-xs text-gray-500 ml-2">(${(file.size / 1024 / 1024).toFixed(2)} MB)</span>
+            `;
+            
+            const removeBtn = document.createElement('button');
+            removeBtn.className = 'text-gray-400 hover:text-gray-600';
+            removeBtn.innerHTML = '<i class="fas fa-times"></i>';
+            removeBtn.onclick = () => {
+                fileItem.remove();
+                uploadedFiles = uploadedFiles.filter(f => f !== file);
+                document.getElementById('submitBtn').disabled = uploadedFiles.length === 0;
+            };
+            
+            fileItem.appendChild(fileInfo);
+            fileItem.appendChild(removeBtn);
+            fileList.appendChild(fileItem);
+        }
+
+        function submitDispute() {
+            // 这里添加提交逻辑
+            if (currentDisputeAction === 'appeal') {
+                console.log('提交申诉', uploadedFiles);
+            } else {
+                console.log('接收拒付');
+            }
+            closeDisputeModal();
+        }
+
+        // 为列表中的"处理"按钮添加点击事件
+        document.addEventListener('DOMContentLoaded', function() {
+            const handleButtons = document.querySelectorAll('a[href="#"]');
+            handleButtons.forEach(button => {
+                if (button.textContent.trim() === '处理') {
+                    button.addEventListener('click', function(e) {
+                        e.preventDefault();
+                        openDisputeModal();
+                    });
+                }
+            });
+        });
+
+        // 查看申诉详情相关的JavaScript
+        function openViewDisputeModal() {
+            document.getElementById('viewDisputeModal').classList.remove('hidden');
+            document.getElementById('viewDisputeModal').classList.add('flex');
+        }
+
+        function closeViewDisputeModal() {
+            document.getElementById('viewDisputeModal').classList.add('hidden');
+            document.getElementById('viewDisputeModal').classList.remove('flex');
+        }
+
+        function downloadFile(event, filename) {
+            event.preventDefault();
+            // 这里添加下载文件的逻辑
+            console.log('下载文件:', filename);
+        }
+
+        // 为列表中的"查看"按钮添加点击事件
+        document.addEventListener('DOMContentLoaded', function() {
+            const viewButtons = document.querySelectorAll('a[href="#"]');
+            viewButtons.forEach(button => {
+                if (button.textContent.trim() === '查看') {
+                    button.addEventListener('click', function(e) {
+                        e.preventDefault();
+                        openViewDisputeModal();
+                    });
+                }
+            });
+        });
+    </script>
+</body>
+</html> 

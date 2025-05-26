@@ -1,0 +1,1055 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Payment Preview - Whalet</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="../../styles/custom.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary-color: #7D33FF;
+            --primary-light: #f0e7ff;
+            --primary-dark: #6929D9;
+        }
+
+        body {
+            background-color: #f5f5f5;
+            font-family: 'Segoe UI', sans-serif;
+        }
+
+        .preview-buttons {
+            position: fixed;
+            left: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            z-index: 9999;
+        }
+
+        .preview-button {
+            padding: 12px 20px;
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            text-decoration: none;
+            text-align: center;
+            font-size: 14px;
+            transition: background-color 0.3s;
+            white-space: nowrap;
+        }
+
+        .preview-button:hover {
+            background: var(--primary-dark);
+        }
+
+        .preview-button.active {
+            background: var(--primary-dark);
+        }
+
+        .header-gradient {
+            background: linear-gradient(135deg, #7D33FF 0%, #6929D9 100%);
+            color: white;
+        }
+        .header-gradient select {
+            color: white;
+            background: transparent;
+        }
+        .header-gradient select option {
+            color: #333;
+            background: white;
+        }
+        .header-gradient .amount {
+            color: white;
+        }
+        .header-gradient .transaction-details {
+            color: rgba(255, 255, 255, 0.8);
+        }
+        .header-gradient .logo-text {
+            color: white;
+        }
+        .header-gradient .logo-image {
+            border-color: transparent;
+            background-color: transparent;
+        }
+        .payment-option {
+            transition: all 0.2s ease;
+            border: 1px solid transparent;
+            padding: 1rem;
+            cursor: pointer;
+            margin: 0;
+            border-bottom: 1px solid #eee;
+            height: 72px;
+            display: flex;
+            align-items: center;
+        }
+        .payment-option:hover {
+            background-color: #f8f9fa;
+        }
+        .payment-option.selected {
+            background-color: #f0e7ff;
+            border: 2px solid #7D33FF;
+            border-radius: 8px;
+            margin: 0.25rem 0;
+            position: relative;
+        }
+        
+        .payment-option.selected::after {
+            content: '\f00c';
+            font-family: 'Font Awesome 5 Free';
+            font-weight: 900;
+            position: absolute;
+            right: 1rem;
+            color: #7D33FF;
+        }
+        .payment-options-container {
+            display: flex;
+            flex-direction: column;
+            gap: 0;
+            max-height: 432px;
+            overflow: hidden;
+            transition: max-height 0.3s ease;
+        }
+        .payment-options-container.expanded {
+            max-height: 2000px;
+        }
+        .expand-button {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0.5rem;
+            color: #7D33FF;
+            cursor: pointer;
+            font-weight: 500;
+            margin-top: 0.5rem;
+            transition: all 0.2s ease;
+            font-size: 14px;
+        }
+        .expand-button:hover {
+            color: #6929D9;
+        }
+        .expand-button i {
+            margin-left: 0.5rem;
+            transition: transform 0.3s ease;
+        }
+        .expand-button.expanded i {
+            transform: rotate(180deg);
+        }
+        .logo-container {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .logo-image {
+            width: 24px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .logo-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+        .logo-text {
+            font-size: 18px;
+            font-weight: 600;
+        }
+        @media (max-width: 1024px) {
+            .layout-container {
+                flex-direction: column;
+            }
+            .layout-left, .layout-right {
+                width: 100%;
+            }
+        }
+        .pay-button {
+            background-color: #7D33FF;
+            color: white;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            width: 100%;
+            text-align: center;
+            font-weight: 600;
+            transition: all 0.2s ease;
+        }
+        .pay-button:hover {
+            background-color: #6929D9;
+        }
+        .amount-container {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            position: relative;
+        }
+        .amount {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: #333;
+        }
+        .transaction-details {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: #666;
+            font-size: 0.875rem;
+            cursor: pointer;
+        }
+        .tooltip {
+            position: absolute;
+            top: 100%;
+            right: 0;
+            background-color: white;
+            border: 1px solid #eee;
+            border-radius: 0.5rem;
+            padding: 1rem;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            width: 250px;
+            z-index: 10;
+            display: none;
+        }
+        .tooltip.show {
+            display: block;
+        }
+        .tooltip-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 0.5rem;
+            color: #666;
+            font-size: 0.875rem;
+        }
+        .tooltip-row:last-child {
+            margin-top: 0.5rem;
+            padding-top: 0.5rem;
+            border-top: 1px solid #eee;
+            font-weight: 600;
+        }
+        .input-error {
+            border-color: #EF4444 !important;
+        }
+        .input-error:focus {
+            border-color: #EF4444 !important;
+            box-shadow: 0 0 0 1px #EF4444 !important;
+        }
+        .icon-container i, .icon-container img {
+            transition: opacity 0.2s ease;
+        }
+        .icon-container i.visible, .icon-container img.visible {
+            opacity: 1 !important;
+        }
+    </style>
+</head>
+<body class="min-h-screen py-8">
+    <div class="preview-buttons">
+        <a href="payment-preview.html" class="preview-button active">PC端效果</a>
+        <a href="payment-preview-mobile.html" class="preview-button">移动端效果</a>
+    </div>
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="bg-white rounded-lg shadow-sm overflow-hidden">
+            <!-- Header -->
+            <div class="header-gradient">
+                <div class="flex justify-between items-center h-16 px-6">
+                    <div class="flex items-center space-x-4">
+                        <div class="logo-container">
+                            <div class="logo-image">
+                                <img src="../../assets/images/whaletlogolittile.png" alt="Whalet">
+                            </div>
+                        </div>
+                        <span class="text-white opacity-80">mdiandian@gmail.com</span>
+                    </div>
+                    <div class="flex items-center space-x-6">
+                        <select class="text-sm border-none focus:ring-0">
+                            <option value="en">English</option>
+                        </select>
+                        <div class="amount-container">
+                            <div class="amount" id="payment-amount">NGN 372,132.65</div>
+                            <div class="transaction-details">
+                                <span>Transaction details</span>
+                                <i class="fas fa-info-circle"></i>
+                            </div>
+                            <div class="tooltip">
+                                <div class="tooltip-row">
+                                    <span>Amount</span>
+                                    <span>EUR 15.00</span>
+                                </div>
+                                <div class="tooltip-row">
+                                    <span>Rate</span>
+                                    <span>COP 4,561.4608</span>
+                                </div>
+                                <div class="tooltip-row">
+                                    <span>Total</span>
+                                    <span>COP 68,421.91</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Main Content -->
+            <div class="flex layout-container">
+                <!-- Left Side - Payment Information -->
+                <div class="w-3/5 layout-left p-8 border-r border-gray-100">
+                    <!-- Default Payment Content -->
+                    <div class="max-w-lg mx-auto payment-content" id="default-payment-content">
+                        <h2 class="text-gray-600 text-lg mb-8 text-center">Please click the button below to pay with Mercado Pago</h2>
+                        
+                        <div class="space-y-6">
+                            <div class="space-y-2">
+                                <label class="text-gray-500 text-sm block">NAME</label>
+                                <input type="text" value="Alex xiong" class="w-full p-2 border border-gray-200 rounded" readonly>
+                            </div>
+                            
+                            <div class="space-y-2">
+                                <label class="text-gray-500 text-sm block">PHONE NUMBER</label>
+                                <input type="text" placeholder="Enter your document number" class="w-full p-2 border border-gray-200 rounded">
+                            </div>
+
+                            <div class="pt-4">
+                                <button class="pay-button">
+                                    Pay NGN 372,132.65
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Cards Payment Content -->
+                    <div class="max-w-lg mx-auto payment-content hidden" id="cards-payment-content">
+                        <div class="text-sm text-gray-600 mb-6">
+                            All fields are required unless marked otherwise.
+                        </div>
+                        
+                        <div class="space-y-6">
+                            <div class="space-y-2">
+                                <label class="text-gray-700 text-sm font-medium block">Card number</label>
+                                <div class="relative">
+                                    <input type="text" id="card-number" placeholder="0000 0000 0000 0000" class="w-full p-3 pr-12 border border-gray-300 rounded-md" maxlength="19">
+                                    <div class="absolute right-3 top-1/2 transform -translate-y-1/2 w-8 h-5 flex items-center justify-center">
+                                        <div class="icon-container relative w-full h-full">
+                                            <i class="fas fa-credit-card text-gray-400 absolute inset-0 flex items-center justify-center" id="default-card-icon"></i>
+                                            <i class="fas fa-exclamation-circle text-red-500 absolute inset-0 flex items-center justify-center opacity-0" id="error-card-icon"></i>
+                                            <img src="../../assets/images/Visa.svg" class="absolute inset-0 w-full h-full object-contain opacity-0" alt="Visa" data-card="visa">
+                                            <img src="../../assets/images/Mastercard.svg" class="absolute inset-0 w-full h-full object-contain opacity-0" alt="Mastercard" data-card="mastercard">
+                                            <img src="../../assets/images/American Express.svg" class="absolute inset-0 w-full h-full object-contain opacity-0" alt="American Express" data-card="amex">
+                                            <img src="../../assets/images/jcb.svg" class="absolute inset-0 w-full h-full object-contain opacity-0" alt="JCB" data-card="jcb">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div id="card-error" class="text-red-500 text-sm hidden">Enter the complete card number</div>
+                                <div class="flex items-center gap-3 mt-2" id="card-types">
+                                    <img src="../../assets/images/Visa.svg" class="h-5 w-auto object-contain" alt="Visa">
+                                    <img src="../../assets/images/Mastercard.svg" class="h-5 w-auto object-contain" alt="Mastercard">
+                                    <img src="../../assets/images/American Express.svg" class="h-5 w-auto object-contain" alt="American Express">
+                                    <img src="../../assets/images/jcb.svg" class="h-5 w-auto object-contain" alt="JCB">
+                                </div>
+                            </div>
+                            
+                            <div class="grid grid-cols-2 gap-4">
+                                <div class="space-y-2">
+                                    <label class="text-gray-700 text-sm font-medium block">Expiry date</label>
+                                    <div class="relative">
+                                        <input type="text" placeholder="MM/YY" class="w-full p-3 border border-gray-300 rounded-md" maxlength="5">
+                                        <div class="absolute right-3 top-1/2 transform -translate-y-1/2">
+                                            <i class="fas fa-calendar text-gray-400"></i>
+                                        </div>
+                                    </div>
+                                    <div class="text-xs text-gray-600">Front of card in MM/YY format</div>
+                                </div>
+                                
+                                <div class="space-y-2">
+                                    <label class="text-gray-700 text-sm font-medium block">Security code</label>
+                                    <div class="relative">
+                                        <input type="text" placeholder="123" class="w-full p-3 border border-gray-300 rounded-md" maxlength="4">
+                                        <div class="absolute right-3 top-1/2 transform -translate-y-1/2">
+                                            <i class="fas fa-lock text-gray-400"></i>
+                                        </div>
+                                    </div>
+                                    <div class="text-xs text-gray-600">3 digits on back of card</div>
+                                </div>
+                            </div>
+
+                            <div class="pt-4">
+                                <button class="pay-button" id="pay-button">
+                                    Pay USD 500.00
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 支付确认页面 -->
+                    <div class="max-w-lg mx-auto payment-content hidden" id="payment-confirmation">
+                        <div class="flex items-center gap-4 mb-6">
+                            <div class="w-12 h-12 bg-gray-100 rounded-lg flex items-center justify-center">
+                                <i class="fas fa-university text-gray-600"></i>
+                            </div>
+                            <div class="w-12 h-12 bg-gray-100 rounded-lg flex items-center justify-center">
+                                <i class="fas fa-credit-card text-gray-600"></i>
+                            </div>
+                        </div>
+                        <a href="#" class="text-blue-600 hover:text-blue-800 mb-6 inline-block" id="show-more-info">Show more info</a>
+
+                        <div class="bg-white rounded-lg p-6">
+                            <h2 class="text-gray-600 uppercase text-sm font-medium mb-4">TEST TRANSACTION DETAILS</h2>
+                            <div class="space-y-3">
+                                <div class="flex justify-between">
+                                    <span class="text-gray-900">Merchant</span>
+                                    <span class="text-gray-600">Credit Card</span>
+                                </div>
+                                <div class="flex justify-between">
+                                    <span class="text-gray-900">Amount</span>
+                                    <span class="text-gray-600">USD 500.00</span>
+                                </div>
+                                <div class="flex justify-between">
+                                    <span class="text-gray-900">Date</span>
+                                    <span class="text-gray-600" id="transaction-date"></span>
+                                </div>
+                                <div class="flex justify-between">
+                                    <span class="text-gray-900">Card</span>
+                                    <span class="text-gray-600" id="masked-card">****0000</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="mt-6">
+                            <h2 class="text-gray-600 uppercase text-sm font-medium mb-4">AUTHENTICATION DETAILS</h2>
+                            <div class="space-y-2">
+                                <div class="flex justify-between items-center">
+                                    <label class="text-gray-900">Password</label>
+                                    <a href="#" class="text-blue-600 hover:text-blue-800 text-sm" id="whats-this">What's this?</a>
+                                </div>
+                                <input type="text" placeholder="enter the word 'password'" class="w-full p-3 border border-gray-300 rounded-lg">
+                            </div>
+                        </div>
+
+                        <div class="flex gap-4 mt-6">
+                            <button class="flex-1 py-3 px-4 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50" id="cancel-button">
+                                Cancel
+                            </button>
+                            <button class="flex-1 py-3 px-4 bg-blue-900 text-white rounded-lg hover:bg-blue-800" id="ok-button">
+                                OK
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right Side - Payment Options -->
+                <div class="w-2/5 layout-right bg-gray-50 p-6">
+                    <h3 class="text-lg font-medium text-gray-900 mb-4">PAYMENT OPTIONS</h3>
+                    <div class="payment-options-container">
+                        <!-- Cards -->
+                        <div class="payment-option flex items-center justify-between selected" data-payment="cards">
+                            <div class="flex items-center">
+                                <div class="w-8 h-8 flex items-center justify-center">
+                                    <i class="fas fa-credit-card text-gray-600"></i>
+                                </div>
+                                <span class="ml-4 text-gray-900">Cards</span>
+                            </div>
+                        </div>
+
+                            <!-- USSD -->
+                            <div class="payment-option flex items-center justify-between" data-payment="ussd">
+                                <div class="flex items-center">
+                                    <div class="w-8 h-8 flex items-center justify-center">
+                                        <i class="fas fa-mobile-alt text-gray-600"></i>
+                                    </div>
+                                    <span class="ml-4 text-gray-900">USSD</span>
+                                </div>
+                            </div>
+
+                            <!-- Bank -->
+                            <div class="payment-option flex items-center justify-between" data-payment="bank">
+                                <div class="flex items-center">
+                                    <div class="w-8 h-8 flex items-center justify-center">
+                                        <i class="fas fa-university text-gray-600"></i>
+                                    </div>
+                                    <span class="ml-4 text-gray-900">Bank</span>
+                                </div>
+                            </div>
+
+                            <!-- Bank Transfer -->
+                            <div class="payment-option flex items-center justify-between" data-payment="bank-transfer">
+                                <div class="flex items-center">
+                                    <div class="w-8 h-8 flex items-center justify-center">
+                                        <i class="fas fa-exchange-alt text-gray-600"></i>
+                                    </div>
+                                    <span class="ml-4 text-gray-900">Bank Transfer</span>
+                                </div>
+                            </div>
+
+                            <!-- Mobile Money -->
+                        <div class="payment-option flex items-center justify-between" data-payment="mobile-money">
+                                <div class="flex items-center">
+                                    <div class="w-8 h-8 flex items-center justify-center">
+                                        <i class="fas fa-wallet text-gray-600"></i>
+                                    </div>
+                                    <span class="ml-4 text-gray-900">Mobile Money</span>
+                                </div>
+                            </div>
+
+                            <!-- Apple Pay -->
+                            <div class="payment-option flex items-center justify-between" data-payment="apple-pay">
+                                <div class="flex items-center">
+                                    <div class="w-8 h-8 flex items-center justify-center">
+                                        <img src="../../assets/images/Apple Pay.svg" class="w-6 h-6" alt="Apple Pay">
+                                    </div>
+                                    <span class="ml-4 text-gray-900">Apple Pay</span>
+                                </div>
+                            </div>
+
+                            <!-- Google Pay -->
+                            <div class="payment-option flex items-center justify-between" data-payment="google-pay">
+                                <div class="flex items-center">
+                                    <div class="w-8 h-8 flex items-center justify-center">
+                                        <img src="../../assets/images/Google Pay.svg" class="w-6 h-6" alt="Google Pay">
+                                    </div>
+                                    <span class="ml-4 text-gray-900">Google Pay</span>
+                                </div>
+                            </div>
+
+                            <!-- RapiPago -->
+                            <div class="payment-option flex items-center justify-between" data-payment="rapipago">
+                                <div class="flex items-center">
+                                    <div class="w-8 h-8 flex items-center justify-center">
+                                        <img src="../../assets/images/RapiPago.svg" class="w-6 h-6" alt="RapiPago">
+                                    </div>
+                                    <span class="ml-4 text-gray-900">RapiPago</span>
+                                </div>
+                            </div>
+
+                            <!-- Pagofacil -->
+                            <div class="payment-option flex items-center justify-between" data-payment="pagofacil">
+                                <div class="flex items-center">
+                                    <div class="w-8 h-8 flex items-center justify-center">
+                                        <img src="../../assets/images/Pagofacil.svg" class="w-6 h-6" alt="Pagofacil">
+                                    </div>
+                                    <span class="ml-4 text-gray-900">Pagofacil</span>
+                                </div>
+                            </div>
+
+                            <!-- Mercado Pago -->
+                            <div class="payment-option flex items-center justify-between" data-payment="mercado-pago">
+                                <div class="flex items-center">
+                                    <div class="w-8 h-8 flex items-center justify-center">
+                                        <img src="../../assets/images/Mercado Pago.svg" class="w-6 h-6" alt="Mercado Pago">
+                                    </div>
+                                    <span class="ml-4 text-gray-900">Mercado Pago</span>
+                                </div>
+                            </div>
+
+                            <!-- Pagosnet -->
+                            <div class="payment-option flex items-center justify-between" data-payment="pagosnet">
+                                <div class="flex items-center">
+                                    <div class="w-8 h-8 flex items-center justify-center">
+                                        <img src="../../assets/images/Pagosnet.svg" class="w-6 h-6" alt="Pagosnet">
+                                    </div>
+                                    <span class="ml-4 text-gray-900">Pagosnet</span>
+                                </div>
+                            </div>
+
+                            <!-- Pix -->
+                            <div class="payment-option flex items-center justify-between" data-payment="pix">
+                                <div class="flex items-center">
+                                    <div class="w-8 h-8 flex items-center justify-center">
+                                        <img src="../../assets/images/Pix.svg" class="w-6 h-6" alt="Pix">
+                                    </div>
+                                    <span class="ml-4 text-gray-900">Pix</span>
+                                </div>
+                            </div>
+
+                            <!-- Pisp -->
+                            <div class="payment-option flex items-center justify-between" data-payment="pisp">
+                                <div class="flex items-center">
+                                    <div class="w-8 h-8 flex items-center justify-center">
+                                        <i class="fas fa-money-bill text-gray-600"></i>
+                                    </div>
+                                    <span class="ml-4 text-gray-900">Pisp</span>
+                                </div>
+                            </div>
+
+                            <!-- Boleto -->
+                            <div class="payment-option flex items-center justify-between" data-payment="boleto">
+                                <div class="flex items-center">
+                                    <div class="w-8 h-8 flex items-center justify-center">
+                                        <img src="../../assets/images/Boleto.svg" class="w-6 h-6" alt="Boleto">
+                                    </div>
+                                    <span class="ml-4 text-gray-900">Boleto</span>
+                                </div>
+                            </div>
+
+                            <!-- Picpay -->
+                            <div class="payment-option flex items-center justify-between" data-payment="picpay">
+                                <div class="flex items-center">
+                                    <div class="w-8 h-8 flex items-center justify-center">
+                                        <img src="../../assets/images/picpay.svg" class="w-6 h-6" alt="Picpay">
+                                    </div>
+                                    <span class="ml-4 text-gray-900">Picpay</span>
+                                </div>
+                            </div>
+
+                            <!-- Paypal -->
+                            <div class="payment-option flex items-center justify-between" data-payment="paypal">
+                                <div class="flex items-center">
+                                    <div class="w-8 h-8 flex items-center justify-center">
+                                        <img src="../../assets/images/paypal.svg" class="w-6 h-6" alt="Paypal">
+                                    </div>
+                                    <span class="ml-4 text-gray-900">Paypal</span>
+                                </div>
+                            </div>
+
+                            <!-- Meal Voucher -->
+                            <div class="payment-option flex items-center justify-between" data-payment="meal-voucher">
+                                <div class="flex items-center">
+                                    <div class="w-8 h-8 flex items-center justify-center">
+                                        <img src="../../assets/images/Voucher Cards.svg" class="w-6 h-6" alt="Meal Voucher">
+                                    </div>
+                                    <span class="ml-4 text-gray-900">Meal Voucher</span>
+                                </div>
+                            </div>
+
+                            <!-- Multi Benefits Voucher -->
+                            <div class="payment-option flex items-center justify-between" data-payment="multi-benefits-voucher">
+                                <div class="flex items-center">
+                                    <div class="w-8 h-8 flex items-center justify-center">
+                                        <img src="../../assets/images/Voucher Cards.svg" class="w-6 h-6" alt="Multi Benefits Voucher">
+                                    </div>
+                                    <span class="ml-4 text-gray-900">Multi Benefits Voucher</span>
+                                </div>
+                            </div>
+
+                            <!-- Servipag -->
+                            <div class="payment-option flex items-center justify-between" data-payment="servipag">
+                                <div class="flex items-center">
+                                    <div class="w-8 h-8 flex items-center justify-center">
+                                        <img src="../../assets/images/Servipag.svg" class="w-6 h-6" alt="Servipag">
+                                    </div>
+                                    <span class="ml-4 text-gray-900">Servipag</span>
+                                </div>
+                            </div>
+
+                            <!-- Sencillito -->
+                            <div class="payment-option flex items-center justify-between" data-payment="sencillito">
+                                <div class="flex items-center">
+                                    <div class="w-8 h-8 flex items-center justify-center">
+                                        <img src="../../assets/images/Sencillito.svg" class="w-6 h-6" alt="Sencillito">
+                                    </div>
+                                    <span class="ml-4 text-gray-900">Sencillito</span>
+                                </div>
+                            </div>
+
+                            <!-- MACH -->
+                            <div class="payment-option flex items-center justify-between" data-payment="mach">
+                                <div class="flex items-center">
+                                    <div class="w-8 h-8 flex items-center justify-center">
+                                        <img src="../../assets/images/mach.svg" class="w-6 h-6" alt="MACH">
+                                    </div>
+                                    <span class="ml-4 text-gray-900">MACH</span>
+                                </div>
+                            </div>
+
+                            <!-- PSE -->
+                            <div class="payment-option flex items-center justify-between" data-payment="pse">
+                                <div class="flex items-center">
+                                    <div class="w-8 h-8 flex items-center justify-center">
+                                        <img src="../../assets/images/PSE.svg" class="w-6 h-6" alt="PSE">
+                                    </div>
+                                    <span class="ml-4 text-gray-900">PSE (Pagos Seguros en Línea)</span>
+                                </div>
+                            </div>
+
+                            <!-- Efecty -->
+                            <div class="payment-option flex items-center justify-between" data-payment="efecty">
+                                <div class="flex items-center">
+                                    <div class="w-8 h-8 flex items-center justify-center">
+                                        <img src="../../assets/images/Efecty.svg" class="w-6 h-6" alt="Efecty">
+                                    </div>
+                                    <span class="ml-4 text-gray-900">Efecty</span>
+                                </div>
+                            </div>
+
+                            <!-- Botón Bancolombia -->
+                            <div class="payment-option flex items-center justify-between" data-payment="bancolombia">
+                                <div class="flex items-center">
+                                    <div class="w-8 h-8 flex items-center justify-center">
+                                        <img src="../../assets/images/Bancolombia.svg" class="w-6 h-6" alt="Botón Bancolombia">
+                                    </div>
+                                    <span class="ml-4 text-gray-900">Botón Bancolombia</span>
+                                </div>
+                            </div>
+
+                            <!-- NEQUI -->
+                            <div class="payment-option flex items-center justify-between" data-payment="nequi">
+                                <div class="flex items-center">
+                                    <div class="w-8 h-8 flex items-center justify-center">
+                                        <img src="../../assets/images/Nequi.svg" class="w-6 h-6" alt="NEQUI">
+                                    </div>
+                                    <span class="ml-4 text-gray-900">NEQUI</span>
+                                </div>
+                            </div>
+
+                            <!-- CASH -->
+                            <div class="payment-option flex items-center justify-between" data-payment="cash">
+                                <div class="flex items-center">
+                                    <div class="w-8 h-8 flex items-center justify-center">
+                                        <i class="fas fa-money-bill text-gray-600"></i>
+                                    </div>
+                                    <span class="ml-4 text-gray-900">CASH</span>
+                                </div>
+                            </div>
+
+                            <!-- OXXO -->
+                            <div class="payment-option flex items-center justify-between" data-payment="oxxo">
+                                <div class="flex items-center">
+                                    <div class="w-8 h-8 flex items-center justify-center">
+                                        <img src="../../assets/images/OXXO.svg" class="w-6 h-6" alt="OXXO">
+                                    </div>
+                                    <span class="ml-4 text-gray-900">OXXO</span>
+                                </div>
+                            </div>
+
+                            <!-- OXXOPay -->
+                            <div class="payment-option flex items-center justify-between" data-payment="oxxopay">
+                                <div class="flex items-center">
+                                    <div class="w-8 h-8 flex items-center justify-center">
+                                        <img src="../../assets/images/OXXOPay.svg" class="w-6 h-6" alt="OXXOPay">
+                                    </div>
+                                    <span class="ml-4 text-gray-900">OXXOPay</span>
+                                </div>
+                            </div>
+
+                            <!-- SPEI -->
+                            <div class="payment-option flex items-center justify-between" data-payment="spei">
+                                <div class="flex items-center">
+                                    <div class="w-8 h-8 flex items-center justify-center">
+                                        <img src="../../assets/images/spei.svg" class="w-6 h-6" alt="SPEI">
+                                    </div>
+                                    <span class="ml-4 text-gray-900">SPEI</span>
+                                </div>
+                            </div>
+
+                            <!-- WebPay -->
+                            <div class="payment-option flex items-center justify-between" data-payment="webpay">
+                                <div class="flex items-center">
+                                    <div class="w-8 h-8 flex items-center justify-center">
+                                        <img src="../../assets/images/webpay.svg" class="w-6 h-6" alt="WebPay">
+                                    </div>
+                                    <span class="ml-4 text-gray-900">WebPay</span>
+                                </div>
+                            </div>
+
+                            <!-- PagoEfectivo -->
+                            <div class="payment-option flex items-center justify-between" data-payment="pagoefectivo">
+                                <div class="flex items-center">
+                                    <div class="w-8 h-8 flex items-center justify-center">
+                                        <img src="../../assets/images/pagoefectivo.svg" class="w-6 h-6" alt="PagoEfectivo">
+                                    </div>
+                                    <span class="ml-4 text-gray-900">PagoEfectivo</span>
+                                </div>
+                            </div>
+
+                            <!-- OZOW -->
+                            <div class="payment-option flex items-center justify-between" data-payment="ozow">
+                                <div class="flex items-center">
+                                    <div class="w-8 h-8 flex items-center justify-center">
+                                        <img src="../../assets/images/OZOW.svg" class="w-6 h-6" alt="OZOW">
+                                    </div>
+                                    <span class="ml-4 text-gray-900">OZOW</span>
+                                </div>
+                            </div>
+
+                            <!-- Capitec Pay -->
+                            <div class="payment-option flex items-center justify-between" data-payment="capitecpay">
+                                <div class="flex items-center">
+                                    <div class="w-8 h-8 flex items-center justify-center">
+                                        <img src="../../assets/images/CapitecPay.svg" class="w-6 h-6" alt="Capitec Pay">
+                                    </div>
+                                    <span class="ml-4 text-gray-900">Capitec Pay</span>
+                                </div>
+                            </div>
+
+                            <!-- SafetyPay -->
+                            <div class="payment-option flex items-center justify-between" data-payment="safetypay">
+                                <div class="flex items-center">
+                                    <div class="w-8 h-8 flex items-center justify-center">
+                                        <img src="../../assets/images/SafetyPay.svg" class="w-6 h-6" alt="SafetyPay">
+                                    </div>
+                                    <span class="ml-4 text-gray-900">SafetyPay</span>
+                                </div>
+                            </div>
+
+                            <!-- Fawry -->
+                            <div class="payment-option flex items-center justify-between" data-payment="fawry">
+                                <div class="flex items-center">
+                                    <div class="w-8 h-8 flex items-center justify-center">
+                                        <img src="../../assets/images/Fawry.jpeg" class="w-6 h-6 object-contain" alt="Fawry">
+                                    </div>
+                                    <span class="ml-4 text-gray-900">Fawry</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="expand-button">
+                            <span class="expand-text">Show More</span>
+                            <i class="fas fa-chevron-down"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // 获取所有需要的DOM元素
+            const cardNumberInput = document.querySelector('#card-number');
+            const cardTypes = document.querySelector('#card-types');
+            const paymentOptions = document.querySelectorAll('.payment-option');
+            const expandButton = document.querySelector('.expand-button');
+            const expandText = expandButton.querySelector('.expand-text');
+            const optionsContainer = document.querySelector('.payment-options-container');
+            const paymentAmount = document.getElementById('payment-amount');
+            const defaultPaymentContent = document.getElementById('default-payment-content');
+            const cardsPaymentContent = document.getElementById('cards-payment-content');
+            const paymentConfirmation = document.getElementById('payment-confirmation');
+            const payButton = document.getElementById('pay-button');
+            const cancelButton = document.getElementById('cancel-button');
+            const okButton = document.getElementById('ok-button');
+            const transactionDate = document.getElementById('transaction-date');
+
+            // 设置交易日期
+            const date = new Date();
+            date.setFullYear(date.getFullYear() + 2); // 设置为两年后
+            if (transactionDate) {
+                transactionDate.textContent = date.toISOString().split('T')[0].replace(/-/g, '/');
+            }
+
+            // 支付按钮点击事件
+            if (payButton) {
+                payButton.addEventListener('click', function() {
+                    defaultPaymentContent.classList.add('hidden');
+                    cardsPaymentContent.classList.add('hidden');
+                    paymentConfirmation.classList.remove('hidden');
+                });
+            }
+
+            // 取消按钮点击事件
+            if (cancelButton) {
+                cancelButton.addEventListener('click', function() {
+                    paymentConfirmation.classList.add('hidden');
+                    cardsPaymentContent.classList.remove('hidden');
+                });
+            }
+
+            // 确认按钮点击事件
+            if (okButton) {
+                okButton.addEventListener('click', function() {
+                    // 处理确认支付逻辑
+                    alert('Payment confirmed!');
+                });
+            }
+
+            // Card BIN patterns
+            const cardPatterns = {
+                visa: /^4/,
+                mastercard: /^(5[1-5]|2[2-7])/,
+                amex: /^3[47]/,
+                jcb: /^35/
+            };
+
+            function updateCardDisplay(cardNumber) {
+                const cleanNumber = cardNumber.replace(/\D/g, '');
+                const cardInput = document.getElementById('card-number');
+                const errorDiv = document.getElementById('card-error');
+                const errorIcon = document.getElementById('error-card-icon');
+                const defaultCardIcon = document.getElementById('default-card-icon');
+                const allIcons = document.querySelectorAll('.icon-container i, .icon-container img');
+                const cardTypes = document.querySelector('#card-types');
+                
+                // 隐藏所有输入框右侧图标
+                allIcons.forEach(icon => {
+                    icon.classList.remove('visible');
+                    icon.style.display = 'none';
+                });
+
+                // 重置错误状态
+                cardInput.classList.remove('input-error');
+                errorDiv.classList.add('hidden');
+
+                // 默认显示底部卡片品牌LOGO
+                cardTypes.style.display = 'flex';
+
+                // 如果没有输入，显示默认图标
+                if (cleanNumber.length === 0) {
+                    defaultCardIcon.style.display = 'flex';
+                    defaultCardIcon.classList.add('visible');
+                    return;
+                }
+
+                // 检查卡号模式
+                let matchFound = false;
+                if (cleanNumber.length >= 2) {
+                    for (const [cardType, pattern] of Object.entries(cardPatterns)) {
+                        if (pattern.test(cleanNumber)) {
+                            const logo = document.querySelector(`[data-card="${cardType}"]`);
+                            if (logo) {
+                                // 显示右侧对应的卡片品牌图标
+                                logo.style.display = 'block';
+                                logo.classList.add('visible');
+                                // 隐藏底部卡片品牌LOGO
+                                cardTypes.style.display = 'none';
+                                matchFound = true;
+                            }
+                            break;
+                        }
+                    }
+                }
+
+                // 处理未匹配情况
+                if (!matchFound) {
+                    if (cleanNumber.length >= 4 && cleanNumber.length < 16) {
+                        // 显示错误状态
+                        errorIcon.style.display = 'flex';
+                        errorIcon.classList.add('visible');
+                        cardInput.classList.add('input-error');
+                        errorDiv.classList.remove('hidden');
+                    } else {
+                        // 显示默认图标
+                        defaultCardIcon.style.display = 'flex';
+                        defaultCardIcon.classList.add('visible');
+                    }
+                }
+            }
+
+            // 初始化显示默认图标
+            const defaultCardIcon = document.getElementById('default-card-icon');
+            defaultCardIcon.style.display = 'flex';
+            defaultCardIcon.classList.add('visible');
+
+            if (cardNumberInput) {
+                cardNumberInput.addEventListener('input', function(e) {
+                    let value = e.target.value.replace(/\D/g, '');
+                    let formattedValue = '';
+                    for (let i = 0; i < value.length; i++) {
+                        if (i > 0 && i % 4 === 0) {
+                            formattedValue += ' ';
+                        }
+                        formattedValue += value[i];
+                    }
+                    e.target.value = formattedValue;
+                    updateCardDisplay(formattedValue);
+                });
+
+                // Handle backspace/delete to empty input
+                cardNumberInput.addEventListener('keyup', function(e) {
+                    if (e.target.value === '') {
+                        updateCardDisplay('');
+                    }
+                });
+            }
+
+            // Expiry date formatting
+            const expiryInput = document.querySelector('input[placeholder="MM/YY"]');
+            if (expiryInput) {
+                expiryInput.addEventListener('input', function(e) {
+                    let value = e.target.value.replace(/\D/g, '');
+                    if (value.length >= 2) {
+                        value = value.slice(0, 2) + '/' + value.slice(2);
+                    }
+                    e.target.value = value;
+                });
+            }
+
+            // Security code validation
+            const securityCodeInput = document.querySelector('input[placeholder="123"]');
+            if (securityCodeInput) {
+                securityCodeInput.addEventListener('input', function(e) {
+                    let value = e.target.value.replace(/\D/g, '');
+                    e.target.value = value;
+                });
+            }
+
+            // Transaction details tooltip
+            const detailsButton = document.querySelector('.transaction-details');
+            const tooltip = document.querySelector('.tooltip');
+
+            detailsButton.addEventListener('mouseenter', function() {
+                tooltip.classList.add('show');
+            });
+
+            detailsButton.addEventListener('mouseleave', function() {
+                tooltip.classList.remove('show');
+            });
+
+            // Function to update payment content based on selected payment method
+            function updatePaymentContent(paymentMethod) {
+                // Hide all payment contents
+                defaultPaymentContent.classList.add('hidden');
+                cardsPaymentContent.classList.add('hidden');
+                paymentConfirmation.classList.add('hidden');
+                
+                // Show the appropriate content and update currency
+                if (paymentMethod === 'cards') {
+                    cardsPaymentContent.classList.remove('hidden');
+                    paymentAmount.textContent = 'USD 500.00';
+                } else {
+                    defaultPaymentContent.classList.remove('hidden');
+                    paymentAmount.textContent = 'NGN 372,132.65';
+                }
+            }
+            
+            // Expand/collapse functionality
+            expandButton.addEventListener('click', function() {
+                const isExpanded = optionsContainer.classList.contains('expanded');
+                optionsContainer.classList.toggle('expanded');
+                expandButton.classList.toggle('expanded');
+                expandText.textContent = isExpanded ? 'Show More' : 'Show Less';
+            });
+
+            // Set initial selected state to Cards
+            const defaultSelected = document.querySelector('[data-payment="cards"]');
+            if (defaultSelected) {
+                defaultSelected.classList.add('selected');
+                updatePaymentContent('cards');
+            }
+            
+            paymentOptions.forEach(option => {
+                option.addEventListener('click', function() {
+                    // Remove selected state from other options
+                    paymentOptions.forEach(opt => {
+                        opt.classList.remove('selected');
+                    });
+                    // Add selected state to current option
+                    this.classList.add('selected');
+                    // Update payment content
+                    const paymentMethod = this.getAttribute('data-payment');
+                    updatePaymentContent(paymentMethod);
+                });
+
+                // Add hover effect
+                option.addEventListener('mouseenter', function() {
+                    if (!this.classList.contains('selected')) {
+                        this.style.backgroundColor = '#f8f9fa';
+                    }
+                });
+
+                option.addEventListener('mouseleave', function() {
+                    if (!this.classList.contains('selected')) {
+                        this.style.backgroundColor = '';
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html> 

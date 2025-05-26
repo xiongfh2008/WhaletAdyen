@@ -1,0 +1,1227 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>提供业务信息 - 激活收单产品</title>
+    <link rel="stylesheet" href="../../styles/main.css">
+    <link rel="stylesheet" href="../../styles/header.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #7D33FF;
+            --primary-hover: #6929D4;
+            --primary-light: rgba(125, 51, 255, 0.1);
+            --bg-color: #FFFFFF;
+            --text-primary: #1F1F1F;
+            --text-secondary: #666666;
+            --border-color: #E5E5E5;
+            --success-color: #34C759;
+            --error-color: #FF3B30;
+            --card-shadow: 0 2px 8px rgba(125, 51, 255, 0.08);
+            --transition: all 0.2s ease-in-out;
+            --header-height: 56px;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            margin: 0;
+            padding: 0;
+            padding-top: var(--header-height);
+            background-color: #F8F7FF;
+            color: var(--text-primary);
+            line-height: 1.5;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 24px auto;
+            padding: 0 24px;
+            display: flex;
+            gap: 32px;
+        }
+
+        /* 左侧进度条样式 */
+        .progress-steps {
+            width: 240px;
+            min-width: 240px;
+            background-color: #fff;
+            border-radius: 12px;
+            padding: 24px;
+            box-shadow: var(--card-shadow);
+            position: sticky;
+            top: calc(var(--header-height) + 24px);
+            align-self: flex-start;
+            height: fit-content;
+        }
+
+        .step {
+            display: flex;
+            margin-bottom: 24px;
+            position: relative;
+            padding-left: 40px;
+        }
+
+        .step:last-child {
+            margin-bottom: 0;
+        }
+
+        .step::before {
+            content: "";
+            position: absolute;
+            left: 14px;
+            top: 24px;
+            bottom: -24px;
+            width: 2px;
+            background-color: var(--border-color);
+            transition: var(--transition);
+        }
+
+        .step:last-child::before {
+            display: none;
+        }
+
+        .step.active::before {
+            background-color: var(--primary-color);
+        }
+
+        /* 添加新规则：确保第二步之后的线条保持灰色 */
+        .step.active + .step::before {
+            background-color: var(--border-color) !important;
+        }
+
+        .step.completed::before {
+            background-color: var(--primary-color);
+        }
+
+        .step-number {
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            background-color: var(--bg-color);
+            border: 2px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-secondary);
+            z-index: 1;
+            transition: var(--transition);
+        }
+
+        .step.active .step-number {
+            background-color: var(--primary-color);
+            border-color: var(--primary-color);
+            color: white;
+        }
+
+        /* 添加新规则：确保第二步之后的步骤圆圈保持灰色 */
+        .step.active + .step .step-number {
+            background-color: var(--bg-color) !important;
+            border-color: var(--border-color) !important;
+            color: var(--text-secondary) !important;
+        }
+
+        .step.completed .step-number {
+            background-color: var(--primary-color);
+            border-color: var(--primary-color);
+            color: white;
+        }
+
+        .step-content {
+            flex: 1;
+        }
+
+        .step-title {
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--text-secondary);
+            margin-bottom: 4px;
+            transition: var(--transition);
+        }
+
+        .step.active .step-title {
+            color: var(--primary-color);
+            font-weight: 600;
+        }
+
+        .step.completed .step-title {
+            color: var(--primary-color);
+            font-weight: 600;
+        }
+
+        .step-desc {
+            font-size: 12px;
+            color: var(--text-secondary);
+            opacity: 0.8;
+            transition: var(--transition);
+        }
+
+        /* 右侧内容区域样式优化 */
+        .content-card {
+            flex: 1;
+            max-width: 680px;
+            background: var(--bg-color);
+            border-radius: 12px;
+            padding: 32px;
+            box-shadow: var(--card-shadow);
+        }
+
+        .section-title {
+            font-size: 20px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 32px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .form-section {
+            margin-bottom: 40px;
+        }
+
+        .form-section-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .form-section-title i {
+            color: var(--primary-color);
+            font-size: 18px;
+        }
+
+        .form-group {
+            margin-bottom: 24px;
+        }
+
+        .form-label {
+            display: block;
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--text-primary);
+            margin-bottom: 8px;
+        }
+
+        .form-required {
+            color: var(--error-color);
+            margin-left: 4px;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            font-size: 14px;
+            color: var(--text-primary);
+            transition: var(--transition);
+            background-color: white;
+            box-sizing: border-box;
+            outline: none;
+        }
+
+        .form-input:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px var(--primary-light);
+        }
+
+        .form-select {
+            height: 36px;
+            padding: 0 12px;
+            background: white;
+            border: 1px solid #E5E7EB;
+            border-radius: 8px;
+            width: 100%;
+            font-size: 14px;
+            color: var(--text-primary);
+            appearance: none;
+            background-image: url('data:image/svg+xml;charset=US-ASCII,<svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M6 8L10 12L14 8" stroke="%236B7280" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>');
+            background-repeat: no-repeat;
+            background-position: right 12px center;
+            background-size: 20px;
+            cursor: pointer;
+        }
+
+        .form-select:focus {
+            border-color: var(--primary-color);
+            outline: none;
+        }
+
+        .form-hint {
+            font-size: 12px;
+            color: var(--text-secondary);
+            margin-top: 8px;
+            line-height: 1.5;
+        }
+
+        .form-row {
+            display: flex;
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        .form-col {
+            flex: 1;
+        }
+
+        .selected-payments {
+            background-color: #F8F9FA;
+            border-radius: 8px;
+            padding: 16px;
+            margin-bottom: 24px;
+        }
+
+        .selected-payment-item {
+            display: flex;
+            align-items: center;
+            padding: 12px;
+            background: white;
+            border-radius: 6px;
+            margin-bottom: 8px;
+        }
+
+        .selected-payment-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .payment-icon {
+            width: 32px;
+            height: 32px;
+            margin-right: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .payment-icon img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+
+        .payment-details {
+            flex: 1;
+        }
+
+        .payment-name {
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--text-primary);
+            margin-bottom: 4px;
+        }
+
+        .payment-type {
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+
+        .button-container {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 32px;
+            padding-top: 24px;
+            border-top: 1px solid var(--border-color);
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: var(--transition);
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-secondary {
+            background-color: white;
+            border: 1px solid var(--border-color);
+            color: var(--text-primary);
+        }
+
+        .btn-secondary:hover {
+            background-color: #F8F9FA;
+        }
+
+        .btn-primary {
+            background-color: var(--primary-color);
+            border: none;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background-color: var(--primary-hover);
+        }
+
+        .btn i {
+            font-size: 16px;
+        }
+
+        @media (max-width: 1024px) {
+            .container {
+                padding: 0 16px;
+                gap: 24px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                flex-direction: column;
+                padding: 16px;
+            }
+
+            .progress-steps {
+                width: 100%;
+                min-width: auto;
+                position: static;
+            }
+
+            .form-row {
+                flex-direction: column;
+                gap: 24px;
+            }
+        }
+
+        /* 添加标签页样式 */
+        .tabs {
+            display: flex;
+            border-bottom: 1px solid var(--border-color);
+            margin-bottom: 24px;
+            gap: 8px;
+        }
+
+        .tab {
+            padding: 12px 24px;
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--text-secondary);
+            cursor: pointer;
+            border-bottom: 2px solid transparent;
+            transition: var(--transition);
+        }
+
+        .tab:hover {
+            color: var(--primary-color);
+        }
+
+        .tab.active {
+            color: var(--primary-color);
+            border-bottom-color: var(--primary-color);
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .step-indicator {
+            display: flex;
+            align-items: center;
+            margin-bottom: 24px;
+        }
+
+        .step-number {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background-color: var(--primary-color);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            margin-right: 8px;
+        }
+
+        .step-text {
+            font-size: 14px;
+            color: var(--text-secondary);
+        }
+
+        /* 添加收单服务商选择样式 */
+        .provider-options {
+            display: none;
+            margin-top: 20px;
+        }
+
+        .provider-options.show {
+            display: block;
+        }
+
+        .provider-checkbox {
+            position: relative;
+            display: flex;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
+        .provider-checkbox input[type="checkbox"] {
+            position: absolute;
+            opacity: 0;
+            cursor: pointer;
+            height: 0;
+            width: 0;
+        }
+
+        .provider-checkbox label {
+            padding-left: 32px;
+            cursor: pointer;
+            font-size: 14px;
+            color: var(--text-primary);
+            user-select: none;
+            display: flex;
+            align-items: center;
+        }
+
+        .provider-checkbox label::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 20px;
+            height: 20px;
+            border: 2px solid #E5E7EB;
+            border-radius: 4px;
+            background-color: white;
+            transition: all 0.2s ease;
+        }
+
+        .provider-checkbox input[type="checkbox"]:checked + label::before {
+            background-color: var(--primary-color);
+            border-color: var(--primary-color);
+        }
+
+        .provider-checkbox label::after {
+            content: '';
+            position: absolute;
+            left: 7px;
+            top: 50%;
+            transform: translateY(-65%) rotate(45deg);
+            width: 6px;
+            height: 12px;
+            border: solid white;
+            border-width: 0 2px 2px 0;
+            opacity: 0;
+            transition: all 0.2s ease;
+        }
+
+        .provider-checkbox input[type="checkbox"]:checked + label::after {
+            opacity: 1;
+        }
+
+        .provider-checkbox:hover label::before {
+            border-color: var(--primary-color);
+        }
+
+        .other-input {
+            display: none;
+            margin-top: 8px;
+            margin-left: 24px;
+        }
+
+        .other-input.show {
+            display: block;
+        }
+
+        /* 调整单选框和复选框的布局样式 */
+        .radio-group,
+        .provider-checkbox {
+            display: flex;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
+        .radio-group label,
+        .provider-checkbox label {
+            margin-left: 8px;
+            font-size: 14px;
+            cursor: pointer;
+        }
+
+        .radio-options {
+            display: flex;
+            gap: 24px;
+        }
+
+        /* 单选框基础样式 */
+        .radio-group input[type="radio"] {
+            appearance: none;
+            -webkit-appearance: none;
+            width: 16px;
+            height: 16px;
+            border: 1px solid #D1D5DB;
+            border-radius: 50%;
+            cursor: pointer;
+            flex-shrink: 0;
+        }
+
+        .radio-group input[type="radio"]:checked {
+            border: 4px solid var(--primary-color);
+        }
+
+        /* 复选框基础样式 */
+        .provider-checkbox input[type="checkbox"] {
+            appearance: none;
+            -webkit-appearance: none;
+            width: 16px;
+            height: 16px;
+            border: 1px solid #D1D5DB;
+            border-radius: 4px;
+            cursor: pointer;
+            flex-shrink: 0;
+        }
+
+        .provider-checkbox input[type="checkbox"]:checked {
+            border-color: var(--primary-color);
+            background-color: var(--primary-color);
+        }
+
+        .provider-checkbox input[type="checkbox"]:checked::after {
+            content: '';
+            position: absolute;
+            width: 4px;
+            height: 8px;
+            border: solid white;
+            border-width: 0 2px 2px 0;
+            top: 2px;
+            left: 5px;
+            transform: rotate(45deg);
+        }
+
+        /* 选项容器样式 */
+        .provider-options {
+            margin-top: 12px;
+            padding-left: 24px;
+        }
+
+        /* 其他输入框样式 */
+        .other-input {
+            margin-top: 8px;
+            margin-left: 24px;
+        }
+
+        .input-group {
+            display: flex;
+            align-items: stretch;
+            width: 100%;
+        }
+
+        .input-group .form-input {
+            flex: 1;
+            border-right: none;
+        }
+
+        .input-group-text {
+            white-space: nowrap;
+            color: #374151;
+            font-size: 14px;
+        }
+
+        .form-select {
+            font-size: 14px;
+            color: #374151;
+        }
+
+        .form-select option {
+            padding: 8px;
+        }
+
+        .input-group-append {
+            display: flex;
+        }
+
+        .input-group-text i {
+            font-size: 14px;
+        }
+
+        /* 添加新的样式 */
+        .currency-input-group {
+            display: flex;
+            align-items: stretch;
+            width: 100%;
+        }
+
+        .currency-input {
+            flex: 1;
+            height: 36px;
+            padding: 0 12px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px 0 0 8px;
+            border-right: none;
+            font-size: 14px;
+            outline: none;
+        }
+
+        .currency-addon {
+            display: flex;
+            align-items: center;
+            padding: 0 12px;
+            background: #F9FAFB;
+            border: 1px solid #E5E7EB;
+            border-left: none;
+            border-radius: 0 8px 8px 0;
+            height: 36px;
+        }
+
+        .currency-flag {
+            width: 16px;
+            height: 12px;
+            margin-right: 6px;
+        }
+
+        .currency-text {
+            color: #374151;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="header-logo">
+            <img src="../../assets/images/whaletlogo2.png" alt="Whalet Logo">
+        </div>
+        <div class="header-divider"></div>
+        <span class="header-title">激活收单产品</span>
+        <i class="fas fa-times header-close" onclick="closeHeader()"></i>
+    </div>
+
+    <div class="container">
+        <!-- 左侧进度条 -->
+        <div class="progress-steps">
+            <div class="step completed">
+                <div class="step-number">1</div>
+                <div class="step-content">
+                    <div class="step-title">选择支付方式</div>
+                    <div class="step-desc">选择您需要的支付方式</div>
+                </div>
+            </div>
+            <div class="step active">
+                <div class="step-number">2</div>
+                <div class="step-content">
+                    <div class="step-title">提供业务信息</div>
+                    <div class="step-desc">填写业务相关信息</div>
+                </div>
+            </div>
+            <div class="step">
+                <div class="step-number">3</div>
+                <div class="step-content">
+                    <div class="step-title">检查并提交申请</div>
+                    <div class="step-desc">确认信息并提交</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 右侧内容 -->
+        <div class="content-card">
+            <h1 class="section-title">提供业务信息</h1>
+
+            <!-- 标签页导航 -->
+            <div class="tabs">
+                <div class="tab active" onclick="switchTab(0)">基本信息</div>
+                <div class="tab" onclick="switchTab(1)">交易信息</div>
+                <div class="tab" onclick="switchTab(2)">其他信息</div>
+            </div>
+
+            <!-- 基本信息 -->
+            <div class="tab-content active">
+                <div class="step-indicator">
+                    <div class="step-number">1</div>
+                    <div class="step-text">请填写关于您业务的基本信息</div>
+                </div>
+                <div class="form-section">
+                    <h2 class="form-section-title">
+                        <i class="fas fa-info-circle"></i>
+                        基本信息
+                    </h2>
+                    <div class="form-group">
+                        <label class="form-label" for="tradeName">
+                            交易名称
+                            <span class="form-required">*</span>
+                        </label>
+                        <input type="text" id="tradeName" name="tradeName" class="form-input">
+                        <div class="form-hint">此名称将出现在您用户的收据和银行对账单上。</div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label" for="industry">
+                            行业
+                            <span class="form-required">*</span>
+                        </label>
+                        <select id="industry" name="industry" class="form-select">
+                            <option value="retail">零售: 宠物用品</option>
+                        </select>
+                        <div class="form-hint">选择最能描述您业务的行业</div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label" for="website">
+                            网址
+                            <span class="form-required">*</span>
+                        </label>
+                        <div class="form-hint" style="margin-bottom: 8px;">您可以在此添加多个属于同一行业的网站，并提交所有不同域名的网站以供审核。只有审核通过的网站才能进行收款。</div>
+                        <div id="websiteInputs">
+                            <div class="website-input-group" style="display: flex; gap: 8px; margin-bottom: 8px;">
+                                <div style="position: relative; flex: 1;">
+                                    <div style="position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: var(--text-secondary); user-select: none;">https://</div>
+                                    <input type="text" name="website" class="form-input website-input" style="padding-left: 68px;">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <button type="button" class="btn btn-secondary" style="color: var(--primary-color); border-color: var(--primary-color);" onclick="window.addWebsite()">
+                                <i class="fas fa-plus"></i>
+                                添加网址
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label" for="description">
+                            请描述您的产品或服务
+                            <span class="form-required">*</span>
+                        </label>
+                        <textarea id="description" name="description" class="form-input" rows="4"></textarea>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 交易信息 -->
+            <div class="tab-content">
+                <div class="step-indicator">
+                    <div class="step-number">2</div>
+                    <div class="step-text">请提供预计的交易信息</div>
+                </div>
+                <div class="form-section">
+                    <h2 class="form-section-title">
+                        <i class="fas fa-exchange-alt"></i>
+                        交易信息
+                    </h2>
+                    <div class="form-hint" style="margin-bottom: 20px;">
+                        提供在未来12个月内您预计在 Whalet 上产生的交易量与交易金额。
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">
+                            其他币种请以USD折算
+                        </label>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label" for="singleAmount">
+                            单笔平均交易金额
+                            <span class="form-required">*</span>
+                        </label>
+                        <div class="currency-input-group">
+                            <input type="text" id="singleAmount" name="singleAmount" class="currency-input">
+                            <div class="currency-addon">
+                                <img src="https://cdn.jsdelivr.net/gh/lipis/flag-icons/flags/4x3/us.svg" alt="USD" class="currency-flag">
+                                <span class="currency-text">USD</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label" for="maxAmount">
+                            单笔最大交易金额
+                            <span class="form-required">*</span>
+                        </label>
+                        <div class="currency-input-group">
+                            <input type="text" id="maxAmount" name="maxAmount" class="currency-input">
+                            <div class="currency-addon">
+                                <img src="https://cdn.jsdelivr.net/gh/lipis/flag-icons/flags/4x3/us.svg" alt="USD" class="currency-flag">
+                                <span class="currency-text">USD</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label" for="monthlyAmount">
+                            平均月交易额
+                            <span class="form-required">*</span>
+                        </label>
+                        <div class="currency-input-group">
+                            <input type="text" id="monthlyAmount" name="monthlyAmount" class="currency-input">
+                            <div class="currency-addon">
+                                <img src="https://cdn.jsdelivr.net/gh/lipis/flag-icons/flags/4x3/us.svg" alt="USD" class="currency-flag">
+                                <span class="currency-text">USD</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label" for="internationalRatio">
+                            国际客户交易的百分比
+                            <span class="form-required">*</span>
+                        </label>
+                        <select id="internationalRatio" name="internationalRatio" class="form-select">
+                            <option value="">选择...</option>
+                            <option value="0-20">0-20%</option>
+                            <option value="20-40">20%-40%</option>
+                            <option value="40-60">40%-60%</option>
+                            <option value="60-80">60%-80%</option>
+                            <option value="80-100">80%-100%</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 其他收单提供商 -->
+            <div class="tab-content">
+                <div class="step-indicator">
+                    <div class="step-number">3</div>
+                    <div class="step-text">请告诉我们您是否使用其他收单提供商</div>
+                </div>
+                <div class="form-section">
+                    <h2 class="form-section-title">
+                        <i class="fas fa-question-circle"></i>
+                        您目前是否在使用其他收单提供商？
+                    </h2>
+                    <div class="form-group">
+                        <div class="radio-options">
+                            <div class="radio-group">
+                                <input type="radio" id="otherProviderYes" name="otherProvider" value="yes" onchange="toggleProviderOptions(true)">
+                                <label for="otherProviderYes">是</label>
+                            </div>
+                            <div class="radio-group">
+                                <input type="radio" id="otherProviderNo" name="otherProvider" value="no" onchange="toggleProviderOptions(false)">
+                                <label for="otherProviderNo">否</label>
+                            </div>
+                        </div>
+
+                        <!-- 收单服务商选择选项 -->
+                        <div class="provider-options" id="providerOptions">
+                            <div class="provider-checkbox">
+                                <input type="checkbox" id="stripeProvider" name="providers" value="stripe">
+                                <label for="stripeProvider">Stripe</label>
+                            </div>
+                            <div class="provider-checkbox">
+                                <input type="checkbox" id="paypalProvider" name="providers" value="paypal">
+                                <label for="paypalProvider">PayPal</label>
+                            </div>
+                            <div class="provider-checkbox">
+                                <input type="checkbox" id="adyenProvider" name="providers" value="adyen">
+                                <label for="adyenProvider">Adyen</label>
+                            </div>
+                            <div class="provider-checkbox">
+                                <input type="checkbox" id="otherProvider" name="providers" value="other" onchange="toggleOtherInput(this.checked)">
+                                <label for="otherProvider">其他</label>
+                            </div>
+                            <div class="other-input" id="otherProviderInput">
+                                <input type="text" class="form-input" placeholder="请输入收单服务商名称">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 按钮组 -->
+            <div class="button-container">
+                <button type="button" class="btn btn-secondary" onclick="goToPreviousStep()">
+                    <i class="fas fa-arrow-left"></i>
+                    上一步
+                </button>
+                <button type="button" class="btn btn-primary" onclick="goToNextStep()">
+                    <i class="fas fa-arrow-right"></i>
+                    下一步
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 全局函数定义
+        function closeHeader() {
+            window.location.href = '../../index.html';
+        }
+
+        window.addWebsite = function() {
+            const websiteInputs = document.getElementById('websiteInputs');
+            const newInputGroup = document.createElement('div');
+            newInputGroup.className = 'website-input-group';
+            newInputGroup.style.display = 'flex';
+            newInputGroup.style.gap = '8px';
+            newInputGroup.style.marginBottom = '8px';
+            
+            newInputGroup.innerHTML = `
+                <div style="position: relative; flex: 1;">
+                    <div style="position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: var(--text-secondary); user-select: none;">https://</div>
+                    <input type="text" name="website" class="form-input website-input" style="padding-left: 68px;">
+                </div>
+                <button type="button" class="delete-website" style="padding: 0 8px; color: #FF3B30; background: none; border: none; cursor: pointer; display: flex; align-items: center; min-width: 32px; height: 36px;" onclick="window.deleteWebsite(this)">
+                    <i class="fas fa-trash-alt" style="font-size: 12px;"></i>
+                </button>
+            `;
+
+            websiteInputs.appendChild(newInputGroup);
+            
+            // 为新添加的输入框绑定事件
+            const newInput = newInputGroup.querySelector('.website-input');
+            bindWebsiteInputEvents(newInput);
+        }
+
+        window.deleteWebsite = function(button) {
+            button.closest('.website-input-group').remove();
+        }
+
+        function bindWebsiteInputEvents(input) {
+            // 监听输入事件
+            input.addEventListener('input', function(e) {
+                // 如果用户手动输入https://，删除它
+                if (this.value.startsWith('https://')) {
+                    this.value = this.value.substring(8);
+                }
+            });
+
+            // 监听粘贴事件
+            input.addEventListener('paste', function(e) {
+                e.preventDefault();
+                const pastedText = (e.clipboardData || window.clipboardData).getData('text');
+                // 如果粘贴的内容包含https://，删除它
+                this.value = pastedText.replace(/^https:\/\//i, '');
+            });
+        }
+
+        function goToPreviousStep() {
+            // 获取当前激活的标签页索引
+            const activeTabIndex = Array.from(document.querySelectorAll('.tab')).findIndex(tab => tab.classList.contains('active'));
+            
+            if (activeTabIndex > 0) {
+                // 如果不是第一个标签页，切换到上一个标签页
+                switchTab(activeTabIndex - 1);
+            } else {
+                // 如果是第一个标签页，返回到第一步
+                window.location.href = './step1-select-payment.html';
+            }
+        }
+
+        function goToNextStep() {
+            // 保存当前标签页的数据
+            saveCurrentTabData();
+
+            // 获取当前激活的标签页索引
+            const activeTabIndex = Array.from(document.querySelectorAll('.tab')).findIndex(tab => tab.classList.contains('active'));
+            const totalTabs = document.querySelectorAll('.tab').length;
+
+            if (activeTabIndex < totalTabs - 1) {
+                // 如果不是最后一个标签页，切换到下一个标签页
+                switchTab(activeTabIndex + 1);
+            } else {
+                // 如果是最后一个标签页（其他信息），验证所有必填项
+                const requiredInputs = document.querySelectorAll('.form-input[required], .form-select[required]');
+                let isValid = true;
+
+                requiredInputs.forEach(input => {
+                    if (!input.value.trim()) {
+                        input.style.borderColor = 'var(--error-color)';
+                        isValid = false;
+                    } else {
+                        input.style.borderColor = 'var(--border-color)';
+                    }
+                });
+
+                if (!isValid) {
+                    alert('请填写所有必填项');
+                    return;
+                }
+
+                // 跳转到第三步
+                window.location.href = './step3-review-submit.html';
+            }
+        }
+
+        // 初始化页面
+        document.addEventListener('DOMContentLoaded', function() {
+            // 为所有标签添加点击事件
+            document.querySelectorAll('.tab').forEach((tab, index) => {
+                tab.addEventListener('click', () => switchTab(index));
+            });
+
+            // 初始化第一个网址输入框的事件
+            const firstInput = document.querySelector('.website-input');
+            if (firstInput) {
+                bindWebsiteInputEvents(firstInput);
+            }
+
+            // 恢复之前填写的表单数据
+            const savedFormData = JSON.parse(localStorage.getItem('businessInfo') || '{}');
+            
+            // 填充基本信息
+            if (savedFormData.tradeName) {
+                document.getElementById('tradeName').value = savedFormData.tradeName;
+                document.getElementById('industry').value = savedFormData.industry;
+                document.getElementById('description').value = savedFormData.description;
+            }
+            
+            // 填充交易信息
+            if (savedFormData.singleAmount) {
+                document.getElementById('singleAmount').value = savedFormData.singleAmount;
+                document.getElementById('maxAmount').value = savedFormData.maxAmount;
+                document.getElementById('monthlyAmount').value = savedFormData.monthlyAmount;
+                document.getElementById('internationalRatio').value = savedFormData.internationalRatio;
+            }
+            
+            // 填充其他信息
+            if (savedFormData.otherProvider) {
+                const radioBtn = document.querySelector(`input[name="otherProvider"][value="${savedFormData.otherProvider}"]`);
+                if (radioBtn) {
+                    radioBtn.checked = true;
+                    if (savedFormData.otherProvider === 'yes') {
+                        toggleProviderOptions(true);
+                    }
+                }
+            }
+
+            if (savedFormData.selectedProviders) {
+                savedFormData.selectedProviders.forEach(provider => {
+                    const checkbox = document.querySelector(`input[name="providers"][value="${provider}"]`);
+                    if (checkbox) {
+                        checkbox.checked = true;
+                    } else {
+                        // 如果是其他选项
+                        const otherCheckbox = document.querySelector('input[name="providers"][value="other"]');
+                        if (otherCheckbox) {
+                            otherCheckbox.checked = true;
+                            toggleOtherInput(true);
+                            document.querySelector('#otherProviderInput input').value = provider;
+                        }
+                    }
+                });
+            }
+
+            // 添加输入框焦点效果
+            const inputs = document.querySelectorAll('.form-input, .form-select');
+            inputs.forEach(input => {
+                input.addEventListener('focus', () => {
+                    input.style.borderColor = 'var(--primary-color)';
+                });
+
+                input.addEventListener('blur', () => {
+                    if (!input.value.trim()) {
+                        input.style.borderColor = 'var(--border-color)';
+                    }
+                });
+            });
+        });
+
+        // 添加标签页切换功能
+        function switchTab(index) {
+            // 保存当前标签页的数据
+            saveCurrentTabData();
+            
+            // 更新标签样式
+            const tabs = document.querySelectorAll('.tab');
+            tabs.forEach((tab, i) => {
+                if (i === index) {
+                    tab.classList.add('active');
+                } else {
+                    tab.classList.remove('active');
+                }
+            });
+
+            // 更新内容显示
+            const contents = document.querySelectorAll('.tab-content');
+            contents.forEach((content, i) => {
+                if (i === index) {
+                    content.classList.add('active');
+                } else {
+                    content.classList.remove('active');
+                }
+            });
+        }
+
+        function saveCurrentTabData() {
+            const formData = JSON.parse(localStorage.getItem('businessInfo') || '{}');
+            const activeTabIndex = Array.from(document.querySelectorAll('.tab')).findIndex(tab => tab.classList.contains('active'));
+
+            switch(activeTabIndex) {
+                case 0: // 基本信息
+                    formData.tradeName = document.getElementById('tradeName')?.value || '';
+                    formData.industry = document.getElementById('industry')?.value || '';
+                    formData.description = document.getElementById('description')?.value || '';
+                    break;
+                case 1: // 交易信息
+                    formData.singleAmount = document.getElementById('singleAmount')?.value || '';
+                    formData.maxAmount = document.getElementById('maxAmount')?.value || '';
+                    formData.monthlyAmount = document.getElementById('monthlyAmount')?.value || '';
+                    formData.internationalRatio = document.getElementById('internationalRatio')?.value || '';
+                    break;
+                case 2: // 其他信息
+                    formData.otherProvider = document.querySelector('input[name="otherProvider"]:checked')?.value || '';
+                    formData.selectedProviders = Array.from(document.querySelectorAll('input[name="providers"]:checked'))
+                        .map(checkbox => {
+                            if (checkbox.value === 'other') {
+                                return document.querySelector('#otherProviderInput input')?.value || '';
+                            }
+                            return checkbox.value;
+                        })
+                        .filter(value => value);
+                    break;
+            }
+
+            localStorage.setItem('businessInfo', JSON.stringify(formData));
+        }
+
+        // 修改表单验证逻辑
+        function validateForm() {
+            const activeTab = document.querySelector('.tab-content.active');
+            const requiredInputs = activeTab.querySelectorAll('.form-input, .form-select');
+            let isValid = true;
+
+            requiredInputs.forEach(input => {
+                if (!input.value.trim()) {
+                    input.style.borderColor = 'var(--error-color)';
+                    isValid = false;
+                } else {
+                    input.style.borderColor = 'var(--border-color)';
+                }
+            });
+
+            return isValid;
+        }
+
+        // 添加收单服务商选择相关函数
+        function toggleProviderOptions(show) {
+            const providerOptions = document.getElementById('providerOptions');
+            if (show) {
+                providerOptions.classList.add('show');
+            } else {
+                providerOptions.classList.remove('show');
+                // 重置所有选项
+                document.querySelectorAll('input[name="providers"]').forEach(checkbox => {
+                    checkbox.checked = false;
+                });
+                toggleOtherInput(false);
+            }
+        }
+
+        function toggleOtherInput(show) {
+            const otherInput = document.getElementById('otherProviderInput');
+            if (show) {
+                otherInput.classList.add('show');
+            } else {
+                otherInput.classList.remove('show');
+                otherInput.querySelector('input').value = '';
+            }
+        }
+    </script>
+</body>
+</html> 

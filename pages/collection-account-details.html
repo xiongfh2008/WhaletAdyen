@@ -1,0 +1,771 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>账户详情 - Whalet</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="../styles/custom.css">
+    <style>
+        /* 基础样式 */
+        .section-container {
+            max-height: calc(100vh - 8rem);
+            overflow-y: auto;
+        }
+        .copy-button:hover {
+            color: #7D33FF;
+        }
+        .account-card {
+            transition: all 0.3s ease;
+        }
+        .account-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+        }
+        .warning-icon {
+            color: #FFA500;
+            animation: pulse 2s infinite;
+        }
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.6; }
+            100% { opacity: 1; }
+        }
+        .text-purple {
+            color: #7D33FF !important;
+        }
+        .purple-text {
+            color: #7D33FF;
+        }
+        .purple-text:hover {
+            color: #6929CC;
+        }
+        /* 紫色主题样式 */
+        .purple-theme {
+            color: #7D33FF !important;
+        }
+        .purple-theme:hover {
+            color: #6929CC !important;
+        }
+        .purple-icon {
+            color: #7D33FF !important;
+        }
+        .purple-icon:hover {
+            color: #6929CC !important;
+        }
+        .purple-button {
+            color: #7D33FF !important;
+        }
+        .purple-button:hover {
+            color: #6929CC !important;
+        }
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+        }
+        .modal.active {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .modal-content {
+            background: white;
+            padding: 2rem;
+            border-radius: 8px;
+            width: 90%;
+            max-width: 800px;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+        .tab-btn.active {
+            border-bottom: 2px solid #7D33FF !important;
+            color: #7D33FF !important;
+        }
+        .tab-btn:hover {
+            color: #7D33FF !important;
+            border-bottom-color: #7D33FF !important;
+        }
+        /* 添加链接样式 */
+        a {
+            color: #7D33FF;
+            text-decoration: none;
+        }
+        a:hover {
+            color: #6929CC;
+        }
+        /* 添加或更新样式 */
+        .custom-purple {
+            color: #7D33FF !important;
+        }
+        .custom-purple-hover:hover {
+            color: #6929CC !important;
+        }
+        /* 确保按钮样式优先级 */
+        button.custom-purple,
+        a.custom-purple {
+            color: #7D33FF !important;
+        }
+        button.custom-purple-hover:hover,
+        a.custom-purple-hover:hover {
+            color: #6929CC !important;
+        }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <div class="container mx-auto px-4 py-6">
+        <!-- 主要内容区域 -->
+        <div class="max-w-7xl mx-auto">
+            <div class="bg-white rounded-lg shadow-sm">
+                <!-- 顶部导航栏 -->
+                <div class="p-4 border-b border-gray-200">
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center">
+                            <button onclick="window.history.back()" class="mr-4 flex items-center" style="color: #7D33FF;">
+                                <i class="fas fa-arrow-left"></i>
+                                <span class="ml-1 text-sm">返回</span>
+                            </button>
+                            <h1 class="text-xl font-medium text-gray-900">账户详情</h1>
+                        </div>
+                        <a href="my-assets.html#bank-accounts" class="px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-md text-sm font-medium transition-colors duration-200 flex items-center">
+                            <i class="fas fa-university mr-2"></i>
+                            银行账户管理
+                        </a>
+                    </div>
+                </div>
+
+                <!-- 内容区域 -->
+                <div class="p-6 space-y-6">
+                    <!-- 收款账户模块 -->
+                    <div class="bg-white border border-gray-200 rounded-lg">
+                        <div class="p-6">
+                            <!-- 账户信息标题 -->
+                            <div class="flex items-center justify-between mb-6">
+                                <div class="flex items-center space-x-2">
+                                    <h2 class="text-lg font-medium text-gray-900">账户信息</h2>
+                                    <span class="text-sm text-red-500">为避免收款失败，请尽快绑定店铺激活账户</span>
+                                </div>
+                                <span class="px-2 py-1 bg-yellow-100 text-yellow-800 rounded-full text-xs">未激活</span>
+                            </div>
+
+                            <!-- 账户信息网格布局 -->
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <!-- 左侧信息 -->
+                                <div class="space-y-4">
+                                    <div class="flex items-start space-x-8">
+                                        <div class="w-32">
+                                            <div class="text-sm text-gray-500">创建时间</div>
+                                            <div class="text-xs text-gray-400">Create Time</div>
+                                        </div>
+                                        <div class="flex-1">
+                                            <span class="text-gray-900">2024-03-26 14:54:24</span>
+                                        </div>
+                                    </div>
+
+                                    <div class="flex items-start space-x-8">
+                                        <div class="w-32">
+                                            <div class="text-sm text-gray-500">银行所在地</div>
+                                            <div class="text-xs text-gray-400">Bank Location</div>
+                                        </div>
+                                        <div class="flex-1">
+                                            <span class="text-gray-900">810 Seventh Avenue, New York, NY 10019, US</span>
+                                            <button class="ml-2 text-sm purple-theme" onclick="copyToClipboard('810 Seventh Avenue, New York, NY 10019, US')">复制</button>
+                                        </div>
+                                    </div>
+
+                                    <div class="flex items-start space-x-8">
+                                        <div class="w-32">
+                                            <div class="text-sm text-gray-500">适用平台</div>
+                                            <div class="text-xs text-gray-400">Applicable Platform</div>
+                                        </div>
+                                        <div class="flex-1">
+                                            <span class="text-gray-900">Amazon 北美站</span>
+                                        </div>
+                                    </div>
+
+                                    <div class="flex items-start space-x-8">
+                                        <div class="w-32">
+                                            <div class="text-sm text-gray-500">银行账号</div>
+                                            <div class="text-xs text-gray-400">Bank Account Number</div>
+                                        </div>
+                                        <div class="flex-1">
+                                            <span class="text-gray-900" id="bankAccountNumber">********1367</span>
+                                            <button class="ml-2 text-sm purple-theme" onclick="handleBankAccountView('bankAccountNumber', '20000044626899')">查看</button>
+                                        </div>
+                                    </div>
+
+                                    <div class="flex items-start space-x-8">
+                                        <div class="w-32">
+                                            <div class="text-sm text-gray-500">金融机构名称</div>
+                                            <div class="text-xs text-gray-400">Financial Institution Name</div>
+                                        </div>
+                                        <div class="flex-1">
+                                            <span class="text-gray-900">Community Federal Savings Bank</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- 右侧信息 -->
+                                <div class="space-y-4">
+                                    <div class="flex items-start space-x-8">
+                                        <div class="w-32">
+                                            <div class="text-sm text-gray-500">操作所在地/地区</div>
+                                            <div class="text-xs text-gray-400">Country/Region</div>
+                                        </div>
+                                        <div class="flex-1">
+                                            <span class="text-gray-900">美国</span>
+                                        </div>
+                                    </div>
+
+                                    <div class="flex items-start space-x-8">
+                                        <div class="w-32">
+                                            <div class="text-sm text-gray-500">收款币种</div>
+                                            <div class="text-xs text-gray-400">Currency Receipt</div>
+                                        </div>
+                                        <div class="flex-1">
+                                            <span class="text-gray-900">美元 USD</span>
+                                        </div>
+                                    </div>
+
+                                    <div class="flex items-start space-x-8">
+                                        <div class="w-32">
+                                            <div class="text-sm text-gray-500">9位数收款路线号码</div>
+                                            <div class="text-xs text-gray-400">9 Digit Routing Number</div>
+                                        </div>
+                                        <div class="flex-1">
+                                            <div class="space-y-2">
+                                                <div class="flex items-center">
+                                                    <span class="text-gray-900">026073150(ACH)</span>
+                                                    <button class="ml-2 text-sm purple-theme" onclick="copyToClipboard('026073150')">复制</button>
+                                                </div>
+                                                <div class="flex items-center">
+                                                    <span class="text-gray-900">026073008(Wire)</span>
+                                                    <button class="ml-2 text-sm purple-theme" onclick="copyToClipboard('026073008')">复制</button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="flex items-start space-x-8">
+                                        <div class="w-32">
+                                            <div class="text-sm text-gray-500">账户持有人姓名</div>
+                                            <div class="text-xs text-gray-400">Account Holder Name</div>
+                                        </div>
+                                        <div class="flex-1">
+                                            <span class="text-gray-900">张珊珊</span>
+                                            <button class="ml-2 text-sm purple-theme" onclick="copyToClipboard('张珊珊')">复制</button>
+                                        </div>
+                                    </div>
+
+                                    <div class="flex items-start space-x-8">
+                                        <div class="w-32">
+                                            <div class="text-sm text-gray-500">注销日期</div>
+                                            <div class="text-xs text-gray-400">Cancellation Date</div>
+                                        </div>
+                                        <div class="flex-1">
+                                            <span class="text-gray-900">2027-04-25</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- 持有人信息部分 -->
+                            <div class="mt-8">
+                                <h3 class="text-lg font-medium text-gray-900 mb-4">持有人银行账户</h3>
+                                <div class="text-sm text-gray-500 mb-4">独立持有人银行账户可接收参与平台支付的收款</div>
+                                
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                    <!-- 第一行 -->
+                                    <div class="space-y-4">
+                                        <div class="flex items-start space-x-8">
+                                            <div class="w-32">
+                                                <div class="text-sm text-gray-500">持有人账户名称</div>
+                                                <div class="text-xs text-gray-400">Account Holder Name</div>
+                                            </div>
+                                            <div class="flex-1">
+                                                <span class="text-gray-900">张珊珊</span>
+                                            </div>
+                                        </div>
+
+                                        <div class="flex items-start space-x-8">
+                                            <div class="w-32">
+                                                <div class="text-sm text-gray-500">持有人银行名称</div>
+                                                <div class="text-xs text-gray-400">Bank Name</div>
+                                            </div>
+                                            <div class="flex-1">
+                                                <span class="text-gray-900">民生银行</span>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- 第二行 -->
+                                    <div class="space-y-4">
+                                        <div class="flex items-start space-x-8">
+                                            <div class="w-32">
+                                                <div class="text-sm text-gray-500">持有人银行账号</div>
+                                                <div class="text-xs text-gray-400">Account Number</div>
+                                            </div>
+                                            <div class="flex-1">
+                                                <span class="text-gray-900" id="holderBankAccountNumber">********4824</span>
+                                                <button class="ml-2 text-sm purple-theme" onclick="handleBankAccountView('holderBankAccountNumber', '6225888888888888')">查看</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 店铺信息模块 -->
+                    <div class="bg-white border border-gray-200 rounded-lg p-6">
+                        <!-- 第一行：经营平台和添加店铺按钮 -->
+                        <div class="flex justify-between items-center mb-6">
+                            <div class="flex items-center">
+                                <img src="https://logo.clearbit.com/shopify.com" alt="Shopify" class="h-8 w-8 rounded-full">
+                                <span class="ml-3 text-lg font-medium">Shopify</span>
+                            </div>
+                            <a href="add-shop.html" class="px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-md text-sm font-medium transition-colors duration-200 flex items-center">
+                                <i class="fas fa-plus mr-2"></i>
+                                添加店铺
+                            </a>
+                        </div>
+                        
+                        <!-- 店铺信息列表 -->
+                        <div class="overflow-hidden">
+                            <!-- 表头 -->
+                            <div class="grid grid-cols-4 gap-4 px-4 py-3 bg-gray-50 border-b border-gray-200">
+                                <div class="text-sm font-medium text-gray-500">店铺名称</div>
+                                <div class="text-sm font-medium text-gray-500">店铺别名</div>
+                                <div class="text-sm font-medium text-gray-500">店铺链接</div>
+                                <div class="text-sm font-medium text-gray-500">状态</div>
+                            </div>
+                            
+                            <!-- 列表内容 -->
+                            <div class="divide-y divide-gray-200">
+                                <!-- 店铺1 -->
+                                <div class="grid grid-cols-4 gap-4 px-4 py-4 hover:bg-gray-50">
+                                    <div class="text-sm text-gray-900">Global Tech Store</div>
+                                    <div class="text-sm text-gray-900 flex items-center">
+                                        <span id="shopAlias1">美国电子产品店</span>
+                                        <button onclick="editShopAlias('shopAlias1')" class="ml-2 text-gray-400 hover:text-gray-600">
+                                            <i class="fas fa-edit text-xs"></i>
+                                        </button>
+                                    </div>
+                                    <div class="text-sm">
+                                        <a href="https://globaltechstore.myshopify.com" target="_blank" class="text-gray-900 hover:text-purple-600">https://globaltechstore.myshopify.com</a>
+                                    </div>
+                                    <div>
+                                        <span class="px-2 py-1 bg-green-100 text-green-800 rounded-full text-xs">正常</span>
+                                    </div>
+                                </div>
+
+                                <!-- 店铺2 -->
+                                <div class="grid grid-cols-4 gap-4 px-4 py-4 hover:bg-gray-50">
+                                    <div class="text-sm text-gray-900">Fashion World</div>
+                                    <div class="text-sm text-gray-900 flex items-center">
+                                        <span id="shopAlias2">时尚服饰店</span>
+                                        <button onclick="editShopAlias('shopAlias2')" class="ml-2 text-gray-400 hover:text-gray-600">
+                                            <i class="fas fa-edit text-xs"></i>
+                                        </button>
+                                    </div>
+                                    <div class="text-sm">
+                                        <a href="https://fashionworld.myshopify.com" target="_blank" class="text-gray-900 hover:text-purple-600">https://fashionworld.myshopify.com</a>
+                                    </div>
+                                    <div class="flex items-center justify-between">
+                                        <span class="px-2 py-1 bg-yellow-100 text-yellow-800 rounded-full text-xs">待完善</span>
+                                        <a href="apply-collection-account-binding.html" class="px-3 py-1 bg-red-600 hover:bg-red-700 text-white rounded text-xs transition-colors duration-200">
+                                            绑定店铺
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 密码验证模态窗 -->
+    <div id="passwordModal" class="modal">
+        <div class="modal-content max-w-md">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-lg font-medium">安全验证</h3>
+                <button onclick="closePasswordModal()" class="text-gray-400 hover:text-gray-600">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="mb-6">
+                <label class="block text-sm font-medium text-gray-700 mb-2">
+                    请输入交易密码
+                </label>
+                <div class="mt-2">
+                    <input type="password" class="w-full px-3 py-2 border border-gray-300 rounded-md" placeholder="输入交易密码">
+                </div>
+                <div id="passwordError" class="mt-2 text-red-500 text-sm hidden"></div>
+                <div class="mt-2">
+                    <a href="#" class="text-sm text-[#7D33FF] hover:text-[#6929CC]">忘记密码？</a>
+                </div>
+            </div>
+            <div class="flex justify-end items-center space-x-4 mt-6">
+                <button onclick="closePasswordModal()" class="px-4 py-2 border border-gray-300 text-gray-700 hover:bg-gray-50 rounded-md">
+                    取消
+                </button>
+                <button onclick="verifyPassword()" class="px-4 py-2 border border-[#7D33FF] text-[#7D33FF] hover:bg-[#7D33FF] hover:text-white rounded-md">
+                    确定
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 账户详情模态窗 -->
+    <div id="accountDetailsModal" class="modal">
+        <div class="modal-content max-w-2xl">
+            <!-- 模态窗顶部 -->
+            <div class="flex justify-between items-center pb-4 mb-4 border-b border-gray-200">
+                <div class="flex items-center">
+                    <h3 class="text-xl font-medium text-gray-900">收款账户详情</h3>
+                </div>
+                <button onclick="closeAccountDetailsModal()" class="text-gray-400 hover:text-gray-600">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+
+            <!-- 账户详细信息 -->
+            <div class="space-y-4">
+                <!-- 收款账户信息 -->
+                <div class="space-y-4">
+                    <h4 class="text-lg font-medium text-gray-900">收款账户信息</h4>
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <div class="text-sm text-gray-500">银行账号</div>
+                            <div class="text-xs text-gray-400">Bank Account Number</div>
+                        </div>
+                        <div class="flex items-center">
+                            <span class="text-gray-900 mr-2">20000044626899</span>
+                            <button class="text-sm purple-theme" onclick="copyToClipboard('20000044626899')">
+                                复制
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <div class="text-sm text-gray-500">ACH汇款路线号码</div>
+                            <div class="text-xs text-gray-400">ACH Routing Number</div>
+                        </div>
+                        <div class="flex items-center">
+                            <span class="text-gray-900 mr-2">028000024</span>
+                            <button class="text-sm purple-theme" onclick="copyToClipboard('028000024')">
+                                复制
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <div class="text-sm text-gray-500">SWIFT/BIC</div>
+                            <div class="text-xs text-gray-400">SWIFT/BIC Code</div>
+                        </div>
+                        <div class="flex items-center">
+                            <span class="text-gray-900 mr-2">CHASUS33</span>
+                            <button class="text-sm purple-theme" onclick="copyToClipboard('CHASUS33')">
+                                复制
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <div class="text-sm text-gray-500">银行名称</div>
+                            <div class="text-xs text-gray-400">Bank Name</div>
+                        </div>
+                        <div class="flex items-center">
+                            <span class="text-gray-900 mr-2">JPMORGAN CHASE BANK, N.A.</span>
+                            <button class="text-sm purple-theme" onclick="copyToClipboard('JPMORGAN CHASE BANK, N.A.')">
+                                复制
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <div class="text-sm text-gray-500">银行地址</div>
+                            <div class="text-xs text-gray-400">Bank Address</div>
+                        </div>
+                        <div class="flex items-center">
+                            <span class="text-gray-900 mr-2">383 MADISON AVENUE, NEW YORK, United States</span>
+                            <button class="text-sm purple-theme" onclick="copyToClipboard('383 MADISON AVENUE, NEW YORK, United States')">
+                                复制
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <div class="text-sm text-gray-500">创建时间</div>
+                            <div class="text-xs text-gray-400">Creation Time</div>
+                        </div>
+                        <span class="text-gray-900">2023-06-20</span>
+                    </div>
+
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <div class="text-sm text-gray-500">收款平台</div>
+                            <div class="text-xs text-gray-400">Payment Platform</div>
+                        </div>
+                        <div class="flex items-center">
+                            <img class="h-5 w-5 rounded-full mr-2" src="https://logo.clearbit.com/shopify.com" alt="">
+                            <span class="text-gray-900">Shopify</span>
+                        </div>
+                    </div>
+
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <div class="text-sm text-gray-500">币种</div>
+                            <div class="text-xs text-gray-400">Currency</div>
+                        </div>
+                        <span class="px-2 py-1 bg-blue-100 text-blue-800 rounded-full text-xs">USD</span>
+                    </div>
+
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <div class="text-sm text-gray-500">状态</div>
+                            <div class="text-xs text-gray-400">Status</div>
+                        </div>
+                        <span class="px-2 py-1 bg-green-100 text-green-800 rounded-full text-xs">正常</span>
+                    </div>
+
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <div class="text-sm text-gray-500">注销日期</div>
+                            <div class="text-xs text-gray-400">Cancellation Date</div>
+                        </div>
+                        <div class="flex items-center">
+                            <span class="text-gray-900">2024-06-20</span>
+                            <i class="fas fa-exclamation-circle text-yellow-500 ml-2" title="即将到期"></i>
+                        </div>
+                    </div>
+
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <div class="text-sm text-gray-500">自动续费</div>
+                            <div class="text-xs text-gray-400">Auto Renewal</div>
+                        </div>
+                        <span class="px-2 py-1 bg-green-100 text-green-800 rounded-full text-xs">已开启</span>
+                    </div>
+                </div>
+
+                <!-- 持有人银行账户信息 -->
+                <div class="pt-6 mt-6 border-t border-gray-200">
+                    <h4 class="text-lg font-medium text-gray-900 mb-4">持有人银行账户</h4>
+                    <div class="space-y-4">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <div class="text-sm text-gray-500">持有人账户名称</div>
+                                <div class="text-xs text-gray-400">Account Holder Name</div>
+                            </div>
+                            <div class="flex items-center">
+                                <span class="text-gray-900 mr-2">ZHANG SHANSHAN</span>
+                                <button class="text-sm purple-theme" onclick="copyToClipboard('ZHANG SHANSHAN')">
+                                    复制
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <div class="text-sm text-gray-500">持有人银行名称</div>
+                                <div class="text-xs text-gray-400">Bank Name</div>
+                            </div>
+                            <div class="flex items-center">
+                                <span class="text-gray-900 mr-2">BANK OF CHINA</span>
+                                <button class="text-sm purple-theme" onclick="copyToClipboard('BANK OF CHINA')">
+                                    复制
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <div class="text-sm text-gray-500">持有人账号</div>
+                                <div class="text-xs text-gray-400">Account Number</div>
+                            </div>
+                            <div class="flex items-center">
+                                <span class="text-gray-900 mr-2">6225 8888 8888 8888</span>
+                                <button class="text-sm purple-theme" onclick="copyToClipboard('6225 8888 8888 8888')">
+                                    复制
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <div class="text-sm text-gray-500">持有人银行代码</div>
+                                <div class="text-xs text-gray-400">Bank Code</div>
+                            </div>
+                            <div class="flex items-center">
+                                <span class="text-gray-900 mr-2">BKCHCNBJ</span>
+                                <button class="text-sm purple-theme" onclick="copyToClipboard('BKCHCNBJ')">
+                                    复制
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 编辑店铺别名
+        function editShopAlias(aliasId) {
+            const aliasSpan = document.getElementById(aliasId);
+            const currentAlias = aliasSpan.textContent;
+            const input = document.createElement('input');
+            input.type = 'text';
+            input.value = currentAlias;
+            input.className = 'border border-gray-300 rounded px-2 py-1 text-sm';
+            
+            // 处理回车键和失去焦点事件
+            function saveAlias() {
+                const newAlias = input.value.trim();
+                if (newAlias) {
+                    aliasSpan.textContent = newAlias;
+                    // 这里可以添加保存到服务器的逻辑
+                } else {
+                    aliasSpan.textContent = currentAlias;
+                }
+            }
+            
+            input.onblur = saveAlias;
+            input.onkeypress = function(e) {
+                if (e.key === 'Enter') {
+                    saveAlias();
+                    input.blur();
+                }
+            };
+            
+            aliasSpan.textContent = '';
+            aliasSpan.appendChild(input);
+            input.focus();
+        }
+
+        // 处理银行账号查看逻辑
+        function handleBankAccountView(elementId, fullNumber) {
+            const element = document.getElementById(elementId);
+            const button = element.nextElementSibling;
+            
+            if (button.textContent === '查看') {
+                showPasswordModal(function() {
+                    element.textContent = fullNumber;
+                    button.textContent = '复制';
+                    button.onclick = function() {
+                        copyToClipboard(fullNumber);
+                    };
+                });
+            }
+        }
+
+        // 密码验证模态窗
+        let remainingAttempts = 5;
+
+        function showPasswordModal(callback) {
+            const modal = document.getElementById('passwordModal');
+            modal.classList.add('active');
+            
+            // 重置错误提示和尝试次数
+            document.getElementById('passwordError').classList.add('hidden');
+            remainingAttempts = 5;
+            
+            // 存储回调函数
+            modal.dataset.callback = true;
+            modal._callback = callback;
+        }
+
+        function verifyPassword() {
+            const modal = document.getElementById('passwordModal');
+            const passwordInput = document.querySelector('#passwordModal input[type="password"]');
+            const errorElement = document.getElementById('passwordError');
+            const password = passwordInput.value;
+            
+            // 这里添加实际的密码验证逻辑
+            if (password === '123456') { // 示例密码，实际应该从后端验证
+                if (modal.dataset.callback && modal._callback) {
+                    modal._callback();
+                    delete modal.dataset.callback;
+                    delete modal._callback;
+                }
+                closePasswordModal();
+                passwordInput.value = ''; // 清空密码输入
+                errorElement.classList.add('hidden');
+            } else {
+                remainingAttempts--;
+                errorElement.textContent = `交易密码错误，您还有 ${remainingAttempts} 次机会`;
+                errorElement.classList.remove('hidden');
+                passwordInput.value = ''; // 清空密码输入
+                
+                if (remainingAttempts <= 0) {
+                    closePasswordModal();
+                    // 这里可以添加账户锁定的逻辑
+                }
+            }
+        }
+
+        function closePasswordModal() {
+            document.getElementById('passwordModal').classList.remove('active');
+        }
+
+        // 账户详情模态窗
+        function showAccountDetailsModal() {
+            document.getElementById('accountDetailsModal').classList.add('active');
+        }
+
+        function closeAccountDetailsModal() {
+            document.getElementById('accountDetailsModal').classList.remove('active');
+        }
+
+        // 点击模态窗口外部关闭
+        document.getElementById('accountDetailsModal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeAccountDetailsModal();
+            }
+        });
+
+        // 更新所有"查看账户详情"链接的点击事件
+        document.querySelectorAll('a[href="#"]').forEach(link => {
+            if (link.textContent === '查看账户详情') {
+                link.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    showAccountDetailsModal();
+                });
+            }
+        });
+
+        // 复制到剪贴板功能
+        function copyToClipboard(text) {
+            navigator.clipboard.writeText(text).then(() => {
+                // 可以添加一个提示，表示复制成功
+                const tooltip = document.createElement('div');
+                tooltip.textContent = '复制成功';
+                tooltip.className = 'fixed px-3 py-2 bg-gray-800 text-white text-sm rounded shadow-lg';
+                tooltip.style.left = (event.clientX + 10) + 'px';
+                tooltip.style.top = (event.clientY - 30) + 'px';
+                document.body.appendChild(tooltip);
+                
+                setTimeout(() => {
+                    tooltip.remove();
+                }, 1500);
+            }).catch(err => {
+                console.error('复制失败:', err);
+            });
+        }
+    </script>
+</body>
+</html> 
