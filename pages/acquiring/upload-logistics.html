@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>批量上传物流信息 - Whalet</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="../../styles/custom.css">
+    <style>
+        body {
+            background-color: #f9fafb;
+            font-family: 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+        }
+        .container {
+            max-width: 1280px;
+            margin: 0 auto;
+            padding: 1.5rem 1rem;
+        }
+        @media (min-width: 640px) {
+            .container {
+                padding: 1.5rem;
+            }
+        }
+        @media (min-width: 1024px) {
+            .container {
+                padding: 1.5rem 2rem;
+            }
+        }
+        .upload-area {
+            border: 2px dashed #d1d5db;
+            border-radius: 0.5rem;
+            transition: all 0.2s ease-in-out;
+        }
+        .upload-area:hover {
+            border-color: #7D33FF;
+        }
+        .upload-area.dragover {
+            border-color: #7D33FF;
+            background-color: #f3f4f6;
+        }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <div class="container mx-auto px-4 py-8">
+        <div class="max-w-6xl mx-auto bg-white rounded-lg shadow-sm">
+            <!-- 头部 -->
+            <div class="p-6 border-b border-gray-200">
+                <div class="flex justify-between items-center">
+                    <div class="flex items-center">
+                        <a href="store-management.html" class="text-purple-600 hover:text-purple-700 mr-2">
+                            <i class="fas fa-arrow-left"></i>
+                        </a>
+                        <a href="store-management.html" class="text-purple-600 hover:text-purple-700 mr-4">返回</a>
+                        <h1 class="text-xl font-semibold text-gray-800">批量上传物流信息</h1>
+                    </div>
+                    <a href="store-management.html" class="text-gray-500 hover:text-gray-700">
+                        <i class="fas fa-times"></i>
+                    </a>
+                </div>
+            </div>
+
+            <!-- 主要内容区域 -->
+            <div class="p-6">
+                <div class="max-w-3xl mx-auto">
+                    <!-- 标题 -->
+                    <div class="text-center mb-8">
+                        <h1 class="text-2xl md:text-3xl font-bold text-gray-900 mb-2">批量上传物流信息</h1>
+                        <p class="text-gray-600">支持Excel文件批量上传物流信息</p>
+                    </div>
+
+                    <!-- 上传区域 -->
+                    <div class="upload-area p-8 text-center mb-8" id="uploadArea">
+                        <input type="file" id="fileInput" class="hidden" accept=".xlsx,.xls">
+                        <div class="space-y-4">
+                            <div class="text-gray-400">
+                                <i class="fas fa-cloud-upload-alt text-4xl"></i>
+                            </div>
+                            <div class="text-gray-600">
+                                <p class="mb-2">将文件拖到此处，或<span class="text-purple-600 cursor-pointer" onclick="document.getElementById('fileInput').click()">点击上传</span></p>
+                                <p class="text-sm">支持 .xlsx、.xls 格式文件</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 上传说明 -->
+                    <div class="bg-gray-50 rounded-lg p-6 mb-8">
+                        <h2 class="text-lg font-medium text-gray-900 mb-4">上传说明</h2>
+                        <div class="space-y-4">
+                            <div class="flex items-start">
+                                <div class="flex-shrink-0">
+                                    <i class="fas fa-info-circle text-blue-500 mt-1"></i>
+                        </div>
+                                <div class="ml-3">
+                                    <p class="text-sm text-gray-600">1. 请下载<a href="#" class="text-purple-600 hover:text-purple-700">物流信息模板</a>，按照模板格式填写数据</p>
+                                </div>
+                            </div>
+                            <div class="flex items-start">
+                                <div class="flex-shrink-0">
+                                    <i class="fas fa-exclamation-circle text-yellow-500 mt-1"></i>
+                                </div>
+                                <div class="ml-3">
+                                    <p class="text-sm text-gray-600">2. 请确保填写的信息准确无误，上传后将无法修改</p>
+                                </div>
+                            </div>
+                            <div class="flex items-start">
+                                <div class="flex-shrink-0">
+                                    <i class="fas fa-check-circle text-green-500 mt-1"></i>
+                        </div>
+                                <div class="ml-3">
+                                    <p class="text-sm text-gray-600">3. 支持批量上传，单次最多可上传1000条记录</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 按钮 -->
+                    <div class="flex justify-center space-x-4">
+                        <button onclick="window.location.href='store-management.html'" class="px-6 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500">
+                            返回
+                        </button>
+                        <button id="uploadBtn" class="px-6 py-2 bg-purple-600 text-white rounded-md hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500" disabled>
+                            开始上传
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const uploadArea = document.getElementById('uploadArea');
+            const fileInput = document.getElementById('fileInput');
+            const uploadBtn = document.getElementById('uploadBtn');
+
+            // 拖拽上传
+            uploadArea.addEventListener('dragover', (e) => {
+                    e.preventDefault();
+                uploadArea.classList.add('dragover');
+            });
+
+            uploadArea.addEventListener('dragleave', () => {
+                uploadArea.classList.remove('dragover');
+            });
+
+            uploadArea.addEventListener('drop', (e) => {
+                e.preventDefault();
+                uploadArea.classList.remove('dragover');
+                const files = e.dataTransfer.files;
+                handleFiles(files);
+            });
+
+            // 点击上传
+            fileInput.addEventListener('change', (e) => {
+                const files = e.target.files;
+                handleFiles(files);
+            });
+
+            // 处理文件
+            function handleFiles(files) {
+                if (files.length > 0) {
+                    const file = files[0];
+                    if (file.name.match(/\.(xlsx|xls)$/)) {
+                        uploadBtn.disabled = false;
+                        // 这里可以添加文件预览或其他处理逻辑
+                    } else {
+                        alert('请上传Excel文件（.xlsx或.xls格式）');
+                    }
+                }
+            }
+
+            // 上传按钮点击事件
+            uploadBtn.addEventListener('click', () => {
+                // 这里添加文件上传逻辑
+                alert('文件上传成功！');
+                window.location.href = 'store-management.html';
+            });
+
+            // 用户中心下拉菜单
+            const userCenterBtn = document.getElementById('userCenterBtn');
+            const userCenterDropdown = document.getElementById('userCenterDropdown');
+            
+            userCenterBtn.addEventListener('click', function() {
+                userCenterDropdown.classList.toggle('hidden');
+            });
+            
+            document.addEventListener('click', function(event) {
+                if (!userCenterBtn.contains(event.target) && !userCenterDropdown.contains(event.target)) {
+                    userCenterDropdown.classList.add('hidden');
+                }
+            });
+        });
+    </script>
+</body>
+</html> 

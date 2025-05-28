@@ -341,8 +341,9 @@
             const termsError = document.getElementById('terms-error');
             
             if (termsCheckbox.checked) {
-                // 在新窗口打开step0-select-payment.html
-                window.open('./step0-select-payment.html', '_blank');
+                // 显示申请信息模态框
+                document.getElementById('applicationModal').classList.remove('hidden');
+                document.getElementById('applicationModal').classList.add('flex');
             } else {
                 termsError.classList.remove('hidden');
             }

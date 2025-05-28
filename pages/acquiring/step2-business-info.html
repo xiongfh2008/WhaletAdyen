@@ -753,11 +753,11 @@
                     </h2>
                     <div class="form-group">
                         <label class="form-label" for="tradeName">
-                            交易名称
+                            店铺名称
                             <span class="form-required">*</span>
                         </label>
                         <input type="text" id="tradeName" name="tradeName" class="form-input">
-                        <div class="form-hint">此名称将出现在您用户的收据和银行对账单上。</div>
+                        <div class="form-hint">此名称将会出现在您客户的信用卡账单或顾客收据上。最大长度：22 个字符。不能全部是数字。</div>
                     </div>
 
                     <div class="form-group">
@@ -772,11 +772,38 @@
                     </div>
 
                     <div class="form-group">
+                        <label class="form-label" for="phoneNumber">
+                            店铺电话号码
+                            <span class="form-required">*</span>
+                        </label>
+                        <div style="display: flex; gap: 8px;">
+                            <div style="width: 120px;">
+                                <select id="countryCode" name="countryCode" class="form-select" style="padding-left: 8px;">
+                                    <option value="+86">🇨🇳 +86</option>
+                                    <option value="+852">🇭🇰 +852</option>
+                                    <option value="+853">🇲🇴 +853</option>
+                                    <option value="+886">🇹🇼 +886</option>
+                                    <option value="+1">🇺🇸 +1</option>
+                                    <option value="+44">🇬🇧 +44</option>
+                                    <option value="+81">🇯🇵 +81</option>
+                                    <option value="+82">🇰🇷 +82</option>
+                                    <option value="+65">🇸🇬 +65</option>
+                                    <option value="+60">🇲🇾 +60</option>
+                                    <option value="+61">🇦🇺 +61</option>
+                                    <option value="+64">🇳🇿 +64</option>
+                                </select>
+                            </div>
+                            <input type="tel" id="phoneNumber" name="phoneNumber" class="form-input" style="flex: 1;" placeholder="请输入电话号码">
+                        </div>
+                        <div class="form-hint">请选择国家代码并输入电话号码</div>
+                    </div>
+
+                    <div class="form-group">
                         <label class="form-label" for="website">
                             网址
                             <span class="form-required">*</span>
                         </label>
-                        <div class="form-hint" style="margin-bottom: 8px;">您可以在此添加多个属于同一行业的网站，并提交所有不同域名的网站以供审核。只有审核通过的网站才能进行收款。</div>
+                        <div class="form-hint" style="margin-bottom: 8px;">您可以在此添加多个属于同一行业的网站，并提交所有不同域名的网站以供审核。只有审核通过的网站才能正常使用收单功能。</div>
                         <div id="websiteInputs">
                             <div class="website-input-group" style="display: flex; gap: 8px; margin-bottom: 8px;">
                                 <div style="position: relative; flex: 1;">
@@ -1068,6 +1095,8 @@
             if (savedFormData.tradeName) {
                 document.getElementById('tradeName').value = savedFormData.tradeName;
                 document.getElementById('industry').value = savedFormData.industry;
+                document.getElementById('countryCode').value = savedFormData.countryCode || '+86';
+                document.getElementById('phoneNumber').value = savedFormData.phoneNumber || '';
                 document.getElementById('description').value = savedFormData.description;
             }
             
@@ -1156,6 +1185,8 @@
                 case 0: // 基本信息
                     formData.tradeName = document.getElementById('tradeName')?.value || '';
                     formData.industry = document.getElementById('industry')?.value || '';
+                    formData.countryCode = document.getElementById('countryCode')?.value || '+86';
+                    formData.phoneNumber = document.getElementById('phoneNumber')?.value || '';
                     formData.description = document.getElementById('description')?.value || '';
                     break;
                 case 1: // 交易信息

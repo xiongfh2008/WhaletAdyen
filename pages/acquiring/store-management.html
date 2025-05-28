@@ -1,0 +1,1176 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>店铺管理 - Whalet</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="../../styles/custom.css">
+    <style>
+        body {
+            background-color: #f9fafb;
+            font-family: 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+        }
+        .container {
+            max-width: 1280px;
+            margin: 0 auto;
+            padding: 1.5rem 1rem;
+        }
+        .tab-btn {
+            border-bottom: 2px solid transparent;
+            color: #6b7280;
+            transition: all 0.2s ease-in-out;
+        }
+        .tab-btn:hover {
+            color: #374151;
+            border-bottom-color: #d1d5db;
+        }
+        .tab-btn.active {
+            border-bottom: 2px solid #7D33FF;
+            color: #7D33FF;
+        }
+        .more-actions-dropdown {
+            position: absolute;
+            right: 0;
+            margin-top: 0.5rem;
+            z-index: 50;
+            min-width: 10rem;
+            padding: 0.5rem 0;
+            background-color: white;
+            border-radius: 0.375rem;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+        .search-input {
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%236B7280'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z'%3E%3C/path%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: 0.75rem center;
+            background-size: 1.25rem;
+            padding-left: 2.5rem;
+        }
+        .status-badge {
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px;
+            font-size: 0.875rem;
+            font-weight: 500;
+        }
+        .status-activated {
+            background-color: #D1FAE5;
+            color: #065F46;
+        }
+        .status-in-progress {
+            background-color: #FEF3C7;
+            color: #92400E;
+        }
+        .status-disabled {
+            background-color: #F3F4F6;
+            color: #6B7280;
+        }
+        .apply-button {
+            background-color: #7D33FF;
+            color: white;
+            padding: 0.375rem 0.75rem;
+            border-radius: 0.375rem;
+            font-size: 0.875rem;
+            font-weight: 500;
+            transition: all 0.2s;
+            cursor: pointer;
+        }
+        .apply-button:hover {
+            background-color: #6B2BDB;
+        }
+
+        /* 弹框样式 */
+        .modal-backdrop {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 50;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: white;
+            border-radius: 8px;
+            width: 90%;
+            max-width: 600px;
+            z-index: 51;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .modal.show {
+            display: block;
+        }
+
+        .modal-backdrop.show {
+            display: block;
+        }
+
+        /* 多选下拉框样式 */
+        .multiselect-dropdown {
+            position: relative;
+        }
+
+        .multiselect-options {
+            display: none;
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: white;
+            border: 1px solid #e5e7eb;
+            border-radius: 0.375rem;
+            margin-top: 4px;
+            max-height: 200px;
+            overflow-y: auto;
+            z-index: 10;
+        }
+
+        .multiselect-options.show {
+            display: block;
+        }
+
+        .selected-options {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 4px;
+            padding: 4px;
+            min-height: 42px;
+            border: 1px solid #e5e7eb;
+            border-radius: 0.375rem;
+        }
+
+        .selected-option {
+            display: inline-flex;
+            align-items: center;
+            background: #f3f4f6;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 0.875rem;
+            gap: 4px;
+        }
+
+        .selected-option button {
+            border: none;
+            background: none;
+            padding: 0;
+            color: #6b7280;
+            cursor: pointer;
+        }
+
+        /* 添加支付方式弹框样式 */
+        .payment-method-modal {
+            max-width: 800px;
+        }
+
+        .payment-search {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .payment-list {
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+        }
+
+        .payment-item {
+            display: flex;
+            align-items: center;
+            padding: 16px;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        .payment-item:last-child {
+            border-bottom: none;
+        }
+
+        .payment-logo {
+            width: 40px;
+            height: 28px;
+            margin-right: 16px;
+            display: flex;
+            align-items: center;
+        }
+
+        .payment-logo img {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+        }
+
+        .payment-info {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .payment-name {
+            min-width: 140px;
+        }
+
+        .payment-type {
+            min-width: 120px;
+            color: #666;
+        }
+
+        .payment-region {
+            min-width: 80px;
+            color: #666;
+        }
+
+        .payment-status {
+            min-width: 100px;
+            text-align: center;
+        }
+
+        .status-tag {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        .status-enabled {
+            background-color: #D1FAE5;
+            color: #065F46;
+        }
+
+        .status-disabled {
+            background-color: #F3F4F6;
+            color: #6B7280;
+        }
+
+        .status-processing {
+            background-color: #FEF3C7;
+            color: #92400E;
+        }
+
+        .status-available {
+            background-color: #E0E7FF;
+            color: #3730A3;
+        }
+
+        /* 表格响应式样式 */
+        @media (max-width: 1280px) {
+            .responsive-table {
+                display: block;
+            }
+
+            .responsive-table thead {
+                display: none;
+            }
+
+            .responsive-table tbody {
+                display: block;
+            }
+
+            .responsive-table tr {
+                display: block;
+                padding: 1rem 0;
+                border-bottom: 1px solid #e5e7eb;
+            }
+
+            .responsive-table td {
+                display: flex;
+                padding: 0.5rem 1rem;
+                text-align: right;
+                border: none;
+            }
+
+            .responsive-table td::before {
+                content: attr(data-label);
+                font-weight: 500;
+                margin-right: auto;
+                color: #374151;
+            }
+
+            .responsive-table td:last-child {
+                border-bottom: none;
+            }
+        }
+
+        /* 表格列宽样式 */
+        .table-description {
+            max-width: 200px; /* 设置最大宽度 */
+            width: 200px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        /* 鼠标悬停时显示完整内容 */
+        .table-description:hover {
+            white-space: normal;
+            overflow: visible;
+            position: relative;
+            z-index: 1;
+        }
+
+        .table-description:hover .description-text {
+            position: absolute;
+            background: white;
+            padding: 8px;
+            border-radius: 4px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            width: max-content;
+            max-width: 400px;
+        }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <div class="container mx-auto">
+        <!-- 将顶部导航和tab选项卡放在同一行 -->
+        <div class="bg-white rounded-lg shadow-sm mb-4">
+            <div class="border-b border-gray-200">
+                <div class="flex justify-between items-center">
+                    <nav class="flex justify-start -mb-px pl-6">
+                        <button class="tab-btn active whitespace-nowrap py-4 px-8 border-b-2 text-center text-sm font-medium" data-tab="store-management">
+                            店铺管理
+                        </button>
+                        <button class="tab-btn whitespace-nowrap py-4 px-8 border-b-2 text-center text-sm font-medium" data-tab="logistics">
+                            上传物流信息
+                        </button>
+                    </nav>
+                    <div class="flex items-center space-x-6 pr-6">
+                        <!-- 公告图标 -->
+                        <div class="relative">
+                            <a href="#" class="text-gray-600 hover:text-blue-600">
+                                <span class="relative">
+                                    <i class="fas fa-bell text-lg"></i>
+                                    <span class="absolute -top-1 -right-1 w-2 h-2 bg-red-500 rounded-full"></span>
+                                </span>
+                            </a>
+                        </div>
+                        
+                        <!-- 帮助 -->
+                        <a href="#" class="text-gray-600 hover:text-blue-600 text-sm">帮助</a>
+                        
+                        <!-- 用户中心 -->
+                        <div class="relative">
+                            <button id="userCenterBtn" class="text-gray-600 hover:text-blue-600">
+                                <i class="fas fa-user-circle text-lg"></i>
+                            </button>
+                            <div id="userCenterDropdown" class="absolute right-0 top-full mt-1 w-64 bg-white rounded-lg shadow-lg py-3 hidden z-10">
+                                <!-- 用户信息部分 -->
+                                <div class="px-4 pb-3 border-b border-gray-100">
+                                    <div class="flex items-center justify-between mb-2">
+                                        <h3 class="font-medium text-gray-900">张珊珊</h3>
+                                        <a href="#" class="text-xs text-blue-600 hover:text-blue-700">升级为企业</a>
+                                    </div>
+                                    <div class="flex items-center justify-between mb-2">
+                                        <div class="flex items-center">
+                                            <span class="text-sm text-gray-600">ZHANG SHANSHAN</span>
+                                            <button class="ml-2 text-gray-400 hover:text-gray-600">
+                                                <i class="fas fa-edit text-xs"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                    <div class="flex items-center justify-between">
+                                        <span class="text-sm text-gray-600">ID</span>
+                                        <button class="text-gray-400 hover:text-gray-600">
+                                            <i class="fas fa-copy text-xs"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                                <!-- 菜单选项 -->
+                                <div class="py-1">
+                                    <a href="../security.html" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                        <i class="fas fa-shield-alt w-5 text-gray-400"></i>
+                                        安全设置
+                                    </a>
+                                    <a href="../authentication-info.html" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                        <i class="fas fa-id-card w-5 text-gray-400"></i>
+                                        认证信息
+                                    </a>
+                                    <a href="../fees.html" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                        <i class="fas fa-percentage w-5 text-gray-400"></i>
+                                        费率查询
+                                    </a>
+                                    <a href="../coupons.html" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                        <i class="fas fa-gift w-5 text-gray-400"></i>
+                                        我的优惠
+                                    </a>
+                                    <a href="../my-invitation.html" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                                        <i class="fas fa-user-plus w-5 text-gray-400"></i>
+                                        我的邀请
+                                    </a>
+                                    <div class="border-t border-gray-100 my-1"></div>
+                                    <a href="../logout.html" class="block px-4 py-2 text-sm text-red-600 hover:bg-gray-100">
+                                        <i class="fas fa-sign-out-alt w-5"></i>
+                                        退出
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 店铺管理内容 -->
+        <div id="store-management" class="tab-content active bg-white rounded-lg shadow-sm">
+            <!-- 标题和按钮部分 -->
+            <div class="p-6 border-b border-gray-200">
+                <div class="flex justify-between items-center">
+                    <h2 class="text-xl font-semibold text-gray-800">店铺管理</h2>
+                    <button class="bg-purple-600 hover:bg-purple-700 text-white px-6 py-2 rounded text-sm font-medium flex items-center">
+                        <i class="fas fa-plus mr-2"></i>
+                        添加店铺
+                    </button>
+                </div>
+            </div>
+
+            <!-- 查询条件部分 -->
+            <div class="p-6 border-b border-gray-200">
+                <div class="flex flex-wrap gap-4">
+                    <div class="flex items-center">
+                        <input type="text" placeholder="搜索店铺名称/链接" class="p-2 text-sm border border-gray-300 rounded-md w-64">
+                    </div>
+                    <div class="flex items-center">
+                        <span class="mr-2 text-sm font-medium text-gray-700">支付方式:</span>
+                        <select class="p-2 text-sm border border-gray-300 rounded-md w-32">
+                            <option value="">全部</option>
+                            <option value="visa">Visa</option>
+                            <option value="mastercard">Mastercard</option>
+                            <option value="paypal">PayPal</option>
+                            <option value="applepay">Apple Pay</option>
+                            <option value="googlepay">Google Pay</option>
+                        </select>
+                    </div>
+                    <div class="flex items-center">
+                        <span class="mr-2 text-sm font-medium text-gray-700">创建时间:</span>
+                        <input type="date" class="p-2 text-sm border border-gray-300 rounded-md">
+                        <span class="mx-2">至</span>
+                        <input type="date" class="p-2 text-sm border border-gray-300 rounded-md">
+                    </div>
+                    <div class="flex items-center">
+                        <span class="mr-2 text-sm font-medium text-gray-700">状态:</span>
+                        <select class="p-2 text-sm border border-gray-300 rounded-md w-32">
+                            <option value="">全部状态</option>
+                            <option value="activated">已启用</option>
+                            <option value="in-progress">审核中</option>
+                            <option value="disabled">已禁用</option>
+                        </select>
+                    </div>
+                    <div class="flex items-center">
+                        <button class="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded text-sm font-medium">查询</button>
+                        <button class="ml-2 border border-gray-300 text-gray-700 px-4 py-2 rounded text-sm font-medium hover:bg-gray-50">重置</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 列表部分 -->
+            <div class="overflow-x-auto">
+                <table class="min-w-full divide-y divide-gray-200">
+                    <thead class="bg-gray-50">
+                        <tr>
+                            <th scope="col" class="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">店铺名称</th>
+                            <th scope="col" class="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">店铺链接</th>
+                            <th scope="col" class="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">店铺说明</th>
+                            <th scope="col" class="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">电话号码</th>
+                            <th scope="col" class="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">支付方式</th>
+                            <th scope="col" class="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">创建时间</th>
+                            <th scope="col" class="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">状态</th>
+                            <th scope="col" class="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">操作</th>
+                        </tr>
+                    </thead>
+                    <tbody class="bg-white divide-y divide-gray-200">
+                        <tr>
+                            <td class="px-3 py-4 whitespace-nowrap">
+                                <span class="text-sm font-medium text-gray-900">Premium Fashion Store</span>
+                            </td>
+                            <td class="px-3 py-4 whitespace-nowrap">
+                                <a href="#" class="text-sm text-blue-600 hover:text-blue-800">store.whalet.com/youpin</a>
+                            </td>
+                            <td class="px-3 py-4">
+                                <div class="text-sm text-gray-900 max-w-xs truncate">High-quality clothing store providing premium shopping experience</div>
+                            </td>
+                            <td class="px-3 py-4 whitespace-nowrap">
+                                <span class="text-sm text-gray-900">+86 13812345678</span>
+                            </td>
+                            <td class="px-3 py-4 whitespace-nowrap">
+                                <div class="flex space-x-2">
+                                    <img src="../../assets/images/Visa.svg" alt="Visa" class="w-6 h-6 object-contain">
+                                    <img src="../../assets/images/Mastercard.svg" alt="Mastercard" class="w-6 h-6 object-contain">
+                                    <img src="../../assets/images/paypal.svg" alt="PayPal" class="w-6 h-6 object-contain">
+                                </div>
+                            </td>
+                            <td class="px-3 py-4 whitespace-nowrap">
+                                <span class="text-sm text-gray-900">2024-03-15 14:30</span>
+                            </td>
+                            <td class="px-3 py-4 whitespace-nowrap">
+                                <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">已启用</span>
+                            </td>
+                            <td class="px-3 py-4 whitespace-nowrap text-sm font-medium">
+                                <button onclick="openAddPaymentModal(this)" data-store-id="1" data-payments="visa,mastercard,paypal" class="text-blue-600 hover:text-blue-900">
+                                    管理
+                                </button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="px-3 py-4 whitespace-nowrap">
+                                <span class="text-sm font-medium text-gray-900">Kids World Fashion</span>
+                            </td>
+                            <td class="px-3 py-4 whitespace-nowrap">
+                                <a href="#" class="text-sm text-blue-600 hover:text-blue-800">store.whalet.com/kidswear</a>
+                            </td>
+                            <td class="px-3 py-4">
+                                <div class="text-sm text-gray-900 max-w-xs truncate">Professional children's clothing store with quality guarantee</div>
+                            </td>
+                            <td class="px-3 py-4 whitespace-nowrap">
+                                <span class="text-sm text-gray-900">+86 13987654321</span>
+                            </td>
+                            <td class="px-3 py-4 whitespace-nowrap">
+                                <div class="flex space-x-2">
+                                    <img src="../../assets/images/Visa.svg" alt="Visa" class="w-6 h-6 object-contain">
+                                    <img src="../../assets/images/Apple Pay.svg" alt="Apple Pay" class="w-6 h-6 object-contain">
+                                </div>
+                            </td>
+                            <td class="px-3 py-4 whitespace-nowrap">
+                                <span class="text-sm text-gray-900">2024-03-14 09:15</span>
+                            </td>
+                            <td class="px-3 py-4 whitespace-nowrap">
+                                <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-100 text-yellow-800">审核中</span>
+                            </td>
+                            <td class="px-3 py-4 whitespace-nowrap text-sm font-medium">
+                                <button onclick="openAddPaymentModal(this)" data-store-id="2" data-payments="visa,applepay" class="text-blue-600 hover:text-blue-900">
+                                    管理
+                                </button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="px-3 py-4 whitespace-nowrap">
+                                <span class="text-sm font-medium text-gray-900">Sports Trend Shop</span>
+                            </td>
+                            <td class="px-3 py-4 whitespace-nowrap">
+                                <a href="#" class="text-sm text-blue-600 hover:text-blue-800">store.whalet.com/sports</a>
+                            </td>
+                            <td class="px-3 py-4">
+                                <div class="text-sm text-gray-900 max-w-xs truncate">Professional sports apparel and equipment, leading sports fashion</div>
+                            </td>
+                            <td class="px-3 py-4 whitespace-nowrap">
+                                <span class="text-sm text-gray-900">+86 13567891234</span>
+                            </td>
+                            <td class="px-3 py-4 whitespace-nowrap">
+                                <div class="flex space-x-2">
+                                    <img src="../../assets/images/Visa.svg" alt="Visa" class="w-6 h-6 object-contain">
+                                    <img src="../../assets/images/Mastercard.svg" alt="Mastercard" class="w-6 h-6 object-contain">
+                                    <img src="../../assets/images/Google Pay.svg" alt="Google Pay" class="w-6 h-6 object-contain">
+                                </div>
+                            </td>
+                            <td class="px-3 py-4 whitespace-nowrap">
+                                <span class="text-sm text-gray-900">2024-03-13 16:45</span>
+                            </td>
+                            <td class="px-3 py-4 whitespace-nowrap">
+                                <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-gray-100 text-gray-800">已禁用</span>
+                            </td>
+                            <td class="px-3 py-4 whitespace-nowrap text-sm font-medium">
+                                <button onclick="openAddPaymentModal(this)" data-store-id="3" data-payments="visa,mastercard,googlepay" class="text-blue-600 hover:text-blue-900">
+                                    管理
+                                </button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+                <!-- 分页 -->
+                <div class="px-6 py-4 border-t border-gray-200">
+                    <div class="flex items-center justify-between">
+                        <div class="text-sm text-gray-500">
+                            共5页/25条数据
+                        </div>
+                        <div class="flex items-center space-x-1">
+                            <button class="px-3 py-1 border border-gray-300 rounded text-sm text-gray-700 hover:bg-gray-50 disabled:opacity-50" disabled>
+                                上一页
+                            </button>
+                            <button class="px-3 py-1 border border-purple-600 bg-purple-600 text-white rounded text-sm">1</button>
+                            <button class="px-3 py-1 border border-gray-300 rounded text-sm text-gray-700 hover:bg-gray-50">2</button>
+                            <button class="px-3 py-1 border border-gray-300 rounded text-sm text-gray-700 hover:bg-gray-50">3</button>
+                            <button class="px-3 py-1 border border-gray-300 rounded text-sm text-gray-700 hover:bg-gray-50">4</button>
+                            <button class="px-3 py-1 border border-gray-300 rounded text-sm text-gray-700 hover:bg-gray-50">5</button>
+                            <button class="px-3 py-1 border border-gray-300 rounded text-sm text-gray-700 hover:bg-gray-50">
+                                下一页
+                            </button>
+                            <div class="flex items-center ml-4">
+                                <span class="text-sm text-gray-700">跳至</span>
+                                <input type="text" class="w-12 h-7 mx-1 text-center text-sm border border-gray-300 rounded">
+                                <span class="text-sm text-gray-700">页</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 上传物流信息内容 -->
+        <div id="logistics" class="tab-content hidden bg-white rounded-lg shadow-sm">
+            <!-- 标题和按钮部分 -->
+            <div class="p-6 border-b border-gray-200">
+                <div class="flex justify-between items-center">
+                    <h2 class="text-xl font-semibold text-gray-800">物流信息管理</h2>
+                    <a href="upload-logistics.html" class="bg-purple-600 hover:bg-purple-700 text-white px-6 py-2 rounded text-sm font-medium flex items-center">
+                        <i class="fas fa-upload mr-2"></i>
+                        批量上传物流信息
+                    </a>
+                </div>
+            </div>
+
+            <!-- 查询条件部分 -->
+            <div class="p-6 border-b border-gray-200">
+                <div class="flex flex-wrap gap-4">
+                    <div class="flex items-center">
+                        <span class="mr-2 text-sm font-medium text-gray-700">日期:</span>
+                        <input type="date" class="p-2 text-sm border border-gray-300 rounded-md" placeholder="开始日期">
+                        <span class="mx-2">至</span>
+                        <input type="date" class="p-2 text-sm border border-gray-300 rounded-md" placeholder="结束日期">
+                    </div>
+                    <div class="flex items-center">
+                        <span class="mr-2 text-sm font-medium text-gray-700">是否上传物流:</span>
+                        <select class="p-2 text-sm border border-gray-300 rounded-md w-32">
+                            <option value="">全部</option>
+                            <option value="uploaded">已上传</option>
+                            <option value="not_uploaded">未上传</option>
+                        </select>
+                    </div>
+                    <div class="flex items-center">
+                        <input type="text" placeholder="商户订单号" class="p-2 text-sm border border-gray-300 rounded-md w-64">
+                        <button class="ml-2 bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded text-sm font-medium">查询</button>
+                        <button class="ml-2 border border-gray-300 text-gray-700 px-4 py-2 rounded text-sm font-medium hover:bg-gray-50">重置</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 列表部分 -->
+            <div class="overflow-x-auto">
+                <table class="min-w-full divide-y divide-gray-200">
+                    <thead class="bg-gray-50">
+                        <tr>
+                            <th scope="col" class="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">创建时间</th>
+                            <th scope="col" class="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">店铺名称</th>
+                            <th scope="col" class="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">商户订单号</th>
+                            <th scope="col" class="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">订单金额</th>
+                            <th scope="col" class="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">物流公司</th>
+                            <th scope="col" class="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">物流单号</th>
+                        </tr>
+                    </thead>
+                    <tbody class="bg-white divide-y divide-gray-200">
+                        <tr>
+                            <td class="px-3 py-4 whitespace-nowrap text-sm text-gray-900">2024-03-15 14:30</td>
+                            <td class="px-3 py-4 whitespace-nowrap text-sm text-gray-900">Premium Fashion Store</td>
+                            <td class="px-3 py-4 whitespace-nowrap text-sm text-gray-900">ORD202403150001</td>
+                            <td class="px-3 py-4 whitespace-nowrap text-sm text-gray-900">$299.99</td>
+                            <td class="px-3 py-4 whitespace-nowrap text-sm text-gray-900">DHL</td>
+                            <td class="px-3 py-4 whitespace-nowrap text-sm text-gray-900">DHL1234567890</td>
+                        </tr>
+                    </tbody>
+                </table>
+                <!-- 分页 -->
+                <div class="px-6 py-4 border-t border-gray-200">
+                    <div class="flex items-center justify-between">
+                        <div class="text-sm text-gray-500">
+                            共3页/15条数据
+                        </div>
+                        <div class="flex items-center space-x-1">
+                            <button class="px-3 py-1 border border-gray-300 rounded text-sm text-gray-700 hover:bg-gray-50 disabled:opacity-50" disabled>
+                                上一页
+                            </button>
+                            <button class="px-3 py-1 border border-purple-600 bg-purple-600 text-white rounded text-sm">1</button>
+                            <button class="px-3 py-1 border border-gray-300 rounded text-sm text-gray-700 hover:bg-gray-50">2</button>
+                            <button class="px-3 py-1 border border-gray-300 rounded text-sm text-gray-700 hover:bg-gray-50">3</button>
+                            <button class="px-3 py-1 border border-gray-300 rounded text-sm text-gray-700 hover:bg-gray-50">
+                                下一页
+                            </button>
+                            <div class="flex items-center ml-4">
+                                <span class="text-sm text-gray-700">跳至</span>
+                                <input type="text" class="w-12 h-7 mx-1 text-center text-sm border border-gray-300 rounded">
+                                <span class="text-sm text-gray-700">页</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 添加店铺弹框 -->
+    <div id="addStoreModal" class="modal">
+        <div class="p-6">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-xl font-medium text-gray-900">添加店铺</h2>
+                <button class="text-gray-400 hover:text-gray-500" onclick="closeModal()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <form id="addStoreForm" class="space-y-6">
+                <!-- 行业 -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">
+                        行业 <span class="text-red-500">*</span>
+                    </label>
+                    <select required class="w-full p-2 border border-gray-300 rounded-md focus:ring-purple-500 focus:border-purple-500">
+                        <option value="">请选择行业</option>
+                        <option value="retail">零售：宠物用品</option>
+                        <option value="service">服务</option>
+                        <option value="food">餐饮</option>
+                        <option value="entertainment">娱乐</option>
+                        <option value="education">教育</option>
+                        <option value="other">其他</option>
+                    </select>
+                </div>
+
+                <!-- 店铺名称 -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">
+                        店铺名称 <span class="text-red-500">*</span>
+                    </label>
+                    <input type="text" required class="w-full p-2 border border-gray-300 rounded-md focus:ring-purple-500 focus:border-purple-500" placeholder="请输入店铺名称" maxlength="22">
+                    <p class="mt-1 text-sm text-gray-500">此名称将会出现在您客户的信用卡账单或收据上。最大长度：22个字符。不能全部是数字。</p>
+                </div>
+
+                <!-- 网址 -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">
+                        网址 <span class="text-red-500">*</span>
+                    </label>
+                    <div class="flex">
+                        <span class="inline-flex items-center px-3 rounded-l-md border border-r-0 border-gray-300 bg-gray-50 text-gray-500 text-sm">
+                            https://
+                        </span>
+                        <input type="text" required class="flex-1 p-2 border border-gray-300 rounded-r-md focus:ring-purple-500 focus:border-purple-500" placeholder="请输入网址">
+                    </div>
+                    <p class="mt-1 text-sm text-gray-500">您可以在此添加多个属于同一行业的网站，并提交所有不同域名的网站以供审核。</p>
+                </div>
+
+                <!-- 店铺电话号码 -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">
+                        店铺电话号码 <span class="text-red-500">*</span>
+                    </label>
+                    <div class="flex gap-2">
+                        <select class="w-32 p-2 border border-gray-300 rounded-md focus:ring-purple-500 focus:border-purple-500">
+                            <option value="86">CN +86</option>
+                            <option value="1">US +1</option>
+                            <option value="44">GB +44</option>
+                            <!-- 其他国家代码 -->
+                        </select>
+                        <input type="tel" required class="flex-1 p-2 border border-gray-300 rounded-md focus:ring-purple-500 focus:border-purple-500" placeholder="请输入电话号码">
+                    </div>
+                </div>
+
+                <!-- 店铺说明 -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">
+                        店铺说明 <span class="text-red-500">*</span>
+                    </label>
+                    <textarea required class="w-full p-2 border border-gray-300 rounded-md focus:ring-purple-500 focus:border-purple-500" rows="4" placeholder="请输入店铺说明"></textarea>
+                </div>
+
+                <!-- 支付方式 -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">
+                        支付方式 <span class="text-red-500">*</span>
+                    </label>
+                    <div class="multiselect-dropdown">
+                        <div class="selected-options" id="selectedPayments">
+                            <span class="text-gray-400 text-sm">请选择支付方式</span>
+                        </div>
+                        <div class="multiselect-options" id="paymentOptions">
+                            <div class="p-2 hover:bg-gray-100">
+                                <label class="flex items-center space-x-2">
+                                    <input type="checkbox" value="visa" class="payment-option">
+                                    <img src="../../assets/images/Visa.svg" alt="Visa" class="w-8 h-6 object-contain">
+                                    <span>Visa</span>
+                                </label>
+                            </div>
+                            <div class="p-2 hover:bg-gray-100">
+                                <label class="flex items-center space-x-2">
+                                    <input type="checkbox" value="mastercard" class="payment-option">
+                                    <img src="../../assets/images/Mastercard.svg" alt="Mastercard" class="w-8 h-6 object-contain">
+                                    <span>Mastercard</span>
+                                </label>
+                            </div>
+                            <div class="p-2 hover:bg-gray-100">
+                                <label class="flex items-center space-x-2">
+                                    <input type="checkbox" value="applepay" class="payment-option">
+                                    <img src="../../assets/images/Apple Pay.svg" alt="Apple Pay" class="w-8 h-6 object-contain">
+                                    <span>Apple Pay</span>
+                                </label>
+                            </div>
+                            <div class="p-2 hover:bg-gray-100">
+                                <label class="flex items-center space-x-2">
+                                    <input type="checkbox" value="googlepay" class="payment-option">
+                                    <img src="../../assets/images/Google Pay.svg" alt="Google Pay" class="w-8 h-6 object-contain">
+                                    <span>Google Pay</span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 按钮组 -->
+                <div class="flex justify-end space-x-4 pt-4">
+                    <button type="button" class="px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50" onclick="closeModal()">
+                        取消
+                    </button>
+                    <button type="submit" class="px-4 py-2 bg-purple-600 text-white rounded-md text-sm font-medium hover:bg-purple-700">
+                        提交
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+    <div id="modalBackdrop" class="modal-backdrop"></div>
+
+    <!-- 添加支付方式弹框 -->
+    <div id="addPaymentModal" class="modal payment-method-modal">
+        <div class="p-6">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-xl font-medium text-gray-900">添加支付方式</h2>
+                <button class="text-gray-400 hover:text-gray-500" onclick="closePaymentModal()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+
+            <div class="payment-search">
+                <input type="text" placeholder="搜索支付方式名称" class="flex-1 p-2 border border-gray-300 rounded-md focus:ring-purple-500 focus:border-purple-500">
+                <select class="p-2 border border-gray-300 rounded-md focus:ring-purple-500 focus:border-purple-500">
+                    <option value="">支付方式类型</option>
+                    <option value="Cards">Cards</option>
+                    <option value="Digital Wallets">Digital Wallets</option>
+                </select>
+                <select class="p-2 border border-gray-300 rounded-md focus:ring-purple-500 focus:border-purple-500">
+                    <option value="">消费者地区</option>
+                    <option value="全球">全球</option>
+                </select>
+            </div>
+
+            <div class="payment-list">
+                <div class="payment-item">
+                    <input type="checkbox" class="payment-checkbox mr-4" value="visa" disabled>
+                    <div class="payment-logo">
+                        <img src="../../assets/images/Visa.svg" alt="Visa">
+                    </div>
+                    <div class="payment-info">
+                        <span class="payment-name">Visa</span>
+                        <span class="payment-type">Cards</span>
+                        <span class="payment-region">全球</span>
+                        <span class="payment-status">
+                            <span class="status-tag status-enabled">已启用</span>
+                        </span>
+                    </div>
+                </div>
+                <div class="payment-item">
+                    <input type="checkbox" class="payment-checkbox mr-4" value="mastercard" disabled>
+                    <div class="payment-logo">
+                        <img src="../../assets/images/Mastercard.svg" alt="Mastercard">
+                    </div>
+                    <div class="payment-info">
+                        <span class="payment-name">Mastercard</span>
+                        <span class="payment-type">Cards</span>
+                        <span class="payment-region">全球</span>
+                        <span class="payment-status">
+                            <span class="status-tag status-processing">处理中</span>
+                        </span>
+                    </div>
+                </div>
+                <div class="payment-item">
+                    <input type="checkbox" class="payment-checkbox mr-4" value="amex">
+                    <div class="payment-logo">
+                        <img src="../../assets/images/American Express.svg" alt="American Express">
+                    </div>
+                    <div class="payment-info">
+                        <span class="payment-name">American Express</span>
+                        <span class="payment-type">Cards</span>
+                        <span class="payment-region">全球</span>
+                        <span class="payment-status">
+                            <span class="status-tag status-available">可申请</span>
+                        </span>
+                    </div>
+                </div>
+                <div class="payment-item">
+                    <input type="checkbox" class="payment-checkbox mr-4" value="applepay" disabled>
+                    <div class="payment-logo">
+                        <img src="../../assets/images/Apple Pay.svg" alt="Apple Pay">
+                    </div>
+                    <div class="payment-info">
+                        <span class="payment-name">Apple Pay</span>
+                        <span class="payment-type">Digital Wallets</span>
+                        <span class="payment-region">全球</span>
+                        <span class="payment-status">
+                            <span class="status-tag status-disabled">禁用</span>
+                        </span>
+                    </div>
+                </div>
+                <div class="payment-item">
+                    <input type="checkbox" class="payment-checkbox mr-4" value="googlepay">
+                    <div class="payment-logo">
+                        <img src="../../assets/images/Google Pay.svg" alt="Google Pay">
+                    </div>
+                    <div class="payment-info">
+                        <span class="payment-name">Google Pay</span>
+                        <span class="payment-type">Digital Wallets</span>
+                        <span class="payment-region">全球</span>
+                        <span class="payment-status">
+                            <span class="status-tag status-available">可申请</span>
+                        </span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 按钮组 -->
+            <div class="flex justify-end space-x-4 pt-6">
+                <button type="button" class="px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50" onclick="closePaymentModal()">
+                    取消
+                </button>
+                <button type="button" onclick="submitAddPayment()" class="px-4 py-2 bg-purple-600 text-white rounded-md text-sm font-medium hover:bg-purple-700">
+                    提交
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 全局变量和函数
+        let currentStoreId = null;
+        let existingPayments = [];
+
+        // 打开添加支付方式弹框
+        function openAddPaymentModal(button) {
+            const modal = document.getElementById('addPaymentModal');
+            const backdrop = document.getElementById('modalBackdrop');
+            currentStoreId = button.getAttribute('data-store-id');
+            existingPayments = button.getAttribute('data-payments').split(',');
+
+            // 根据支付方式状态设置复选框状态
+            document.querySelectorAll('.payment-item').forEach(item => {
+                const checkbox = item.querySelector('.payment-checkbox');
+                const status = item.querySelector('.status-tag').textContent;
+                const paymentValue = checkbox.value;
+
+                // 设置复选框状态
+                if (existingPayments.includes(paymentValue)) {
+                    checkbox.checked = true;
+                    checkbox.disabled = true;
+                } else {
+                    checkbox.checked = false;
+                    checkbox.disabled = status !== '可申请';
+                }
+            });
+
+            modal.classList.add('show');
+            backdrop.classList.add('show');
+        }
+
+        // 关闭添加支付方式弹框
+        function closePaymentModal() {
+            const modal = document.getElementById('addPaymentModal');
+            const backdrop = document.getElementById('modalBackdrop');
+            modal.classList.remove('show');
+            backdrop.classList.remove('show');
+        }
+
+        // 提交添加支付方式
+        function submitAddPayment() {
+            const selectedPayments = Array.from(document.querySelectorAll('.payment-checkbox:checked')).map(cb => cb.value);
+            
+            // 这里添加提交逻辑，可以是API调用
+            console.log('提交支付方式:', {
+                storeId: currentStoreId,
+                payments: selectedPayments
+            });
+
+            // 关闭弹框
+            closePaymentModal();
+            
+            // 显示成功提示
+            alert('支付方式添加成功！');
+        }
+
+        // Tab切换功能
+        document.addEventListener('DOMContentLoaded', function() {
+            const tabButtons = document.querySelectorAll('.tab-btn');
+            const tabContents = document.querySelectorAll('.tab-content');
+
+            tabButtons.forEach(button => {
+                button.addEventListener('click', () => {
+                    // 移除所有tab按钮的active类
+                    tabButtons.forEach(btn => {
+                        btn.classList.remove('active');
+                        btn.classList.remove('border-purple-600');
+                        btn.classList.add('border-transparent');
+                    });
+
+                    // 添加当前tab按钮的active类
+                    button.classList.add('active');
+                    button.classList.add('border-purple-600');
+                    button.classList.remove('border-transparent');
+
+                    // 隐藏所有tab内容
+                    tabContents.forEach(content => {
+                        content.classList.add('hidden');
+                    });
+
+                    // 显示当前tab内容
+                    const tabId = button.getAttribute('data-tab');
+                    document.getElementById(tabId).classList.remove('hidden');
+                });
+            });
+
+            // User center dropdown
+            const userCenterBtn = document.getElementById('userCenterBtn');
+            const userCenterDropdown = document.getElementById('userCenterDropdown');
+            
+            userCenterBtn.addEventListener('click', function() {
+                userCenterDropdown.classList.toggle('hidden');
+            });
+            
+            // Close dropdown when clicking outside
+            document.addEventListener('click', function(event) {
+                if (!userCenterBtn.contains(event.target) && !userCenterDropdown.contains(event.target)) {
+                    userCenterDropdown.classList.add('hidden');
+                }
+            });
+
+            // 分页相关的事件处理
+            const paginationLinks = document.querySelectorAll('nav[aria-label="Pagination"] a');
+            paginationLinks.forEach(link => {
+                link.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    // 这里可以添加页面切换的逻辑
+                });
+            });
+
+            // 添加店铺弹框相关代码
+            const addStoreButton = document.querySelector('.bg-purple-600');
+            const modal = document.getElementById('addStoreModal');
+            const backdrop = document.getElementById('modalBackdrop');
+            const selectedPayments = document.getElementById('selectedPayments');
+            const paymentOptions = document.getElementById('paymentOptions');
+            const paymentCheckboxes = document.querySelectorAll('.payment-option');
+
+            // 打开弹框
+            addStoreButton.addEventListener('click', function() {
+                modal.classList.add('show');
+                backdrop.classList.add('show');
+            });
+
+            // 关闭弹框
+            window.closeModal = function() {
+                modal.classList.remove('show');
+                backdrop.classList.remove('show');
+            };
+
+            backdrop.addEventListener('click', closeModal);
+
+            // 支付方式多选下拉框
+            selectedPayments.addEventListener('click', function() {
+                paymentOptions.classList.toggle('show');
+            });
+
+            // 点击其他地方关闭下拉框
+            document.addEventListener('click', function(e) {
+                if (!selectedPayments.contains(e.target) && !paymentOptions.contains(e.target)) {
+                    paymentOptions.classList.remove('show');
+                }
+            });
+
+            // 处理支付方式选择
+            paymentCheckboxes.forEach(checkbox => {
+                checkbox.addEventListener('change', function() {
+                    updateSelectedPayments();
+                });
+            });
+
+            function updateSelectedPayments() {
+                const selected = Array.from(paymentCheckboxes)
+                    .filter(cb => cb.checked)
+                    .map(cb => {
+                        const label = cb.closest('label');
+                        const img = label.querySelector('img').cloneNode(true);
+                        const span = label.querySelector('span').textContent;
+                        return { img, text: span, value: cb.value };
+                    });
+
+                selectedPayments.innerHTML = selected.length ? 
+                    selected.map(item => `
+                        <div class="selected-option">
+                            ${item.img.outerHTML}
+                            <span>${item.text}</span>
+                            <button type="button" onclick="removePayment('${item.value}')">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        </div>
+                    `).join('') :
+                    '<span class="text-gray-400 text-sm">请选择支付方式</span>';
+            }
+
+            // 移除已选支付方式
+            window.removePayment = function(value) {
+                const checkbox = document.querySelector(`.payment-checkbox[value="${value}"]`);
+                if (checkbox) {
+                    checkbox.checked = false;
+                    updateSelectedPayments();
+                }
+            };
+
+            // 表单提交
+            document.getElementById('addStoreForm').addEventListener('submit', function(e) {
+                e.preventDefault();
+                // 这里添加表单提交逻辑
+                alert('店铺添加成功！');
+                closeModal();
+            });
+
+            // 添加支付方式弹框关闭事件
+            document.getElementById('modalBackdrop').addEventListener('click', closePaymentModal);
+
+            // 支付方式搜索功能
+            const paymentSearch = document.querySelector('.payment-search input');
+            if (paymentSearch) {
+                paymentSearch.addEventListener('input', function(e) {
+                    const searchTerm = e.target.value.toLowerCase();
+                    document.querySelectorAll('.payment-item').forEach(item => {
+                        const paymentName = item.querySelector('.payment-name').textContent.toLowerCase();
+                        const paymentType = item.querySelector('.payment-type').textContent.toLowerCase();
+                        const paymentStatus = item.querySelector('.status-tag').textContent.toLowerCase();
+                        if (paymentName.includes(searchTerm) || 
+                            paymentType.includes(searchTerm) || 
+                            paymentStatus.includes(searchTerm)) {
+                            item.style.display = '';
+                        } else {
+                            item.style.display = 'none';
+                        }
+                    });
+                });
+            }
+
+            // 支付方式类型筛选
+            const typeFilter = document.querySelector('.payment-search select:first-of-type');
+            if (typeFilter) {
+                typeFilter.addEventListener('change', function(e) {
+                    const filterValue = e.target.value.toLowerCase();
+                    document.querySelectorAll('.payment-item').forEach(item => {
+                        const paymentType = item.querySelector('.payment-type').textContent;
+                        if (!filterValue || paymentType.toLowerCase() === filterValue) {
+                            item.style.display = '';
+                        } else {
+                            item.style.display = 'none';
+                        }
+                    });
+                });
+            }
+        });
+    </script>
+</body>
+</html> 
