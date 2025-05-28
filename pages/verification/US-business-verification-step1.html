@@ -636,23 +636,67 @@
                     <div class="form-col">
                         <div class="form-group">
                             <label class="form-label required">企业注册州</label>
-                            <select class="select-input">
+                            <div class="form-row" style="margin-bottom: 8px;">
+                                <div class="form-col">
+                                    <input type="text" class="form-input" placeholder="请输入城市">
+                                </div>
+                                <div class="form-col">
+                                    <select class="select-input" id="reg-state">
                                 <option value="" disabled selected>请选择州</option>
-                                <option value="AL">Alabama</option>
-                                <option value="AK">Alaska</option>
-                                <option value="AZ">Arizona</option>
-                                <option value="AR">Arkansas</option>
-                                <option value="CA">California</option>
-                                <option value="CO">Colorado</option>
-                                <option value="CT">Connecticut</option>
-                                <option value="DE">Delaware</option>
-                                <option value="FL">Florida</option>
-                                <option value="GA">Georgia</option>
-                                <option value="HI">Hawaii</option>
-                                <option value="ID">Idaho</option>
-                                <option value="IL">Illinois</option>
-                                <!-- 其他州份... -->
+                                        <option value="AL">Alabama 阿拉巴马州</option>
+                                        <option value="AK">Alaska 阿拉斯加州</option>
+                                        <option value="AZ">Arizona 亚利桑那州</option>
+                                        <option value="AR">Arkansas 阿肯色州</option>
+                                        <option value="CA">California 加利福尼亚州</option>
+                                        <option value="CO">Colorado 科罗拉多州</option>
+                                        <option value="CT">Connecticut 康涅狄格州</option>
+                                        <option value="DE">Delaware 特拉华州</option>
+                                        <option value="FL">Florida 佛罗里达州</option>
+                                        <option value="GA">Georgia 乔治亚州</option>
+                                        <option value="HI">Hawaii 夏威夷州</option>
+                                        <option value="ID">Idaho 爱达荷州</option>
+                                        <option value="IL">Illinois 伊利诺伊州</option>
+                                        <option value="IN">Indiana 印第安纳州</option>
+                                        <option value="IA">Iowa 爱荷华州</option>
+                                        <option value="KS">Kansas 堪萨斯州</option>
+                                        <option value="KY">Kentucky 肯塔基州</option>
+                                        <option value="LA">Louisiana 路易斯安那州</option>
+                                        <option value="ME">Maine 缅因州</option>
+                                        <option value="MD">Maryland 马里兰州</option>
+                                        <option value="MA">Massachusetts 马萨诸塞州</option>
+                                        <option value="MI">Michigan 密歇根州</option>
+                                        <option value="MN">Minnesota 明尼苏达州</option>
+                                        <option value="MS">Mississippi 密西西比州</option>
+                                        <option value="MO">Missouri 密苏里州</option>
+                                        <option value="MT">Montana 蒙大拿州</option>
+                                        <option value="NE">Nebraska 内布拉斯加州</option>
+                                        <option value="NV">Nevada 内华达州</option>
+                                        <option value="NH">New Hampshire 新罕布什尔州</option>
+                                        <option value="NJ">New Jersey 新泽西州</option>
+                                        <option value="NM">New Mexico 新墨西哥州</option>
+                                        <option value="NY">New York 纽约州</option>
+                                        <option value="NC">North Carolina 北卡罗来纳州</option>
+                                        <option value="ND">North Dakota 北达科他州</option>
+                                        <option value="OH">Ohio 俄亥俄州</option>
+                                        <option value="OK">Oklahoma 俄克拉荷马州</option>
+                                        <option value="OR">Oregon 俄勒冈州</option>
+                                        <option value="PA">Pennsylvania 宾夕法尼亚州</option>
+                                        <option value="RI">Rhode Island 罗德岛州</option>
+                                        <option value="SC">South Carolina 南卡罗来纳州</option>
+                                        <option value="SD">South Dakota 南达科他州</option>
+                                        <option value="TN">Tennessee 田纳西州</option>
+                                        <option value="TX">Texas 得克萨斯州</option>
+                                        <option value="UT">Utah 犹他州</option>
+                                        <option value="VT">Vermont 佛蒙特州</option>
+                                        <option value="VA">Virginia 弗吉尼亚州</option>
+                                        <option value="WA">Washington 华盛顿州</option>
+                                        <option value="WV">West Virginia 西弗吉尼亚州</option>
+                                        <option value="WI">Wisconsin 威斯康星州</option>
+                                        <option value="WY">Wyoming 怀俄明州</option>
+                                        <option value="DC">District of Columbia 哥伦比亚特区</option>
                             </select>
+                                </div>
+                            </div>
                         </div>
                     </div>
                     
@@ -668,21 +712,71 @@
                 <!-- 企业注册地址 -->
                 <div class="form-group">
                     <label class="form-label required">企业注册地址</label>
+                    <input type="text" class="form-input" placeholder="地址1" style="margin-bottom: 8px;">
+                    <input type="text" class="form-input" placeholder="地址2（可选）" style="margin-bottom: 8px;">
                     <div class="form-row" style="margin-bottom: 8px;">
-                        <div class="form-col">
-                            <select class="select-input" id="reg-state">
-                                <option value="" disabled selected>请选择州</option>
-                                <!-- 州份选项与上面相同 -->
-                            </select>
-                        </div>
                         <div class="form-col">
                             <input type="text" class="form-input" placeholder="请输入城市">
                         </div>
+                        <div class="form-col">
+                            <select class="select-input" id="reg-state">
+                                <option value="" disabled selected>请选择州</option>
+                                <option value="AL">Alabama 阿拉巴马州</option>
+                                <option value="AK">Alaska 阿拉斯加州</option>
+                                <option value="AZ">Arizona 亚利桑那州</option>
+                                <option value="AR">Arkansas 阿肯色州</option>
+                                <option value="CA">California 加利福尼亚州</option>
+                                <option value="CO">Colorado 科罗拉多州</option>
+                                <option value="CT">Connecticut 康涅狄格州</option>
+                                <option value="DE">Delaware 特拉华州</option>
+                                <option value="FL">Florida 佛罗里达州</option>
+                                <option value="GA">Georgia 乔治亚州</option>
+                                <option value="HI">Hawaii 夏威夷州</option>
+                                <option value="ID">Idaho 爱达荷州</option>
+                                <option value="IL">Illinois 伊利诺伊州</option>
+                                <option value="IN">Indiana 印第安纳州</option>
+                                <option value="IA">Iowa 爱荷华州</option>
+                                <option value="KS">Kansas 堪萨斯州</option>
+                                <option value="KY">Kentucky 肯塔基州</option>
+                                <option value="LA">Louisiana 路易斯安那州</option>
+                                <option value="ME">Maine 缅因州</option>
+                                <option value="MD">Maryland 马里兰州</option>
+                                <option value="MA">Massachusetts 马萨诸塞州</option>
+                                <option value="MI">Michigan 密歇根州</option>
+                                <option value="MN">Minnesota 明尼苏达州</option>
+                                <option value="MS">Mississippi 密西西比州</option>
+                                <option value="MO">Missouri 密苏里州</option>
+                                <option value="MT">Montana 蒙大拿州</option>
+                                <option value="NE">Nebraska 内布拉斯加州</option>
+                                <option value="NV">Nevada 内华达州</option>
+                                <option value="NH">New Hampshire 新罕布什尔州</option>
+                                <option value="NJ">New Jersey 新泽西州</option>
+                                <option value="NM">New Mexico 新墨西哥州</option>
+                                <option value="NY">New York 纽约州</option>
+                                <option value="NC">North Carolina 北卡罗来纳州</option>
+                                <option value="ND">North Dakota 北达科他州</option>
+                                <option value="OH">Ohio 俄亥俄州</option>
+                                <option value="OK">Oklahoma 俄克拉荷马州</option>
+                                <option value="OR">Oregon 俄勒冈州</option>
+                                <option value="PA">Pennsylvania 宾夕法尼亚州</option>
+                                <option value="RI">Rhode Island 罗德岛州</option>
+                                <option value="SC">South Carolina 南卡罗来纳州</option>
+                                <option value="SD">South Dakota 南达科他州</option>
+                                <option value="TN">Tennessee 田纳西州</option>
+                                <option value="TX">Texas 得克萨斯州</option>
+                                <option value="UT">Utah 犹他州</option>
+                                <option value="VT">Vermont 佛蒙特州</option>
+                                <option value="VA">Virginia 弗吉尼亚州</option>
+                                <option value="WA">Washington 华盛顿州</option>
+                                <option value="WV">West Virginia 西弗吉尼亚州</option>
+                                <option value="WI">Wisconsin 威斯康星州</option>
+                                <option value="WY">Wyoming 怀俄明州</option>
+                                <option value="DC">District of Columbia 哥伦比亚特区</option>
+                            </select>
+                        </div>
+                        </div>
                     </div>
-                    <input type="text" class="form-input" placeholder="地址1" style="margin-bottom: 8px;">
-                    <input type="text" class="form-input" placeholder="地址2（可选）" style="margin-bottom: 8px;">
                     <input type="text" class="form-input" placeholder="邮政编码">
-                </div>
 
                 <!-- 企业经营地址 -->
                 <div class="form-group">
@@ -702,7 +796,57 @@
                             <div class="form-col">
                                 <select class="select-input">
                                     <option value="" disabled selected>请选择州</option>
-                                    <!-- 州份选项与上面相同 -->
+                                    <option value="AL">Alabama 阿拉巴马州</option>
+                                    <option value="AK">Alaska 阿拉斯加州</option>
+                                    <option value="AZ">Arizona 亚利桑那州</option>
+                                    <option value="AR">Arkansas 阿肯色州</option>
+                                    <option value="CA">California 加利福尼亚州</option>
+                                    <option value="CO">Colorado 科罗拉多州</option>
+                                    <option value="CT">Connecticut 康涅狄格州</option>
+                                    <option value="DE">Delaware 特拉华州</option>
+                                    <option value="FL">Florida 佛罗里达州</option>
+                                    <option value="GA">Georgia 乔治亚州</option>
+                                    <option value="HI">Hawaii 夏威夷州</option>
+                                    <option value="ID">Idaho 爱达荷州</option>
+                                    <option value="IL">Illinois 伊利诺伊州</option>
+                                    <option value="IN">Indiana 印第安纳州</option>
+                                    <option value="IA">Iowa 爱荷华州</option>
+                                    <option value="KS">Kansas 堪萨斯州</option>
+                                    <option value="KY">Kentucky 肯塔基州</option>
+                                    <option value="LA">Louisiana 路易斯安那州</option>
+                                    <option value="ME">Maine 缅因州</option>
+                                    <option value="MD">Maryland 马里兰州</option>
+                                    <option value="MA">Massachusetts 马萨诸塞州</option>
+                                    <option value="MI">Michigan 密歇根州</option>
+                                    <option value="MN">Minnesota 明尼苏达州</option>
+                                    <option value="MS">Mississippi 密西西比州</option>
+                                    <option value="MO">Missouri 密苏里州</option>
+                                    <option value="MT">Montana 蒙大拿州</option>
+                                    <option value="NE">Nebraska 内布拉斯加州</option>
+                                    <option value="NV">Nevada 内华达州</option>
+                                    <option value="NH">New Hampshire 新罕布什尔州</option>
+                                    <option value="NJ">New Jersey 新泽西州</option>
+                                    <option value="NM">New Mexico 新墨西哥州</option>
+                                    <option value="NY">New York 纽约州</option>
+                                    <option value="NC">North Carolina 北卡罗来纳州</option>
+                                    <option value="ND">North Dakota 北达科他州</option>
+                                    <option value="OH">Ohio 俄亥俄州</option>
+                                    <option value="OK">Oklahoma 俄克拉荷马州</option>
+                                    <option value="OR">Oregon 俄勒冈州</option>
+                                    <option value="PA">Pennsylvania 宾夕法尼亚州</option>
+                                    <option value="RI">Rhode Island 罗德岛州</option>
+                                    <option value="SC">South Carolina 南卡罗来纳州</option>
+                                    <option value="SD">South Dakota 南达科他州</option>
+                                    <option value="TN">Tennessee 田纳西州</option>
+                                    <option value="TX">Texas 得克萨斯州</option>
+                                    <option value="UT">Utah 犹他州</option>
+                                    <option value="VT">Vermont 佛蒙特州</option>
+                                    <option value="VA">Virginia 弗吉尼亚州</option>
+                                    <option value="WA">Washington 华盛顿州</option>
+                                    <option value="WV">West Virginia 西弗吉尼亚州</option>
+                                    <option value="WI">Wisconsin 威斯康星州</option>
+                                    <option value="WY">Wyoming 怀俄明州</option>
+                                    <option value="DC">District of Columbia 哥伦比亚特区</option>
                                 </select>
                             </div>
                             <div class="form-col">
