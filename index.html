@@ -613,12 +613,12 @@
                     <ul class="submenu" id="submenu-acquiring">
                         <li>
                             <div class="menu-item" data-page="acquiring/store-management">
-                                <span class="menu-text">店铺管理</span>
+                                <span class="menu-text" data-i18n="menu_store_management">店铺管理</span>
                             </div>
                         </li>
                         <li>
                             <div class="menu-item" data-page="acquiring/disputes">
-                                <span class="menu-text">拒付管理</span>
+                                <span class="menu-text" data-i18n="menu_disputes">拒付管理</span>
                             </div>
                         </li>
                         <li>
@@ -763,24 +763,46 @@
         // 获取IP地址并判断地区
         async function getIPLocation() {
             try {
-                // 使用 ipify.org 服务获取IP
-                const ipResponse = await fetch('https://api.ipify.org?format=json');
-                const ipData = await ipResponse.json();
-                console.log('获取到的IP地址:', ipData.ip);
+                // 使用多个API来检测IP位置，提高成功率
+                const apis = [
+                    'https://ipapi.co/json/',
+                    'https://ipinfo.io/json',
+                    'https://api.ipify.org?format=json'
+                ];
                 
-                // 使用 ip-api.com 服务获取IP地理位置信息
-                const locationResponse = await fetch(`http://ip-api.com/json/${ipData.ip}`);
-                const locationData = await locationResponse.json();
-                console.log('IP地理位置信息:', locationData);
+                for (const api of apis) {
+                    try {
+                        const response = await fetch(api, { timeout: 5000 });
+                        const data = await response.json();
+                        console.log('IP检测API响应:', api, data);
+                        
+                        // 根据不同API的响应格式判断
+                        let countryCode = null;
+                        if (data.country_code) countryCode = data.country_code;
+                        else if (data.country) countryCode = data.country;
+                        else if (api.includes('ipify')) {
+                            // ipify只返回IP，跳过继续尝试其他API
+                            continue;
+                        }
+                        
+                        if (countryCode) {
+                            const isChineseIP = countryCode === 'CN';
+                            console.log('检测到国家代码:', countryCode, '是否中国IP:', isChineseIP);
+                            return isChineseIP ? 'zh-CN' : 'en';
+                        }
+                    } catch (apiError) {
+                        console.warn('API请求失败:', api, apiError);
+                        continue;
+                    }
+                }
                 
-                // 检查是否是中国IP
-                const isChineseIP = locationData.countryCode === 'CN';
-                console.log('是否中国IP:', isChineseIP);
-                
-                return isChineseIP ? 'zh-CN' : 'en';
+                // 所有API都失败，默认返回中文
+                console.log('所有IP检测API都失败，默认返回中文');
+                return 'zh-CN';
             } catch (error) {
-                console.error('获取IP地址失败:', error);
-                return 'en';
+                console.error('IP检测失败:', error);
+                // 如果检测失败，默认返回中文
+                return 'zh-CN';
             }
         }
 
@@ -798,6 +820,8 @@
         // 设置语言
         function setLanguage(lang) {
             console.log('开始设置语言:', lang);
+            // 保存语言设置到localStorage
+            localStorage.setItem('language', lang);
             document.documentElement.lang = lang;
             
             // 更新所有翻译文本
@@ -920,12 +944,37 @@
             const newLang = currentLang === 'zh-CN' ? 'en' : 'zh-CN';
             console.log('从', currentLang, '切换到', newLang);
             
+            // 标记这是用户明确的选择
+            localStorage.setItem('userSetLanguage', 'true');
             setLanguage(newLang);
         }
+
+        // 重置语言设置函数（调试用）
+        function resetLanguageSettings() {
+            localStorage.removeItem('language');
+            localStorage.removeItem('userSetLanguage');
+            console.log('语言设置已重置，页面将重新加载');
+            window.location.reload();
+        }
+        
+        // 将重置函数暴露到全局，方便调试
+        window.resetLanguageSettings = resetLanguageSettings;
 
         // 初始化页面语言
         async function initializeLanguage() {
             console.log('开始初始化语言...');
+            
+            // 检查是否有用户明确设置的语言标记
+            const userSetLanguage = localStorage.getItem('userSetLanguage');
+            const savedLang = localStorage.getItem('language');
+            
+            if (userSetLanguage === 'true' && savedLang) {
+                console.log('使用用户明确设置的语言:', savedLang);
+                setLanguage(savedLang);
+                return;
+            }
+            
+            // 如果没有用户明确设置，执行IP检测或默认中文
             try {
                 const detectedLang = await getIPLocation();
                 console.log('IP检测结果语言:', detectedLang);
@@ -949,7 +998,8 @@
                 setLanguage(detectedLang);
             } catch (error) {
                 console.error('语言初始化失败:', error);
-                setLanguage('en');
+                // 如果检测失败，默认设置为中文
+                setLanguage('zh-CN');
             }
         }
         

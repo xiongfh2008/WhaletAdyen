@@ -41,6 +41,70 @@
             border-radius: 0.375rem;
             box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
         }
+        
+        /* 弹框样式 */
+        .modal-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 1rem;
+            z-index: 1000;
+        }
+        
+        .modal-container.hidden {
+            display: none !important;
+        }
+        
+        .modal-box {
+            background: white;
+            border-radius: 0.5rem;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+            width: 100%;
+            max-width: 42rem;
+            max-height: 85vh;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .modal-header {
+            padding: 1.5rem;
+            border-bottom: 1px solid #e5e7eb;
+            flex-shrink: 0;
+        }
+        
+        .modal-body {
+            flex: 1;
+            overflow-y: auto;
+            padding: 1.5rem;
+            min-height: 0;
+        }
+        
+        .modal-footer {
+            padding: 1.5rem;
+            border-top: 1px solid #e5e7eb;
+            flex-shrink: 0;
+        }
+        .modal-content {
+            max-height: 85vh;
+            overflow-y: auto;
+        }
+        @media (max-height: 600px) {
+            .modal-content {
+                max-height: 80vh;
+            }
+        }
+        @media (max-width: 640px) {
+            .modal-width {
+                width: 95vw;
+                max-width: 95vw;
+            }
+        }
     </style>
 </head>
 <body class="bg-gray-50">
@@ -359,36 +423,43 @@
     </div>
 
     <!-- 处理拒付弹框 -->
-    <div id="disputeModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 hidden items-center justify-center">
-        <div class="bg-white rounded-lg shadow-xl w-[600px]">
+    <div id="disputeModal" class="modal-container hidden">
+        <div class="modal-box">
             <!-- 弹框头部 -->
-            <div class="px-6 py-4 border-b border-gray-200 flex justify-between items-center">
+            <div class="modal-header flex justify-between items-center">
                 <h3 class="text-lg font-medium text-gray-900">处理拒付</h3>
                 <button onclick="closeDisputeModal()" class="text-gray-400 hover:text-gray-500">
-                    <i class="fas fa-times"></i>
+                    <i class="fas fa-times text-xl"></i>
                 </button>
             </div>
 
-            <!-- 弹框内容 -->
-            <div class="px-6 py-4">
+            <!-- 弹框内容 - 可滚动区域 -->
+            <div class="modal-body">
                 <div class="mb-6">
+                    <!-- 选择处理方式标签 -->
+                    <div class="mb-3">
+                        <label class="text-sm font-medium text-gray-900">
+                            选择处理方式<span class="text-red-500 ml-1">*</span>
+                        </label>
+                    </div>
+                    
                     <div class="flex space-x-4">
                         <button onclick="selectDisputeAction('appeal')" id="appealBtn" class="flex-1 py-2 px-4 rounded border text-center transition-colors">
-                            申诉拒付
+                            申诉
                         </button>
                         <button onclick="selectDisputeAction('accept')" id="acceptBtn" class="flex-1 py-2 px-4 rounded border text-center transition-colors">
-                            接收拒付
+                            接受拒付
                         </button>
                     </div>
                 </div>
 
-                <!-- 申诉拒付上传区域 -->
+                <!-- 申诉上传区域 -->
                 <div id="appealSection" class="hidden">
                     <div class="mb-4">
-                        <h4 class="text-base font-medium text-gray-900 mb-2">提交以下文件以申诉拒付：</h4>
-                        <p class="text-sm text-gray-600 mb-2">在同一文件中提交您的申诉文件。请确保格式符合以下要求：</p>
+                        <h4 class="text-base font-medium text-gray-900 mb-2">提交以下文件以申诉：</h4>
+                        <p class="text-sm text-gray-600 mb-4">请按照文件类型分别上传申诉材料。请确保格式符合以下要求：</p>
                         
-                        <div class="bg-gray-50 p-4 rounded-lg mb-4">
+                        <div class="bg-gray-50 p-4 rounded-lg mb-6">
                             <h5 class="font-medium mb-2">上传文件要求：</h5>
                             <ul class="text-sm text-gray-600 list-disc list-inside space-y-1">
                                 <li>文件必须为英文</li>
@@ -397,21 +468,59 @@
                             </ul>
                         </div>
 
-                        <div class="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center" id="dropZone">
-                            <div class="mb-3">
-                                <i class="fas fa-file-upload text-gray-400 text-3xl"></i>
+                        <!-- TIDorInvoice 上传区域 -->
+                        <div class="mb-6">
+                            <div class="flex items-center mb-3">
+                                <h5 class="font-medium text-gray-900">TID或发票</h5>
+                                <span class="ml-2 px-2 py-1 bg-gray-100 text-gray-600 text-xs rounded">非必传</span>
                             </div>
-                            <p class="text-gray-600 mb-2">点击上传或拖拽文件至此处</p>
-                            <p class="text-sm text-gray-500">支持 JPG、TIFF、PDF 格式</p>
-                            <input type="file" id="fileInput" class="hidden" accept=".jpg,.jpeg,.tiff,.pdf" onchange="handleFileSelect(event)">
+                            <div class="border-2 border-dashed border-gray-300 rounded-lg p-4 text-center" id="tidDropZone">
+                                <div class="mb-2">
+                                    <i class="fas fa-file-upload text-gray-400 text-2xl"></i>
+                                </div>
+                                <p class="text-gray-600 mb-1 text-sm">点击上传或拖拽文件至此处</p>
+                                <p class="text-xs text-gray-500">支持 JPG、TIFF、PDF 格式</p>
+                                <input type="file" id="tidFileInput" class="hidden" accept=".jpg,.jpeg,.tiff,.pdf" onchange="handleFileSelect(event, 'tid')">
+                            </div>
+                            <div id="tidFileList" class="mt-3 space-y-2"></div>
                         </div>
-                        <div id="fileList" class="mt-4 space-y-2"></div>
+
+                        <!-- GoodsNotReturned 上传区域 -->
+                        <div class="mb-4">
+                            <div class="flex items-center mb-3">
+                                <h5 class="font-medium text-gray-900">商品未退回证明</h5>
+                                <span class="ml-2 px-2 py-1 bg-red-100 text-red-600 text-xs rounded">必传</span>
+                            </div>
+                            <div class="border-2 border-dashed border-gray-300 rounded-lg p-4 text-center" id="goodsDropZone">
+                                <div class="mb-2">
+                                    <i class="fas fa-file-upload text-gray-400 text-2xl"></i>
+                                </div>
+                                <p class="text-gray-600 mb-1 text-sm">点击上传或拖拽文件至此处</p>
+                                <p class="text-xs text-gray-500">支持 JPG、TIFF、PDF 格式</p>
+                                <input type="file" id="goodsFileInput" class="hidden" accept=".jpg,.jpeg,.tiff,.pdf" onchange="handleFileSelect(event, 'goods')">
+                            </div>
+                            <div id="goodsFileList" class="mt-3 space-y-2"></div>
+                        </div>
                     </div>
                 </div>
 
-                <!-- 接收拒付提示 -->
+                <!-- 接受拒付提示 -->
                 <div id="acceptSection" class="hidden">
-                    <p class="text-gray-600 mb-4">您确定要接收此笔拒付吗？接收后将无法再次申诉。</p>
+                    <p class="text-gray-600 mb-4">您确定要接受此笔拒付吗？接受后将无法再次申诉。</p>
+                </div>
+
+                <!-- 申诉建议提示 -->
+                <div class="bg-blue-50 p-4 rounded-lg mb-4">
+                    <div class="flex">
+                        <div class="flex-shrink-0">
+                            <i class="fas fa-info-circle text-blue-400"></i>
+                        </div>
+                        <div class="ml-3">
+                            <p class="text-sm text-blue-700">
+                                建议您仅在交易金额较高或拥有充分有力证据时再发起拒付申诉。每笔申诉将收取手续费，且流程较长，可能产生额外成本。请您谨慎评估后再做决定。
+                            </p>
+                        </div>
+                    </div>
                 </div>
 
                 <!-- 警告提示 -->
@@ -430,7 +539,7 @@
             </div>
 
             <!-- 弹框底部 -->
-            <div class="px-6 py-4 border-t border-gray-200 flex justify-end">
+            <div class="modal-footer flex justify-end">
                 <button onclick="closeDisputeModal()" class="mr-3 px-4 py-2 border border-gray-300 rounded-md text-sm text-gray-700 hover:bg-gray-50">
                     取消
                 </button>
@@ -442,18 +551,18 @@
     </div>
 
     <!-- 查看申诉详情弹框 -->
-    <div id="viewDisputeModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 hidden items-center justify-center">
-        <div class="bg-white rounded-lg shadow-xl w-[600px]">
+    <div id="viewDisputeModal" class="modal-container hidden">
+        <div class="modal-box">
             <!-- 弹框头部 -->
-            <div class="px-6 py-4 border-b border-gray-200 flex justify-between items-center">
+            <div class="modal-header flex justify-between items-center">
                 <h3 class="text-lg font-medium text-gray-900">申诉详情</h3>
                 <button onclick="closeViewDisputeModal()" class="text-gray-400 hover:text-gray-500">
-                    <i class="fas fa-times"></i>
+                    <i class="fas fa-times text-xl"></i>
                 </button>
             </div>
 
-            <!-- 弹框内容 -->
-            <div class="px-6 py-4">
+            <!-- 弹框内容 - 可滚动区域 -->
+            <div class="modal-body">
                 <!-- 基本信息 -->
                 <div class="mb-6">
                     <div class="flex items-center justify-between mb-4">
@@ -501,7 +610,7 @@
             </div>
 
             <!-- 弹框底部 -->
-            <div class="px-6 py-4 border-t border-gray-200 flex justify-end">
+            <div class="modal-footer flex justify-end">
                 <button onclick="closeViewDisputeModal()" class="px-4 py-2 border border-gray-300 rounded-md text-sm text-gray-700 hover:bg-gray-50">
                     关闭
                 </button>
@@ -600,30 +709,36 @@
 
         // 处理拒付相关的JavaScript
         let currentDisputeAction = null;
-        let uploadedFiles = [];
+        let uploadedFiles = {
+            tid: [],
+            goods: []
+        };
 
         function openDisputeModal() {
             document.getElementById('disputeModal').classList.remove('hidden');
-            document.getElementById('disputeModal').classList.add('flex');
             resetModal();
         }
 
         function closeDisputeModal() {
             document.getElementById('disputeModal').classList.add('hidden');
-            document.getElementById('disputeModal').classList.remove('flex');
             resetModal();
         }
 
         function resetModal() {
             currentDisputeAction = null;
-            uploadedFiles = [];
+            uploadedFiles = {
+                tid: [],
+                goods: []
+            };
             document.getElementById('appealBtn').classList.remove('bg-purple-600', 'text-white');
             document.getElementById('acceptBtn').classList.remove('bg-purple-600', 'text-white');
             document.getElementById('appealSection').classList.add('hidden');
             document.getElementById('acceptSection').classList.add('hidden');
-            document.getElementById('fileList').innerHTML = '';
+            document.getElementById('tidFileList').innerHTML = '';
+            document.getElementById('goodsFileList').innerHTML = '';
             document.getElementById('submitBtn').disabled = true;
-            document.getElementById('fileInput').value = '';
+            document.getElementById('tidFileInput').value = '';
+            document.getElementById('goodsFileInput').value = '';
         }
 
         function selectDisputeAction(action) {
@@ -637,7 +752,7 @@
                 document.getElementById('appealBtn').classList.add('bg-purple-600', 'text-white');
                 document.getElementById('appealSection').classList.remove('hidden');
                 document.getElementById('acceptSection').classList.add('hidden');
-                document.getElementById('submitBtn').disabled = uploadedFiles.length === 0;
+                updateSubmitButton();
             } else {
                 document.getElementById('acceptBtn').classList.add('bg-purple-600', 'text-white');
                 document.getElementById('appealSection').classList.add('hidden');
@@ -646,43 +761,73 @@
             }
         }
 
-        // 文件上传相关
-        const dropZone = document.getElementById('dropZone');
-        const fileInput = document.getElementById('fileInput');
-
-        dropZone.addEventListener('click', () => {
-            fileInput.click();
-        });
-
-        dropZone.addEventListener('dragover', (e) => {
-            e.preventDefault();
-            dropZone.classList.add('border-purple-500');
-        });
-
-        dropZone.addEventListener('dragleave', () => {
-            dropZone.classList.remove('border-purple-500');
-        });
-
-        dropZone.addEventListener('drop', (e) => {
-            e.preventDefault();
-            dropZone.classList.remove('border-purple-500');
-            const files = e.dataTransfer.files;
-            handleFiles(files);
-        });
-
-        function handleFileSelect(event) {
-            const files = event.target.files;
-            handleFiles(files);
+        function updateSubmitButton() {
+            // 申诉模式下，必须上传商品未退回证明
+            const hasRequiredFiles = uploadedFiles.goods.length > 0;
+            document.getElementById('submitBtn').disabled = !hasRequiredFiles;
         }
 
-        function handleFiles(files) {
+        // 文件上传相关
+        const tidDropZone = document.getElementById('tidDropZone');
+        const goodsDropZone = document.getElementById('goodsDropZone');
+        const tidFileInput = document.getElementById('tidFileInput');
+        const goodsFileInput = document.getElementById('goodsFileInput');
+
+        // TID上传区域事件
+        tidDropZone.addEventListener('click', () => {
+            tidFileInput.click();
+        });
+
+        tidDropZone.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            tidDropZone.classList.add('border-purple-500');
+        });
+
+        tidDropZone.addEventListener('dragleave', () => {
+            tidDropZone.classList.remove('border-purple-500');
+        });
+
+        tidDropZone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            tidDropZone.classList.remove('border-purple-500');
+            const files = e.dataTransfer.files;
+            handleFiles(files, 'tid');
+        });
+
+        // 商品证明上传区域事件
+        goodsDropZone.addEventListener('click', () => {
+            goodsFileInput.click();
+        });
+
+        goodsDropZone.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            goodsDropZone.classList.add('border-purple-500');
+        });
+
+        goodsDropZone.addEventListener('dragleave', () => {
+            goodsDropZone.classList.remove('border-purple-500');
+        });
+
+        goodsDropZone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            goodsDropZone.classList.remove('border-purple-500');
+            const files = e.dataTransfer.files;
+            handleFiles(files, 'goods');
+        });
+
+        function handleFileSelect(event, type) {
+            const files = event.target.files;
+            handleFiles(files, type);
+        }
+
+        function handleFiles(files, type) {
             for (const file of files) {
                 if (validateFile(file)) {
-                    uploadedFiles.push(file);
-                    displayFile(file);
+                    uploadedFiles[type].push(file);
+                    displayFile(file, type);
                 }
             }
-            document.getElementById('submitBtn').disabled = false;
+            updateSubmitButton();
         }
 
         function validateFile(file) {
@@ -702,8 +847,8 @@
             return true;
         }
 
-        function displayFile(file) {
-            const fileList = document.getElementById('fileList');
+        function displayFile(file, type) {
+            const fileList = document.getElementById(type + 'FileList');
             const fileItem = document.createElement('div');
             fileItem.className = 'flex items-center justify-between bg-gray-50 p-3 rounded';
             
@@ -720,8 +865,8 @@
             removeBtn.innerHTML = '<i class="fas fa-times"></i>';
             removeBtn.onclick = () => {
                 fileItem.remove();
-                uploadedFiles = uploadedFiles.filter(f => f !== file);
-                document.getElementById('submitBtn').disabled = uploadedFiles.length === 0;
+                uploadedFiles[type] = uploadedFiles[type].filter(f => f !== file);
+                updateSubmitButton();
             };
             
             fileItem.appendChild(fileInfo);
@@ -734,7 +879,7 @@
             if (currentDisputeAction === 'appeal') {
                 console.log('提交申诉', uploadedFiles);
             } else {
-                console.log('接收拒付');
+                console.log('接受拒付');
             }
             closeDisputeModal();
         }
@@ -755,12 +900,10 @@
         // 查看申诉详情相关的JavaScript
         function openViewDisputeModal() {
             document.getElementById('viewDisputeModal').classList.remove('hidden');
-            document.getElementById('viewDisputeModal').classList.add('flex');
         }
 
         function closeViewDisputeModal() {
             document.getElementById('viewDisputeModal').classList.add('hidden');
-            document.getElementById('viewDisputeModal').classList.remove('flex');
         }
 
         function downloadFile(event, filename) {
@@ -771,6 +914,10 @@
 
         // 为列表中的"查看"按钮添加点击事件
         document.addEventListener('DOMContentLoaded', function() {
+            // 确保所有弹框初始状态都是隐藏的
+            document.getElementById('viewDisputeModal').classList.add('hidden');
+            document.getElementById('disputeModal').classList.add('hidden');
+            
             const viewButtons = document.querySelectorAll('a[href="#"]');
             viewButtons.forEach(button => {
                 if (button.textContent.trim() === '查看') {
@@ -778,6 +925,32 @@
                         e.preventDefault();
                         openViewDisputeModal();
                     });
+                }
+            });
+            
+            // 添加点击背景关闭弹框的功能
+            document.getElementById('viewDisputeModal').addEventListener('click', function(e) {
+                if (e.target === this) {
+                    closeViewDisputeModal();
+                }
+            });
+            
+            document.getElementById('disputeModal').addEventListener('click', function(e) {
+                if (e.target === this) {
+                    closeDisputeModal();
+                }
+            });
+            
+            // 添加ESC键关闭弹框功能
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'Escape') {
+                    // 关闭当前打开的弹框
+                    if (!document.getElementById('viewDisputeModal').classList.contains('hidden')) {
+                        closeViewDisputeModal();
+                    }
+                    if (!document.getElementById('disputeModal').classList.contains('hidden')) {
+                        closeDisputeModal();
+                    }
                 }
             });
         });
