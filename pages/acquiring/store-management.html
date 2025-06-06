@@ -62,9 +62,9 @@
             background-color: #FEF3C7;
             color: #92400E;
         }
-        .status-disabled {
-            background-color: #F3F4F6;
-            color: #6B7280;
+        .status-rejected {
+            background-color: #FEE2E2;
+            color: #DC2626;
         }
         .apply-button {
             background-color: #7D33FF;
@@ -105,6 +105,8 @@
             z-index: 51;
             max-height: 90vh;
             overflow-y: auto;
+            overflow-x: hidden;
+            box-sizing: border-box;
         }
 
         .modal.show {
@@ -113,6 +115,23 @@
 
         .modal-backdrop.show {
             display: block;
+        }
+
+        /* 防止弹框内容横向溢出 */
+        .modal * {
+            box-sizing: border-box;
+        }
+
+        .modal input, .modal select, .modal textarea {
+            max-width: 100%;
+        }
+
+        .modal .flex {
+            min-width: 0;
+        }
+
+        .modal .flex > * {
+            min-width: 0;
         }
 
         /* 多选下拉框样式 */
@@ -604,7 +623,7 @@
                             <option value="">全部状态</option>
                             <option value="activated">已启用</option>
                             <option value="in-progress">审核中</option>
-                            <option value="disabled">已禁用</option>
+                            <option value="rejected">被驳回</option>
                         </select>
                     </div>
                     <div class="flex items-center">
@@ -688,9 +707,7 @@
                                 <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-100 text-yellow-800">审核中</span>
                             </td>
                             <td class="px-3 py-4 whitespace-nowrap text-sm font-medium">
-                                <button onclick="openAddPaymentModal(this)" data-store-id="2" data-payments="visa,applepay" class="text-blue-600 hover:text-blue-900">
-                                    管理
-                                </button>
+                                <span class="text-gray-400">-</span>
                             </td>
                         </tr>
                         <tr>
@@ -717,11 +734,11 @@
                                 <span class="text-sm text-gray-900">2024-03-13 16:45</span>
                             </td>
                             <td class="px-3 py-4 whitespace-nowrap">
-                                <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-gray-100 text-gray-800">已禁用</span>
+                                <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800">被驳回</span>
                             </td>
                             <td class="px-3 py-4 whitespace-nowrap text-sm font-medium">
-                                <button onclick="openAddPaymentModal(this)" data-store-id="3" data-payments="visa,mastercard,googlepay" class="text-blue-600 hover:text-blue-900">
-                                    管理
+                                <button onclick="reopenStoreApplication(this)" data-store-id="3" data-store-data='{"industry":"315","storeName":"Sports Trend Shop","website":"store.whalet.com/sports","phone":"+86 13567891234","description":"Professional sports apparel and equipment, leading sports fashion","payments":["visa","mastercard","googlepay"]}' data-rejection-reason="店铺说明不够详细，请提供更具体的经营范围和产品信息。网站部分页面无法正常访问，请确保网站功能完整。" class="text-blue-600 hover:text-blue-900">
+                                    重新申请
                                 </button>
                             </td>
                         </tr>
@@ -848,14 +865,28 @@
 
     <!-- 添加店铺弹框 -->
     <div id="addStoreModal" class="modal">
-        <div class="p-6">
+        <div class="p-6" style="box-sizing: border-box; width: 100%; overflow-x: hidden;">
             <div class="flex justify-between items-center mb-6">
                 <h2 class="text-xl font-medium text-gray-900">添加店铺</h2>
                 <button class="text-gray-400 hover:text-gray-500" onclick="closeModal()">
                     <i class="fas fa-times"></i>
                 </button>
             </div>
-            <form id="addStoreForm" class="space-y-6">
+            <!-- 驳回原因提示区域 -->
+            <div id="rejectionReason" class="hidden mb-6 p-4 bg-red-50 border border-red-200 rounded-lg" style="box-sizing: border-box; width: 100%; word-wrap: break-word; overflow-wrap: break-word;">
+                <div class="flex items-start">
+                    <div class="flex-shrink-0">
+                        <i class="fas fa-exclamation-triangle text-red-400"></i>
+                    </div>
+                    <div class="ml-3">
+                        <h3 class="text-sm font-medium text-red-800">申请被驳回</h3>
+                        <div class="mt-2 text-sm text-red-700">
+                            <p id="rejectionReasonText">请根据以下原因修改后重新提交申请</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <form id="addStoreForm" class="space-y-6" style="box-sizing: border-box; width: 100%; overflow-x: hidden;">
                 <!-- 行业 -->
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-2">
@@ -865,7 +896,7 @@
                         <span class="absolute left-3 top-2.5 text-gray-400 pointer-events-none">
                             <i class="fas fa-search"></i>
                         </span>
-                        <select required id="industrySelect" class="w-full h-10 pl-10 pr-8 text-sm border border-gray-300 rounded-md focus:ring-2 focus:ring-purple-100 focus:border-purple-500 appearance-none bg-white">
+                        <select required id="industrySelect" class="w-full h-10 pl-10 pr-8 text-sm border border-gray-300 rounded-md focus:ring-2 focus:ring-purple-100 focus:border-purple-500 appearance-none bg-white" style="box-sizing: border-box; max-width: 100%;">
                             <option value="" class="py-2">搜索或选择行业...</option>
                             <option value="11" class="py-2">农业、林业、渔业和狩猎 | Agriculture, forestry, fishing, and hunting</option>
                             <option value="2211" class="py-2">电力生产、传输和配送 | Electric power generation, transmission, and distribution</option>
@@ -903,13 +934,13 @@
                     <label class="block text-sm font-medium text-gray-700 mb-2">
                         网址 <span class="text-red-500">*</span>
                     </label>
-                    <div class="flex">
-                        <span class="inline-flex items-center px-3 rounded-l-md border border-r-0 border-gray-300 bg-gray-50 text-gray-500 text-sm">
+                    <div class="flex" style="box-sizing: border-box; width: 100%; max-width: 100%;">
+                        <span class="inline-flex items-center px-3 rounded-l-md border border-r-0 border-gray-300 bg-gray-50 text-gray-500 text-sm" style="flex-shrink: 0;">
                             https://
                         </span>
-                        <input type="text" required class="flex-1 p-2 border border-gray-300 rounded-r-md focus:ring-purple-500 focus:border-purple-500" placeholder="请输入网址">
+                        <input type="text" required class="flex-1 p-2 border border-gray-300 rounded-r-md focus:ring-purple-500 focus:border-purple-500" placeholder="请输入网址" style="min-width: 0; box-sizing: border-box;">
                     </div>
-                    <p class="mt-1 text-sm text-gray-500">您可以在此添加多个属于同一行业的网站，并提交所有不同域名的网站以供审核。</p>
+                    <p class="mt-1 text-sm text-gray-500">请在此添加跟选择的行业一致的网站以供审核。</p>
                 </div>
 
                 <!-- 店铺电话号码 -->
@@ -917,14 +948,14 @@
                     <label class="block text-sm font-medium text-gray-700 mb-2">
                         店铺电话号码 <span class="text-red-500">*</span>
                     </label>
-                    <div class="flex gap-2">
-                        <select class="w-32 p-2 border border-gray-300 rounded-md focus:ring-purple-500 focus:border-purple-500">
+                    <div class="flex gap-2" style="box-sizing: border-box; width: 100%; max-width: 100%;">
+                        <select class="w-32 p-2 border border-gray-300 rounded-md focus:ring-purple-500 focus:border-purple-500" style="flex-shrink: 0; box-sizing: border-box;">
                             <option value="86">CN +86</option>
                             <option value="1">US +1</option>
                             <option value="44">GB +44</option>
                             <!-- 其他国家代码 -->
                         </select>
-                        <input type="tel" required class="flex-1 p-2 border border-gray-300 rounded-md focus:ring-purple-500 focus:border-purple-500" placeholder="请输入电话号码">
+                        <input type="tel" required class="flex-1 p-2 border border-gray-300 rounded-md focus:ring-purple-500 focus:border-purple-500" placeholder="请输入电话号码" style="min-width: 0; box-sizing: border-box;">
                     </div>
                 </div>
 
@@ -941,8 +972,8 @@
                     <label class="block text-sm font-medium text-gray-700 mb-2">
                         支付方式 <span class="text-red-500">*</span>
                     </label>
-                    <div class="multiselect-dropdown">
-                        <div class="selected-options" id="selectedPayments">
+                    <div class="multiselect-dropdown" style="box-sizing: border-box; width: 100%; max-width: 100%;">
+                        <div class="selected-options" id="selectedPayments" style="box-sizing: border-box; width: 100%; max-width: 100%;">
                             <span class="text-gray-400 text-sm">请选择支付方式</span>
                         </div>
                         <div class="multiselect-options" id="paymentOptions">
@@ -979,7 +1010,7 @@
                 </div>
 
                 <!-- 按钮组 -->
-                <div class="flex justify-end space-x-4 pt-4">
+                <div class="flex justify-end space-x-4 pt-4" style="box-sizing: border-box; width: 100%; max-width: 100%;">
                     <button type="button" class="px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50" onclick="closeModal()">
                         取消
                     </button>
@@ -994,7 +1025,7 @@
 
     <!-- 添加支付方式弹框 -->
     <div id="addPaymentModal" class="modal payment-method-modal">
-        <div class="p-6">
+        <div class="p-6" style="box-sizing: border-box; width: 100%; overflow-x: hidden;">
             <div class="flex justify-between items-center mb-6">
                 <h2 class="text-xl font-medium text-gray-900">添加支付方式</h2>
                 <button class="text-gray-400 hover:text-gray-500" onclick="closePaymentModal()">
@@ -1002,14 +1033,14 @@
                 </button>
             </div>
 
-            <div class="payment-search">
-                <input type="text" placeholder="搜索支付方式名称" class="flex-1 p-2 border border-gray-300 rounded-md focus:ring-purple-500 focus:border-purple-500">
-                <select class="p-2 border border-gray-300 rounded-md focus:ring-purple-500 focus:border-purple-500">
+            <div class="payment-search" style="box-sizing: border-box; width: 100%; max-width: 100%; flex-wrap: wrap;">
+                <input type="text" placeholder="搜索支付方式名称" class="flex-1 p-2 border border-gray-300 rounded-md focus:ring-purple-500 focus:border-purple-500" style="min-width: 150px; box-sizing: border-box;">
+                <select class="p-2 border border-gray-300 rounded-md focus:ring-purple-500 focus:border-purple-500" style="box-sizing: border-box;">
                     <option value="">支付方式类型</option>
                     <option value="Cards">Cards</option>
                     <option value="Digital Wallets">Digital Wallets</option>
                 </select>
-                <select class="p-2 border border-gray-300 rounded-md focus:ring-purple-500 focus:border-purple-500">
+                <select class="p-2 border border-gray-300 rounded-md focus:ring-purple-500 focus:border-purple-500" style="box-sizing: border-box;">
                     <option value="">消费者地区</option>
                     <option value="全球">全球</option>
                 </select>
@@ -1176,6 +1207,77 @@
             });
         });
 
+        // 全局声明更新支付方式函数
+        let updateSelectedPayments = null;
+
+        // 重新申请店铺函数
+        window.reopenStoreApplication = function(button) {
+            console.log('重新申请函数被调用');
+            const modal = document.getElementById('addStoreModal');
+            const backdrop = document.getElementById('modalBackdrop');
+            const storeData = JSON.parse(button.getAttribute('data-store-data'));
+            const rejectionReason = button.getAttribute('data-rejection-reason');
+            console.log('店铺数据:', storeData);
+            
+            // 更新弹框标题
+            document.querySelector('#addStoreModal h2').textContent = '重新申请店铺';
+            
+            // 显示驳回原因
+            const rejectionReasonDiv = document.getElementById('rejectionReason');
+            const rejectionReasonText = document.getElementById('rejectionReasonText');
+            if (rejectionReason) {
+                rejectionReasonText.textContent = rejectionReason;
+                rejectionReasonDiv.classList.remove('hidden');
+            } else {
+                rejectionReasonDiv.classList.add('hidden');
+            }
+            
+            // 填充表单数据
+            document.getElementById('industrySelect').value = storeData.industry;
+            document.querySelector('input[placeholder="请输入店铺名称"]').value = storeData.storeName;
+            document.querySelector('input[placeholder="请输入网址"]').value = storeData.website.replace('https://', '');
+            
+            // 处理电话号码 - 分离国家代码和号码
+            const phoneMatch = storeData.phone.match(/^\+(\d+)\s(.+)$/);
+            if (phoneMatch) {
+                // 选择电话号码表单中的国家代码下拉框
+                const countrySelect = document.querySelector('.flex.gap-2 select');
+                const phoneInput = document.querySelector('input[placeholder="请输入电话号码"]');
+                if (countrySelect && phoneInput) {
+                    countrySelect.value = phoneMatch[1]; // 国家代码
+                    phoneInput.value = phoneMatch[2]; // 电话号码
+                }
+            }
+            
+            document.querySelector('textarea[placeholder="请输入店铺说明"]').value = storeData.description;
+            
+            // 清除之前选择的支付方式
+            document.querySelectorAll('.payment-option').forEach(cb => cb.checked = false);
+            
+            // 设置支付方式
+            storeData.payments.forEach(payment => {
+                const checkbox = document.querySelector(`.payment-option[value="${payment}"]`);
+                if (checkbox) {
+                    checkbox.checked = true;
+                }
+            });
+            
+            // 更新显示的已选支付方式 - 使用全局函数
+            if (updateSelectedPayments) {
+                updateSelectedPayments();
+            }
+            
+            // 修改提交按钮文本
+            document.querySelector('#addStoreForm button[type="submit"]').textContent = '重新提交';
+            
+            // 标记为重新申请模式
+            document.getElementById('addStoreForm').setAttribute('data-mode', 'reapply');
+            document.getElementById('addStoreForm').setAttribute('data-store-id', button.getAttribute('data-store-id'));
+            
+            modal.classList.add('show');
+            backdrop.classList.add('show');
+        };
+
         // 打开添加支付方式弹框
         function openAddPaymentModal(button) {
             const modal = document.getElementById('addPaymentModal');
@@ -1292,6 +1394,20 @@
 
             // 打开弹框
             addStoreButton.addEventListener('click', function() {
+                // 重置弹框为添加模式
+                document.querySelector('#addStoreModal h2').textContent = '添加店铺';
+                document.querySelector('#addStoreForm button[type="submit"]').textContent = '提交';
+                document.getElementById('addStoreForm').removeAttribute('data-mode');
+                document.getElementById('addStoreForm').removeAttribute('data-store-id');
+                
+                // 隐藏驳回原因提示
+                document.getElementById('rejectionReason').classList.add('hidden');
+                
+                // 清空表单
+                document.getElementById('addStoreForm').reset();
+                document.getElementById('selectedPayments').innerHTML = '<span class="text-gray-400 text-sm">请选择支付方式</span>';
+                document.querySelectorAll('.payment-option').forEach(cb => cb.checked = false);
+                
                 modal.classList.add('show');
                 backdrop.classList.add('show');
             });
@@ -1300,6 +1416,15 @@
             window.closeModal = function() {
                 modal.classList.remove('show');
                 backdrop.classList.remove('show');
+                
+                // 重置弹框状态
+                document.querySelector('#addStoreModal h2').textContent = '添加店铺';
+                document.querySelector('#addStoreForm button[type="submit"]').textContent = '提交';
+                document.getElementById('addStoreForm').removeAttribute('data-mode');
+                document.getElementById('addStoreForm').removeAttribute('data-store-id');
+                
+                // 隐藏驳回原因提示
+                document.getElementById('rejectionReason').classList.add('hidden');
             };
 
             backdrop.addEventListener('click', closeModal);
@@ -1323,7 +1448,8 @@
                 });
             });
 
-            function updateSelectedPayments() {
+            // 定义更新支付方式函数并赋值给全局变量
+            updateSelectedPayments = function() {
                 const selected = Array.from(paymentCheckboxes)
                     .filter(cb => cb.checked)
                     .map(cb => {
@@ -1344,11 +1470,11 @@
                         </div>
                     `).join('') :
                     '<span class="text-gray-400 text-sm">请选择支付方式</span>';
-            }
+            };
 
             // 移除已选支付方式
             window.removePayment = function(value) {
-                const checkbox = document.querySelector(`.payment-checkbox[value="${value}"]`);
+                const checkbox = document.querySelector(`.payment-option[value="${value}"]`);
                 if (checkbox) {
                     checkbox.checked = false;
                     updateSelectedPayments();
@@ -1358,8 +1484,19 @@
             // 表单提交
             document.getElementById('addStoreForm').addEventListener('submit', function(e) {
                 e.preventDefault();
+                
+                const isReapply = this.getAttribute('data-mode') === 'reapply';
+                const storeId = this.getAttribute('data-store-id');
+                
                 // 这里添加表单提交逻辑
-                alert('店铺添加成功！');
+                if (isReapply) {
+                    console.log('重新申请店铺，店铺ID:', storeId);
+                    alert('店铺重新申请成功！我们将在3-5个工作日内完成审核。');
+                } else {
+                    console.log('添加新店铺');
+                    alert('店铺添加成功！我们将在3-5个工作日内完成审核。');
+                }
+                
                 closeModal();
             });
 
