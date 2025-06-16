@@ -10,7 +10,7 @@
     <style>
         :root {
             --primary-color: #7D33FF;
-            --primary-hover: #6929CC;
+            --primary-hover: #6929D4;
             --primary-light: rgba(125, 51, 255, 0.1);
             --primary-lighter: rgba(125, 51, 255, 0.05);
         }
@@ -60,6 +60,70 @@
             background-color: var(--primary-lighter);
             color: var(--primary-color);
         }
+        
+        /* 弹框样式 */
+        .modal-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 1rem;
+            z-index: 1000;
+        }
+        
+        .modal-container.hidden {
+            display: none !important;
+        }
+        
+        .modal-box {
+            background: white;
+            border-radius: 0.5rem;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+            width: 100%;
+            max-width: 42rem;
+            max-height: 85vh;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .modal-header {
+            padding: 1.5rem;
+            border-bottom: 1px solid #e5e7eb;
+            flex-shrink: 0;
+        }
+        
+        .modal-body {
+            flex: 1;
+            overflow-y: auto;
+            padding: 1.5rem;
+            min-height: 0;
+        }
+        
+        .modal-footer {
+            padding: 1.5rem;
+            border-top: 1px solid #e5e7eb;
+            flex-shrink: 0;
+        }
+        .modal-content {
+            max-height: 85vh;
+            overflow-y: auto;
+        }
+        @media (max-height: 600px) {
+            .modal-content {
+                max-height: 80vh;
+            }
+        }
+        @media (max-width: 640px) {
+            .modal-width {
+                width: 95vw;
+                max-width: 95vw;
+            }
+        }
     </style>
 </head>
 <body class="min-h-screen">
@@ -94,14 +158,14 @@
                             接受拒付
                         </button>
                         <button class="px-4 py-2 bg-purple-600 text-white rounded-md text-sm hover:bg-purple-700">
-                            申诉拒付
+                            申诉
                         </button>
                     </div>
                 </div>
 
                 <div class="flex items-center space-x-4 mb-8">
                     <span class="text-sm text-gray-500">拒付时间：2024-01-01 12:56</span>
-                    <span class="text-sm text-gray-500">交易流水号：dst_sgstkqhcjgonld83bjw</span>
+                    <span class="text-sm text-gray-500">拒付流水号：dst_sgstkqhcjgonld83bjw</span>
                     <span class="text-sm text-gray-500">申诉截止时间：2024-01-10 09:00</span>
                     <span class="text-sm text-orange-600">剩余10天</span>
                     <span class="text-sm text-gray-500">原因：商品未收到</span>
@@ -144,11 +208,11 @@
                                 </div>
                             </div>
                             <div class="flex justify-between">
-                                <div class="text-sm text-gray-500">持卡人姓名</div>
+                                <div class="text-sm text-gray-500">买家姓名</div>
                                 <div class="text-sm text-gray-900">Rachel Green</div>
                             </div>
                             <div class="flex justify-between">
-                                <div class="text-sm text-gray-500">持卡人邮箱</div>
+                                <div class="text-sm text-gray-500">买家邮箱</div>
                                 <div class="text-sm text-gray-900">rachel@friends.com</div>
                             </div>
                             <div class="flex justify-between">
@@ -186,12 +250,12 @@
                 <div id="appeal-history" class="tab-content hidden">
                     <div class="detail-section p-6">
                         <div class="space-y-6">
-                            <!-- 申诉拒付记录 -->
+                            <!-- 申诉记录 -->
                             <div class="border-b border-gray-200 pb-6">
                                 <div class="flex items-center justify-between mb-4">
                                     <div class="flex items-center">
                                         <div class="text-sm text-gray-500">提交时间：2024-01-05 16:30:00</div>
-                                        <span class="ml-3 px-2 py-1 bg-purple-100 text-purple-800 text-xs rounded-full">申诉拒付</span>
+                                        <span class="ml-3 px-2 py-1 bg-purple-100 text-purple-800 text-xs rounded-full">申诉</span>
                                     </div>
                                 </div>
                                 <div class="space-y-4">
@@ -258,135 +322,129 @@
     </div>
 
     <!-- 处理拒付弹框 -->
-    <div id="disputeModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 hidden">
-        <div class="fixed inset-0 overflow-y-auto">
-            <div class="flex min-h-full items-center justify-center p-4">
-                <div class="bg-white rounded-lg shadow-xl w-[600px] max-h-[80vh] flex flex-col">
-                    <!-- 弹框头部 -->
-                    <div class="px-6 py-4 border-b border-gray-200 flex justify-between items-center">
-                        <h3 class="text-lg font-medium text-gray-900">处理拒付</h3>
-                        <button onclick="closeDisputeModal()" class="text-gray-400 hover:text-gray-500">
-                            <i class="fas fa-times"></i>
-                        </button>
+    <div id="disputeModal" class="modal-container hidden">
+        <div class="modal-box">
+            <!-- 弹框头部 -->
+            <div class="modal-header flex justify-between items-center">
+                <h3 class="text-lg font-medium text-gray-900">处理拒付</h3>
+                <button onclick="closeDisputeModal()" class="text-gray-400 hover:text-gray-500">
+                    <i class="fas fa-times text-xl"></i>
+                </button>
+            </div>
+
+            <!-- 弹框内容 - 可滚动区域 -->
+            <div class="modal-body">
+                <div class="mb-6">
+                    <!-- 选择处理方式标签 -->
+                    <div class="mb-3">
+                        <label class="text-sm font-medium text-gray-900">
+                            选择处理方式<span class="text-red-500 ml-1">*</span>
+                        </label>
                     </div>
-
-                    <!-- 弹框内容 -->
-                    <div class="px-6 py-4 overflow-y-auto">
-                        <div class="mb-6">
-                            <div class="flex space-x-4">
-                                <button onclick="selectDisputeAction('accept')" id="acceptBtn" class="flex-1 py-2 px-4 rounded border text-center transition-colors">
-                                    接受拒付
-                                </button>
-                                <button onclick="selectDisputeAction('appeal')" id="appealBtn" class="flex-1 py-2 px-4 rounded border text-center transition-colors">
-                                    申诉拒付
-                                </button>
-                            </div>
-                        </div>
-
-                        <!-- 申诉拒付上传区域 -->
-                        <div id="appealSection" class="hidden">
-                            <div class="mb-4">
-                                <h4 class="text-base font-medium text-gray-900 mb-2">提交以下文件以申诉拒付：</h4>
-                                <p class="text-sm text-gray-600 mb-2">在同一文件中提交您的申诉文件。请确保格式符合以下要求：</p>
-                                
-                                <div class="bg-gray-50 p-4 rounded-lg mb-4">
-                                    <h5 class="font-medium mb-2">上传文件要求：</h5>
-                                    <ul class="text-sm text-gray-600 list-disc list-inside space-y-1">
-                                        <li>文件必须为英文</li>
-                                        <li>可接受的格式和文件大小为JPG、TIFF（最大10MB）或PDF（最大2MB）</li>
-                                        <li>为获得最佳效果，原始文件应为A4（21 x 29.7cm）或US Letter（8.5 x 11"）</li>
-                                    </ul>
-                                </div>
-
-                                <!-- GoodsNotReturned 文件上传 -->
-                                <div class="mb-6">
-                                    <div class="flex items-center mb-2">
-                                        <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-blue-100 text-blue-800">
-                                            GoodsNotReturned
-                                        </span>
-                                        <span class="ml-2 text-red-500 text-sm">*必传</span>
-                                    </div>
-                                    <div class="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center" id="dropZoneGoodsNotReturned">
-                                        <div class="mb-3">
-                                            <i class="fas fa-file-upload text-gray-400 text-3xl"></i>
-                                        </div>
-                                        <p class="text-gray-600 mb-2">点击上传或拖拽文件至此处</p>
-                                        <p class="text-sm text-gray-500">支持 JPG、TIFF、PDF 格式</p>
-                                        <input type="file" id="fileInputGoodsNotReturned" class="hidden" accept=".jpg,.jpeg,.tiff,.pdf" onchange="handleFileSelect(event, 'GoodsNotReturned')">
-                                    </div>
-                                    <div id="fileListGoodsNotReturned" class="mt-2"></div>
-                                </div>
-
-                                <!-- GoodsWereAsDescribed 文件上传 -->
-                                <div class="mb-6">
-                                    <div class="flex items-center mb-2">
-                                        <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-blue-100 text-blue-800">
-                                            GoodsWereAsDescribed
-                                        </span>
-                                        <span class="ml-2 text-red-500 text-sm">*必传</span>
-                                    </div>
-                                    <div class="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center" id="dropZoneGoodsWereAsDescribed">
-                                        <div class="mb-3">
-                                            <i class="fas fa-file-upload text-gray-400 text-3xl"></i>
-                                        </div>
-                                        <p class="text-gray-600 mb-2">点击上传或拖拽文件至此处</p>
-                                        <p class="text-sm text-gray-500">支持 JPG、TIFF、PDF 格式</p>
-                                        <input type="file" id="fileInputGoodsWereAsDescribed" class="hidden" accept=".jpg,.jpeg,.tiff,.pdf" onchange="handleFileSelect(event, 'GoodsWereAsDescribed')">
-                                    </div>
-                                    <div id="fileListGoodsWereAsDescribed" class="mt-2"></div>
-                                </div>
-
-                                <!-- TIDorInvoice 文件上传 -->
-                                <div class="mb-6">
-                                    <div class="flex items-center mb-2">
-                                        <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-blue-100 text-blue-800">
-                                            TIDorInvoice
-                                        </span>
-                                        <span class="ml-2 text-gray-500 text-sm">选传</span>
-                                    </div>
-                                    <div class="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center" id="dropZoneTIDorInvoice">
-                                        <div class="mb-3">
-                                            <i class="fas fa-file-upload text-gray-400 text-3xl"></i>
-                                        </div>
-                                        <p class="text-gray-600 mb-2">点击上传或拖拽文件至此处</p>
-                                        <p class="text-sm text-gray-500">支持 JPG、TIFF、PDF 格式</p>
-                                        <input type="file" id="fileInputTIDorInvoice" class="hidden" accept=".jpg,.jpeg,.tiff,.pdf" onchange="handleFileSelect(event, 'TIDorInvoice')">
-                                    </div>
-                                    <div id="fileListTIDorInvoice" class="mt-2"></div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- 接收拒付提示 -->
-                        <div id="acceptSection" class="hidden">
-                            <p class="text-gray-600 mb-4">您确定要接受此笔拒付吗？接受后将无法再次申诉。</p>
-                        </div>
-
-                        <!-- 警告提示 -->
-                        <div class="bg-yellow-50 p-4 rounded-lg mb-4">
-                            <div class="flex">
-                                <div class="flex-shrink-0">
-                                    <i class="fas fa-exclamation-triangle text-yellow-400"></i>
-                                </div>
-                                <div class="ml-3">
-                                    <p class="text-sm text-yellow-700">
-                                        提交后将无法更改您的申诉。
-                                    </p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- 弹框底部 -->
-                    <div class="px-6 py-4 border-t border-gray-200 flex justify-end">
-                        <button onclick="closeDisputeModal()" class="mr-3 px-4 py-2 border border-gray-300 rounded-md text-sm text-gray-700 hover:bg-gray-50">
-                            取消
+                    
+                    <div class="flex space-x-4">
+                        <button onclick="selectDisputeAction('appeal')" id="appealBtn" class="flex-1 py-2 px-4 rounded border text-center transition-colors">
+                            申诉
                         </button>
-                        <button onclick="submitDispute()" id="submitBtn" class="px-4 py-2 bg-purple-600 text-white rounded-md text-sm hover:bg-purple-700" disabled>
-                            提交
+                        <button onclick="selectDisputeAction('accept')" id="acceptBtn" class="flex-1 py-2 px-4 rounded border text-center transition-colors">
+                            接受拒付
                         </button>
                     </div>
                 </div>
+
+                <!-- 申诉上传区域 -->
+                <div id="appealSection" class="hidden">
+                    <!-- 申诉建议提示 -->
+                    <div class="bg-blue-50 p-4 rounded-lg mb-4">
+                        <div class="flex">
+                            <div class="flex-shrink-0">
+                                <i class="fas fa-info-circle text-blue-400"></i>
+                            </div>
+                            <div class="ml-3">
+                                <p class="text-sm text-blue-700">
+                                    建议您仅在交易金额较高或拥有充分有力证据时再发起拒付申诉。每笔申诉将收取手续费，且流程较长，可能产生额外成本。请您谨慎评估后再做决定。
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-4">
+                        <h4 class="text-base font-medium text-gray-900 mb-2">提交以下文件以申诉：</h4>
+                        <p class="text-sm text-gray-600 mb-4">请按照文件类型分别上传申诉材料。请确保格式符合以下要求：</p>
+                        
+                        <div class="bg-gray-50 p-4 rounded-lg mb-6">
+                            <h5 class="font-medium mb-2">上传文件要求：</h5>
+                            <ul class="text-sm text-gray-600 list-disc list-inside space-y-1">
+                                <li>文件必须为英文</li>
+                                <li>可接受的格式和文件大小为JPG、TIFF（最大10MB）或PDF（最大2MB）</li>
+                                <li>为获得最佳效果，原始文件应为A4（21 x 29.7cm）或US Letter（8.5 x 11"）</li>
+                            </ul>
+                        </div>
+
+                        <!-- TIDorInvoice 上传区域 -->
+                        <div class="mb-6">
+                            <div class="flex items-center mb-3">
+                                <h5 class="font-medium text-gray-900">TID或发票</h5>
+                                <span class="ml-2 px-2 py-1 bg-gray-100 text-gray-600 text-xs rounded">非必传</span>
+                            </div>
+                            <div class="border-2 border-dashed border-gray-300 rounded-lg p-4 text-center" id="tidDropZone">
+                                <div class="mb-2">
+                                    <i class="fas fa-file-upload text-gray-400 text-2xl"></i>
+                                </div>
+                                <p class="text-gray-600 mb-1 text-sm">点击上传或拖拽文件至此处</p>
+                                <p class="text-xs text-gray-500">支持 JPG、TIFF、PDF 格式</p>
+                                <input type="file" id="tidFileInput" class="hidden" accept=".jpg,.jpeg,.tiff,.pdf" onchange="handleFileSelect(event, 'tid')">
+                            </div>
+                            <div id="tidFileList" class="mt-3 space-y-2"></div>
+                        </div>
+
+                        <!-- GoodsNotReturned 上传区域 -->
+                        <div class="mb-4">
+                            <div class="flex items-center mb-3">
+                                <h5 class="font-medium text-gray-900">商品未退回证明</h5>
+                                <span class="ml-2 px-2 py-1 bg-red-100 text-red-600 text-xs rounded">必传</span>
+                            </div>
+                            <div class="border-2 border-dashed border-gray-300 rounded-lg p-4 text-center" id="goodsDropZone">
+                                <div class="mb-2">
+                                    <i class="fas fa-file-upload text-gray-400 text-2xl"></i>
+                                </div>
+                                <p class="text-gray-600 mb-1 text-sm">点击上传或拖拽文件至此处</p>
+                                <p class="text-xs text-gray-500">支持 JPG、TIFF、PDF 格式</p>
+                                <input type="file" id="goodsFileInput" class="hidden" accept=".jpg,.jpeg,.tiff,.pdf" onchange="handleFileSelect(event, 'goods')">
+                            </div>
+                            <div id="goodsFileList" class="mt-3 space-y-2"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 接受拒付提示 -->
+                <div id="acceptSection" class="hidden">
+                    <p class="text-gray-600 mb-4">您确定要接受此笔拒付吗？接受后将无法再次申诉。</p>
+                </div>
+
+                <!-- 警告提示 -->
+                <div class="bg-yellow-50 p-4 rounded-lg mb-4">
+                    <div class="flex">
+                        <div class="flex-shrink-0">
+                            <i class="fas fa-exclamation-triangle text-yellow-400"></i>
+                        </div>
+                        <div class="ml-3">
+                            <p class="text-sm text-yellow-700">
+                                提交后将无法更改您的申诉。
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 弹框底部 -->
+            <div class="modal-footer flex justify-end">
+                <button onclick="closeDisputeModal()" class="mr-3 px-4 py-2 border border-gray-300 rounded-md text-sm text-gray-700 hover:bg-gray-50">
+                    取消
+                </button>
+                <button onclick="submitDispute()" id="submitBtn" class="px-4 py-2 bg-purple-600 text-white rounded-md text-sm hover:bg-purple-700" disabled>
+                    提交
+                </button>
             </div>
         </div>
     </div>
@@ -409,7 +467,7 @@
                 });
             });
 
-            // 为接收拒付和申诉拒付按钮添加点击事件
+            // 为接收拒付和申诉按钮添加点击事件
             const buttons = document.querySelectorAll('.flex.space-x-4 button');
             buttons.forEach(button => {
                 if (button.textContent.trim() === '接受拒付') {
@@ -417,7 +475,7 @@
                         openDisputeModal();
                         selectDisputeAction('accept');
                     });
-                } else if (button.textContent.trim() === '申诉拒付') {
+                } else if (button.textContent.trim() === '申诉') {
                     button.addEventListener('click', function() {
                         openDisputeModal();
                         selectDisputeAction('appeal');
@@ -446,40 +504,35 @@
         // 处理拒付相关的JavaScript
         let currentDisputeAction = null;
         let uploadedFiles = {
-            GoodsNotReturned: null,
-            GoodsWereAsDescribed: null,
-            TIDorInvoice: null
+            tid: [],
+            goods: []
         };
 
         function openDisputeModal() {
             document.getElementById('disputeModal').classList.remove('hidden');
-            document.getElementById('disputeModal').classList.add('flex');
+            resetModal();
         }
 
         function closeDisputeModal() {
             document.getElementById('disputeModal').classList.add('hidden');
-            document.getElementById('disputeModal').classList.remove('flex');
             resetModal();
         }
 
         function resetModal() {
             currentDisputeAction = null;
             uploadedFiles = {
-                GoodsNotReturned: null,
-                GoodsWereAsDescribed: null,
-                TIDorInvoice: null
+                tid: [],
+                goods: []
             };
             document.getElementById('appealBtn').classList.remove('bg-purple-600', 'text-white');
             document.getElementById('acceptBtn').classList.remove('bg-purple-600', 'text-white');
             document.getElementById('appealSection').classList.add('hidden');
             document.getElementById('acceptSection').classList.add('hidden');
-            document.getElementById('fileListGoodsNotReturned').innerHTML = '';
-            document.getElementById('fileListGoodsWereAsDescribed').innerHTML = '';
-            document.getElementById('fileListTIDorInvoice').innerHTML = '';
+            document.getElementById('tidFileList').innerHTML = '';
+            document.getElementById('goodsFileList').innerHTML = '';
             document.getElementById('submitBtn').disabled = true;
-            document.getElementById('fileInputGoodsNotReturned').value = '';
-            document.getElementById('fileInputGoodsWereAsDescribed').value = '';
-            document.getElementById('fileInputTIDorInvoice').value = '';
+            document.getElementById('tidFileInput').value = '';
+            document.getElementById('goodsFileInput').value = '';
         }
 
         function selectDisputeAction(action) {
@@ -493,7 +546,7 @@
                 document.getElementById('appealBtn').classList.add('bg-purple-600', 'text-white');
                 document.getElementById('appealSection').classList.remove('hidden');
                 document.getElementById('acceptSection').classList.add('hidden');
-                document.getElementById('submitBtn').disabled = !uploadedFiles.GoodsNotReturned || !uploadedFiles.GoodsWereAsDescribed;
+                updateSubmitButton();
             } else {
                 document.getElementById('acceptBtn').classList.add('bg-purple-600', 'text-white');
                 document.getElementById('appealSection').classList.add('hidden');
@@ -502,41 +555,95 @@
             }
         }
 
-        // 修改文件上传相关的JavaScript
-        function initializeDropZone(type) {
-            const dropZone = document.getElementById(`dropZone${type}`);
-            const fileInput = document.getElementById(`fileInput${type}`);
+        function updateSubmitButton() {
+            // 申诉模式下，必须上传商品未退回证明
+            const hasRequiredFiles = uploadedFiles.goods.length > 0;
+            document.getElementById('submitBtn').disabled = !hasRequiredFiles;
+        }
 
-            dropZone.addEventListener('click', () => {
-                fileInput.click();
-            });
+        // 文件上传相关
+        document.addEventListener('DOMContentLoaded', function() {
+            const tidDropZone = document.getElementById('tidDropZone');
+            const goodsDropZone = document.getElementById('goodsDropZone');
+            const tidFileInput = document.getElementById('tidFileInput');
+            const goodsFileInput = document.getElementById('goodsFileInput');
 
-            dropZone.addEventListener('dragover', (e) => {
-                e.preventDefault();
-                dropZone.classList.add('border-purple-500');
-            });
+            if (tidDropZone && tidFileInput) {
+                // TID上传区域事件
+                tidDropZone.addEventListener('click', () => {
+                    tidFileInput.click();
+                });
 
-            dropZone.addEventListener('dragleave', () => {
-                dropZone.classList.remove('border-purple-500');
-            });
+                tidDropZone.addEventListener('dragover', (e) => {
+                    e.preventDefault();
+                    tidDropZone.classList.add('border-purple-500');
+                });
 
-            dropZone.addEventListener('drop', (e) => {
-                e.preventDefault();
-                dropZone.classList.remove('border-purple-500');
-                const files = e.dataTransfer.files;
-                if (files.length > 0) {
-                    handleFileSelect({ target: { files: files } }, type);
+                tidDropZone.addEventListener('dragleave', () => {
+                    tidDropZone.classList.remove('border-purple-500');
+                });
+
+                tidDropZone.addEventListener('drop', (e) => {
+                    e.preventDefault();
+                    tidDropZone.classList.remove('border-purple-500');
+                    const files = e.dataTransfer.files;
+                    handleFiles(files, 'tid');
+                });
+            }
+
+            if (goodsDropZone && goodsFileInput) {
+                // 商品证明上传区域事件
+                goodsDropZone.addEventListener('click', () => {
+                    goodsFileInput.click();
+                });
+
+                goodsDropZone.addEventListener('dragover', (e) => {
+                    e.preventDefault();
+                    goodsDropZone.classList.add('border-purple-500');
+                });
+
+                goodsDropZone.addEventListener('dragleave', () => {
+                    goodsDropZone.classList.remove('border-purple-500');
+                });
+
+                goodsDropZone.addEventListener('drop', (e) => {
+                    e.preventDefault();
+                    goodsDropZone.classList.remove('border-purple-500');
+                    const files = e.dataTransfer.files;
+                    handleFiles(files, 'goods');
+                });
+            }
+            
+            // 添加点击背景关闭弹框的功能
+            document.getElementById('disputeModal').addEventListener('click', function(e) {
+                if (e.target === this) {
+                    closeDisputeModal();
                 }
             });
-        }
+            
+            // 添加ESC键关闭弹框功能
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'Escape') {
+                    if (!document.getElementById('disputeModal').classList.contains('hidden')) {
+                        closeDisputeModal();
+                    }
+                }
+            });
+        });
 
         function handleFileSelect(event, type) {
             const files = event.target.files;
-            if (files.length > 0 && validateFile(files[0])) {
-                uploadedFiles[type] = files[0];
-                displayFile(files[0], type);
-                updateSubmitButtonState();
+            handleFiles(files, type);
+        }
+
+        function handleFiles(files, type) {
+            for (const file of files) {
+                if (validateFile(file)) {
+                    uploadedFiles[type].push(file);
+                    displayFile(file, type);
+                }
             }
+            updateSubmitButton();
         }
 
         function validateFile(file) {
@@ -557,11 +664,9 @@
         }
 
         function displayFile(file, type) {
-            const fileList = document.getElementById(`fileList${type}`);
-            fileList.innerHTML = ''; // 清除之前的文件
-            
+            const fileList = document.getElementById(type + 'FileList');
             const fileItem = document.createElement('div');
-            fileItem.className = 'flex items-center justify-between bg-gray-50 p-3 rounded mt-2';
+            fileItem.className = 'flex items-center justify-between bg-gray-50 p-3 rounded';
             
             const fileInfo = document.createElement('div');
             fileInfo.className = 'flex items-center';
@@ -576,8 +681,8 @@
             removeBtn.innerHTML = '<i class="fas fa-times"></i>';
             removeBtn.onclick = () => {
                 fileItem.remove();
-                uploadedFiles[type] = null;
-                updateSubmitButtonState();
+                uploadedFiles[type] = uploadedFiles[type].filter(f => f !== file);
+                updateSubmitButton();
             };
             
             fileItem.appendChild(fileInfo);
@@ -585,26 +690,12 @@
             fileList.appendChild(fileItem);
         }
 
-        function updateSubmitButtonState() {
-            const submitBtn = document.getElementById('submitBtn');
-            // 检查必传文件是否都已上传
-            const isValid = uploadedFiles.GoodsNotReturned && uploadedFiles.GoodsWereAsDescribed;
-            submitBtn.disabled = !isValid;
-        }
-
-        // 初始化所有拖放区域
-        document.addEventListener('DOMContentLoaded', function() {
-            initializeDropZone('GoodsNotReturned');
-            initializeDropZone('GoodsWereAsDescribed');
-            initializeDropZone('TIDorInvoice');
-        });
-
         function submitDispute() {
             // 这里添加提交逻辑
             if (currentDisputeAction === 'appeal') {
                 console.log('提交申诉', uploadedFiles);
             } else {
-                console.log('接收拒付');
+                console.log('接受拒付');
             }
             closeDisputeModal();
         }

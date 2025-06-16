@@ -281,7 +281,7 @@
                     <thead>
                         <tr>
                             <th class="px-3 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-[160px]">
-                                <div>交易流水号</div>
+                                <div>拒付流水号</div>
                             </th>
                             <th class="px-3 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-[160px]">
                                 <div>商户订单号</div>
@@ -455,6 +455,20 @@
 
                 <!-- 申诉上传区域 -->
                 <div id="appealSection" class="hidden">
+                    <!-- 申诉建议提示 -->
+                    <div class="bg-blue-50 p-4 rounded-lg mb-4">
+                        <div class="flex">
+                            <div class="flex-shrink-0">
+                                <i class="fas fa-info-circle text-blue-400"></i>
+                            </div>
+                            <div class="ml-3">
+                                <p class="text-sm text-blue-700">
+                                    建议您仅在交易金额较高或拥有充分有力证据时再发起拒付申诉。每笔申诉将收取手续费，且流程较长，可能产生额外成本。请您谨慎评估后再做决定。
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                    
                     <div class="mb-4">
                         <h4 class="text-base font-medium text-gray-900 mb-2">提交以下文件以申诉：</h4>
                         <p class="text-sm text-gray-600 mb-4">请按照文件类型分别上传申诉材料。请确保格式符合以下要求：</p>
@@ -507,20 +521,6 @@
                 <!-- 接受拒付提示 -->
                 <div id="acceptSection" class="hidden">
                     <p class="text-gray-600 mb-4">您确定要接受此笔拒付吗？接受后将无法再次申诉。</p>
-                </div>
-
-                <!-- 申诉建议提示 -->
-                <div class="bg-blue-50 p-4 rounded-lg mb-4">
-                    <div class="flex">
-                        <div class="flex-shrink-0">
-                            <i class="fas fa-info-circle text-blue-400"></i>
-                        </div>
-                        <div class="ml-3">
-                            <p class="text-sm text-blue-700">
-                                建议您仅在交易金额较高或拥有充分有力证据时再发起拒付申诉。每笔申诉将收取手续费，且流程较长，可能产生额外成本。请您谨慎评估后再做决定。
-                            </p>
-                        </div>
-                    </div>
                 </div>
 
                 <!-- 警告提示 -->
