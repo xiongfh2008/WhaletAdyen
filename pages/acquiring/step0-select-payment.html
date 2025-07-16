@@ -243,7 +243,7 @@
 
         .payment-item {
             display: flex;
-            align-items: center;
+            flex-direction: column;
             padding: 16px;
             border-bottom: 1px solid var(--border-color);
             background: white;
@@ -256,6 +256,12 @@
 
         .payment-item:last-child {
             border-bottom: none;
+        }
+
+        .payment-item-header {
+            display: flex;
+            align-items: center;
+            width: 100%;
         }
 
         .payment-checkbox {
@@ -327,11 +333,65 @@
             text-align: center;
         }
 
-        .payment-time {
-            font-size: 14px;
+        .payment-expand-btn {
+            background: none;
+            border: none;
             color: var(--text-secondary);
-            min-width: 100px;
-            text-align: right;
+            cursor: pointer;
+            padding: 4px;
+            transition: transform 0.2s;
+        }
+
+        .payment-expand-btn.expanded {
+            transform: rotate(180deg);
+        }
+
+        .payment-details {
+            display: none;
+            margin-top: 16px;
+            padding-top: 16px;
+            border-top: 1px dashed var(--border-color);
+            margin-left: 74px;
+        }
+
+        .payment-details.expanded {
+            display: block;
+        }
+
+        .payment-details-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 16px;
+        }
+
+        .payment-detail-item {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .detail-label {
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+
+        .detail-value {
+            font-size: 14px;
+            color: var(--text-primary);
+        }
+
+        .detail-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .detail-tag {
+            font-size: 12px;
+            color: var(--text-secondary);
+            background-color: #F5F5F5;
+            padding: 2px 8px;
+            border-radius: 4px;
         }
 
         .button-container {
@@ -1163,72 +1223,222 @@
             <!-- 支付方式列表 -->
             <div class="payment-list">
                 <div class="payment-item">
-                    <input type="checkbox" class="payment-checkbox">
-                    <div class="payment-logo">
-                        <img src="../../assets/images/Visa.svg" alt="Visa">
-                    </div>
-                    <div class="payment-info">
-                        <div class="payment-name-container">
-                            <span class="payment-name">Visa</span>
+                    <div class="payment-item-header">
+                        <input type="checkbox" class="payment-checkbox">
+                        <div class="payment-logo">
+                            <img src="../../assets/images/Visa.svg" alt="Visa">
                         </div>
-                        <span class="payment-type">Cards</span>
-                        <span class="payment-status">全球</span>
+                        <div class="payment-info">
+                            <div class="payment-name-container">
+                                <span class="payment-name">Visa</span>
+                            </div>
+                            <span class="payment-type">Cards</span>
+                            <span class="payment-status">全球</span>
+                            <button class="payment-expand-btn">
+                                <i class="fas fa-chevron-down"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="payment-details">
+                        <div class="payment-details-grid">
+                            <div class="payment-detail-item">
+                                <span class="detail-label">支持的国家/地区</span>
+                                <div class="detail-tags">
+                                    <span class="detail-tag">中国</span>
+                                    <span class="detail-tag">美国</span>
+                                    <span class="detail-tag">欧盟</span>
+                                    <span class="detail-tag">英国</span>
+                                    <span class="detail-tag">日本</span>
+                                    <span class="detail-tag">更多...</span>
+                                </div>
+                            </div>
+                            <div class="payment-detail-item">
+                                <span class="detail-label">结算币种</span>
+                                <div class="detail-tags">
+                                    <span class="detail-tag">USD</span>
+                                    <span class="detail-tag">EUR</span>
+                                    <span class="detail-tag">GBP</span>
+                                    <span class="detail-tag">JPY</span>
+                                    <span class="detail-tag">更多...</span>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
                 <div class="payment-item">
-                    <input type="checkbox" class="payment-checkbox">
-                    <div class="payment-logo">
-                        <img src="../../assets/images/Mastercard.svg" alt="Mastercard">
-                    </div>
-                    <div class="payment-info">
-                        <div class="payment-name-container">
-                            <span class="payment-name">Mastercard</span>
+                    <div class="payment-item-header">
+                        <input type="checkbox" class="payment-checkbox">
+                        <div class="payment-logo">
+                            <img src="../../assets/images/Mastercard.svg" alt="Mastercard">
                         </div>
-                        <span class="payment-type">Cards</span>
-                        <span class="payment-status">全球</span>
+                        <div class="payment-info">
+                            <div class="payment-name-container">
+                                <span class="payment-name">Mastercard</span>
+                            </div>
+                            <span class="payment-type">Cards</span>
+                            <span class="payment-status">全球</span>
+                            <button class="payment-expand-btn">
+                                <i class="fas fa-chevron-down"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="payment-details">
+                        <div class="payment-details-grid">
+                            <div class="payment-detail-item">
+                                <span class="detail-label">支持的国家/地区</span>
+                                <div class="detail-tags">
+                                    <span class="detail-tag">中国</span>
+                                    <span class="detail-tag">美国</span>
+                                    <span class="detail-tag">欧盟</span>
+                                    <span class="detail-tag">英国</span>
+                                    <span class="detail-tag">日本</span>
+                                    <span class="detail-tag">更多...</span>
+                                </div>
+                            </div>
+                            <div class="payment-detail-item">
+                                <span class="detail-label">结算币种</span>
+                                <div class="detail-tags">
+                                    <span class="detail-tag">USD</span>
+                                    <span class="detail-tag">EUR</span>
+                                    <span class="detail-tag">GBP</span>
+                                    <span class="detail-tag">JPY</span>
+                                    <span class="detail-tag">更多...</span>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
                 <div class="payment-item">
-                    <input type="checkbox" class="payment-checkbox">
-                    <div class="payment-logo">
-                        <img src="../../assets/images/American Express.svg" alt="American Express">
-                    </div>
-                    <div class="payment-info">
-                        <div class="payment-name-container">
-                            <span class="payment-name">American Express</span>
+                    <div class="payment-item-header">
+                        <input type="checkbox" class="payment-checkbox">
+                        <div class="payment-logo">
+                            <img src="../../assets/images/American Express.svg" alt="American Express">
                         </div>
-                        <span class="payment-type">Cards</span>
-                        <span class="payment-status">全球</span>
+                        <div class="payment-info">
+                            <div class="payment-name-container">
+                                <span class="payment-name">American Express</span>
+                            </div>
+                            <span class="payment-type">Cards</span>
+                            <span class="payment-status">全球</span>
+                            <button class="payment-expand-btn">
+                                <i class="fas fa-chevron-down"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="payment-details">
+                        <div class="payment-details-grid">
+                            <div class="payment-detail-item">
+                                <span class="detail-label">支持的国家/地区</span>
+                                <div class="detail-tags">
+                                    <span class="detail-tag">中国</span>
+                                    <span class="detail-tag">美国</span>
+                                    <span class="detail-tag">欧盟</span>
+                                    <span class="detail-tag">英国</span>
+                                    <span class="detail-tag">日本</span>
+                                    <span class="detail-tag">更多...</span>
+                                </div>
+                            </div>
+                            <div class="payment-detail-item">
+                                <span class="detail-label">结算币种</span>
+                                <div class="detail-tags">
+                                    <span class="detail-tag">USD</span>
+                                    <span class="detail-tag">EUR</span>
+                                    <span class="detail-tag">GBP</span>
+                                    <span class="detail-tag">JPY</span>
+                                    <span class="detail-tag">更多...</span>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
                 <div class="payment-item">
-                    <input type="checkbox" class="payment-checkbox">
-                    <div class="payment-logo">
-                        <img src="../../assets/images/Apple Pay.svg" alt="Apple Pay">
-                    </div>
-                    <div class="payment-info">
-                        <div class="payment-name-container">
-                            <span class="payment-name">Apple Pay</span>
+                    <div class="payment-item-header">
+                        <input type="checkbox" class="payment-checkbox">
+                        <div class="payment-logo">
+                            <img src="../../assets/images/Apple Pay.svg" alt="Apple Pay">
                         </div>
-                        <span class="payment-type">Digital Wallets</span>
-                        <span class="payment-status">全球</span>
+                        <div class="payment-info">
+                            <div class="payment-name-container">
+                                <span class="payment-name">Apple Pay</span>
+                            </div>
+                            <span class="payment-type">Digital Wallets</span>
+                            <span class="payment-status">全球</span>
+                            <button class="payment-expand-btn">
+                                <i class="fas fa-chevron-down"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="payment-details">
+                        <div class="payment-details-grid">
+                            <div class="payment-detail-item">
+                                <span class="detail-label">支持的国家/地区</span>
+                                <div class="detail-tags">
+                                    <span class="detail-tag">中国</span>
+                                    <span class="detail-tag">美国</span>
+                                    <span class="detail-tag">欧盟</span>
+                                    <span class="detail-tag">英国</span>
+                                    <span class="detail-tag">日本</span>
+                                    <span class="detail-tag">更多...</span>
+                                </div>
+                            </div>
+                            <div class="payment-detail-item">
+                                <span class="detail-label">结算币种</span>
+                                <div class="detail-tags">
+                                    <span class="detail-tag">USD</span>
+                                    <span class="detail-tag">EUR</span>
+                                    <span class="detail-tag">GBP</span>
+                                    <span class="detail-tag">JPY</span>
+                                    <span class="detail-tag">更多...</span>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
                 <div class="payment-item">
-                    <input type="checkbox" class="payment-checkbox">
-                    <div class="payment-logo">
-                        <img src="../../assets/images/Google Pay.svg" alt="Google Pay">
-                    </div>
-                    <div class="payment-info">
-                        <div class="payment-name-container">
-                            <span class="payment-name">Google Pay</span>
+                    <div class="payment-item-header">
+                        <input type="checkbox" class="payment-checkbox">
+                        <div class="payment-logo">
+                            <img src="../../assets/images/Google Pay.svg" alt="Google Pay">
                         </div>
-                        <span class="payment-type">Digital Wallets</span>
-                        <span class="payment-status">全球</span>
+                        <div class="payment-info">
+                            <div class="payment-name-container">
+                                <span class="payment-name">Google Pay</span>
+                            </div>
+                            <span class="payment-type">Digital Wallets</span>
+                            <span class="payment-status">全球</span>
+                            <button class="payment-expand-btn">
+                                <i class="fas fa-chevron-down"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="payment-details">
+                        <div class="payment-details-grid">
+                            <div class="payment-detail-item">
+                                <span class="detail-label">支持的国家/地区</span>
+                                <div class="detail-tags">
+                                    <span class="detail-tag">中国</span>
+                                    <span class="detail-tag">美国</span>
+                                    <span class="detail-tag">欧盟</span>
+                                    <span class="detail-tag">英国</span>
+                                    <span class="detail-tag">日本</span>
+                                    <span class="detail-tag">更多...</span>
+                                </div>
+                            </div>
+                            <div class="payment-detail-item">
+                                <span class="detail-label">结算币种</span>
+                                <div class="detail-tags">
+                                    <span class="detail-tag">USD</span>
+                                    <span class="detail-tag">EUR</span>
+                                    <span class="detail-tag">GBP</span>
+                                    <span class="detail-tag">JPY</span>
+                                    <span class="detail-tag">更多...</span>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
@@ -1830,6 +2040,29 @@
 
             // 初始化
             initializeIndustryOptions();
+        });
+
+        // 支付方式展开/收缩功能
+        document.addEventListener('DOMContentLoaded', function() {
+            document.querySelectorAll('.payment-expand-btn').forEach(button => {
+                button.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const paymentItem = this.closest('.payment-item');
+                    const details = paymentItem.querySelector('.payment-details');
+                    const icon = this.querySelector('i');
+                    
+                    // 切换展开状态
+                    this.classList.toggle('expanded');
+                    details.classList.toggle('expanded');
+                    
+                    // 动画图标
+                    if (this.classList.contains('expanded')) {
+                        icon.style.transform = 'rotate(180deg)';
+                    } else {
+                        icon.style.transform = 'rotate(0deg)';
+                    }
+                });
+            });
         });
     </script>
 </body>
